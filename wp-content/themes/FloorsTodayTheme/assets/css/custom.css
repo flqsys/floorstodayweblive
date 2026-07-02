@@ -1,0 +1,158 @@
+/*
+ * Custom styles for the entire WordPress admin area.
+ */
+
+/* Add custom WordPress backend CSS below. */
+
+/* Hide empty Dashboard columns and their Screen Options placeholders. */
+#dashboard-widgets .postbox-container:has(.empty-container) {
+  display: none;
+}
+
+#dashboard-widgets .empty-container {
+  display: none;
+}
+
+/* Hide the WordPress credit and version footer. */
+#wpfooter {
+  display: none;
+}
+
+/* Use a clean white WordPress admin toolbar. */
+#wpadminbar {
+  background: #fff;
+  color: #111;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
+}
+
+#wpadminbar .ab-item,
+#wpadminbar a.ab-item,
+#wpadminbar > #wp-toolbar span.ab-label,
+#wpadminbar > #wp-toolbar span.noticon,
+#wpadminbar .ab-icon::before {
+  color: #111;
+}
+
+#wpadminbar .ab-top-menu > li:hover > .ab-item,
+#wpadminbar .ab-top-menu > li.hover > .ab-item,
+#wpadminbar .ab-top-menu > li > .ab-item:focus {
+  background: #f0f0f1;
+  color: #000;
+}
+
+#wpadminbar .menupop .ab-sub-wrapper,
+#wpadminbar .shortlink-input {
+  background: #fff;
+  color: #111;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+}
+
+#wpadminbar .quicklinks .menupop ul.ab-sub-secondary,
+#wpadminbar .quicklinks .menupop ul.ab-sub-secondary .ab-submenu {
+  background: #f6f7f7;
+}
+
+#wpadminbar .quicklinks .menupop ul li a,
+#wpadminbar .quicklinks .menupop ul li a strong,
+#wpadminbar .quicklinks .menupop.hover ul li a,
+#wpadminbar.nojs .quicklinks .menupop:hover ul li a {
+  color: #111;
+}
+
+#wpadminbar .quicklinks .menupop ul li a:hover,
+#wpadminbar .quicklinks .menupop ul li a:focus {
+  background: #f0f0f1;
+  color: #000;
+}
+
+/* Hide the WordPress logo and its toolbar menu. */
+#wpadminbar #wp-admin-bar-wp-logo {
+  display: none;
+}
+
+#wpadminbar #wp-admin-bar-site-name .dashicons-visibility {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 32px;
+  margin: 0 6px 0 0;
+  color: #111;
+  font-size: 18px;
+  line-height: 32px;
+}
+
+#wpadminbar #wp-admin-bar-site-name > .ab-item::before {
+  display: none;
+  content: none;
+}
+
+#wpadminbar #wp-admin-bar-site-name > .ab-item {
+  display: flex;
+  align-items: center;
+}
+
+#adminmenu #ft-admin-sidebar-copyright {
+  margin: 0;
+  padding: 0;
+}
+
+#adminmenu .ft-admin-sidebar-copyright {
+  display: block;
+  padding: 6px 12px 10px 36px;
+  color: #9ca2a7;
+  font-size: 11px;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+#adminmenu .ft-admin-sidebar-copyright:hover,
+#adminmenu .ft-admin-sidebar-copyright:focus {
+  color: #fff;
+}
+
+.folded #adminmenu #ft-admin-sidebar-copyright,
+.auto-fold #adminmenu #ft-admin-sidebar-copyright {
+  display: none;
+}
+
+/* Hide the parent theme card in Appearance > Themes while keeping updates enabled. */
+body.themes-php .theme[data-slug="hello-elementor"] {
+  display: none !important;
+}
+
+/* Hide the child-theme parent notice in the active theme details popup. */
+body.themes-php .theme-overlay .parent-theme {
+  display: none !important;
+}
+
+/* Admin Menu Editor can retain a stale WordPress count; use our unread badge only. */
+#adminmenu #toplevel_page_ft-inbox .awaiting-mod {
+  display: none !important;
+}
+
+#adminmenu #toplevel_page_ft-inbox .pending-count {
+  display: none !important;
+}
+
+#adminmenu .ft-inbox-menu-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: 7px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #d63638;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  vertical-align: middle;
+}
+
+#adminmenu .wp-menu-name > .ft-inbox-menu-count {
+  float: right;
+  margin-top: 1px;
+}

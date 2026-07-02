@@ -1,0 +1,11 @@
+.ft-inbox-wrap {
+  --ft-inbox-accent: #198754;
+}
+
+.ft-inbox-panel--primary {
+  border-top: 4px solid var(--ft-inbox-accent);
+}
+
+.ft-inbox-data-grid div:nth-last-child(-n + 2) {
+  display: none;
+}

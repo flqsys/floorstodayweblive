@@ -1,0 +1,7 @@
+.ft-inbox-wrap {
+  --ft-inbox-accent: #2566e8;
+}
+
+.ft-inbox-panel--primary {
+  border-top: 4px solid var(--ft-inbox-accent);
+}

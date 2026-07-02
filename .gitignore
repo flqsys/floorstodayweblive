@@ -1,0 +1,133 @@
+# Utility / debug scripts (never commit)
+/opcache-reset.php
+/sendy-test.php
+
+# Notes file may contain credentials - never commit
+/Info.md
+
+# Secrets
+/wp-config.php
+/wp-config-local.php
+/wp-config-live.php
+/.env
+/.env.*
+/public/.env
+/public/.env.*
+!.env.example
+!/public/.env.example
+
+# WordPress caches, backups, logs
+/wp-content/cache/
+/wp-content/upgrade/
+/wp-content/uploads/elementor/css/
+/wp-content/uploads/wpallimport/
+/wp-content/uploads/wc-logs/
+/wp-content/uploads/woocommerce_uploads/
+/wp-content/wpvividbackups/
+/wp-content/wpvivid_staging/
+/wp-content/ai1wm-backups/
+/wp-content/backups/
+/wp-content/wflogs/
+/wp-content/debug.log
+
+# Next.js source - build locally, deploy built output only
+/next-homepage-src/
+
+# Dependencies
+/node_modules/
+/public/node_modules/
+
+# WordPress core (managed by hosting - never commit)
+#/wp-admin/
+#/wp-includes/
+# /wp-activate.php
+# /wp-blog-header.php
+# /wp-comments-post.php
+# /wp-cron.php
+# /wp-links-opml.php
+# /wp-load.php
+# /wp-login.php
+# /wp-mail.php
+# /wp-settings.php
+# /wp-signup.php
+# /wp-trackback.php
+# /xmlrpc.php
+# /index.php
+# /license.txt
+# /readme.html
+# /wp-config-sample.php
+
+# Next.js generated output (never commit)
+/_next/
+/_not-found/
+/index.html
+/index.txt
+/404.html
+/_not-found.html
+/_not-found.txt
+/__next.*.txt
+/apple-icon.png
+/favicon.png
+/icon-dark-32x32.png
+/icon-light-32x32.png
+/icon.svg
+
+# Build output
+/public/.next/
+/public/out/
+/public/_next/static/*
+!/public/_next/static/chunks/
+!/public/_next/static/media/
+!/public/_next/static/*/
+/live-build/
+
+# Vercel / AI tools
+/public/.vercel/
+/public/.snowflake/
+/public/.v0-trash/
+
+# Deployee runtime files
+/deployee/storage/*
+!/deployee/storage/.gitignore
+!/deployee/storage/.htaccess
+
+.htaccess.bak
+wp-config.php
+wp-config.php.bak
+
+# Database dumps & archives
+*.sql
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+# Logs
+*.log
+
+# IDE / AI assistant project files (not part of the site)
+.vscode/
+.idea/
+.cursor/
+.agents/
+
+# OS
+.DS_Store
+Thumbs.db
+# WordPress managed runtime/vendor folders
+/wp-content/languages/
+/wp-content/plugins/
+/wp-content/themes/hello-elementor/
+/wp-content/.analyst_*
+
+# Local backup copies
+*.backup-*
+*-backup-*
+*.bom-backup-*
+*.ctcbackup.*
+* copy.css
+
+*.php.*backup-*
+
+# WordPress core auto-generated during updates
+/wp-content/upgrade-temp-backup/

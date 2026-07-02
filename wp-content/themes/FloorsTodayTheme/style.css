@@ -1,0 +1,34 @@
+/*
+Theme Name: Floors Today Theme
+Theme URI: https://xdeye.com/contact
+Template: hello-elementor
+Author: XDEYE Digital
+Author URI: https://xdeye.com
+Description: Responsive Theme is a lightweight, mobile-friendly WordPress theme that automatically adapts to desktops, tablets, and smartphones. It offers fast performance, SEO-friendly code, customizable layouts, WooCommerce compatibility, and an easy-to-use design system suitable for business, blog, and e-commerce websites. About XDEYE: XD Eye Serving companies across the globe from our offices in Mississauga, XD Eye boasts a powerhouse team of digital professionals dedicated to helping you grow your business.
+Version: 3.4.9.1781631468
+Updated: 2026-06-16 13:37:48
+
+*/
+
+/* Make Elementor page full width */
+body.elementor-page .elementor-section-wrap,
+body.elementor-page .elementor,
+body.elementor-page main,
+body.elementor-page #content,
+body.elementor-page .site-main,
+body.elementor-page .page-content,
+body.elementor-page .entry-content {
+  width: 100% !important;
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body.elementor-page .elementor-section.elementor-section-boxed > .elementor-container {
+  max-width: 100% !important;
+}
+
+body.elementor-page .elementor-section {
+  left: 0 !important;
+  right: 0 !important;
+}
