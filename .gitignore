@@ -16,20 +16,6 @@
 !.env.example
 !/public/.env.example
 
-# WordPress caches, backups, logs
-/wp-content/cache/
-/wp-content/upgrade/
-/wp-content/uploads/elementor/css/
-/wp-content/uploads/wpallimport/
-/wp-content/uploads/wc-logs/
-/wp-content/uploads/woocommerce_uploads/
-/wp-content/wpvividbackups/
-/wp-content/wpvivid_staging/
-/wp-content/ai1wm-backups/
-/wp-content/backups/
-/wp-content/wflogs/
-/wp-content/debug.log
-
 # Next.js source - build locally, deploy built output only
 /next-homepage-src/
 
@@ -37,25 +23,6 @@
 /node_modules/
 /public/node_modules/
 
-# WordPress core (managed by hosting - never commit)
-#/wp-admin/
-#/wp-includes/
-# /wp-activate.php
-# /wp-blog-header.php
-# /wp-comments-post.php
-# /wp-cron.php
-# /wp-links-opml.php
-# /wp-load.php
-# /wp-login.php
-# /wp-mail.php
-# /wp-settings.php
-# /wp-signup.php
-# /wp-trackback.php
-# /xmlrpc.php
-# /index.php
-# /license.txt
-# /readme.html
-# /wp-config-sample.php
 
 # Next.js generated output (never commit)
 /_next/
@@ -91,9 +58,11 @@
 !/deployee/storage/.gitignore
 !/deployee/storage/.htaccess
 
+.htaccess
 .htaccess.bak
 wp-config.php
 wp-config.php.bak
+.htaccess-live
 
 # Database dumps & archives
 *.sql
@@ -114,11 +83,6 @@ wp-config.php.bak
 # OS
 .DS_Store
 Thumbs.db
-# WordPress managed runtime/vendor folders
-/wp-content/languages/
-/wp-content/plugins/
-/wp-content/themes/hello-elementor/
-/wp-content/.analyst_*
 
 # Local backup copies
 *.backup-*

@@ -1,0 +1,266 @@
+@use "../../../css/wp-admin-colors";
+@import "../../../css/indeterminate-checkbox";
+@import "../../../css/boxes";
+@import "../../../css/ui-constants";
+
+$desiredChildTweakOffset: 2em;
+$childrenOffset: 1.7em;
+
+.ame-twm-section {
+	@include ame-emulated-postbox();
+
+	.ws-ame-postbox-content {
+		padding-top: 8px;
+	}
+
+	max-width: 630px;
+}
+
+.ame-twm-tweak-children {
+	margin-left: $childrenOffset;
+
+	& > .ame-twm-tweak {
+		margin-left: $desiredChildTweakOffset - $childrenOffset;
+	}
+}
+
+.ame-twm-named-node input[type=checkbox] {
+	@include ame-indeterminate-checkbox;
+}
+
+.ame-twm-named-node {
+	font-size: 14px;
+	line-height: 1.65;
+
+	.ws-ame-postbox & .ws_tooltip_trigger .dashicons {
+		vertical-align: text-bottom;
+		//color: #777;
+
+		&:hover {
+			color: inherit;
+		}
+	}
+}
+
+//region Tweak description
+.ame-twm-tweak {
+	.description {
+		display: block;
+		line-height: 1.4;
+
+		//Leave room for the checkbox.
+		margin-left: 24px;
+
+		//Extra margin below description, to separate label + description from the next tweak.
+		margin-bottom: 0.5em;
+	}
+}
+
+.ame-twm-tweak:last-child .description {
+	margin-bottom: 0;
+}
+
+@media screen and (max-width: 782px) {
+	.ame-twm-tweak {
+		.description {
+			margin-left: 2.125rem;
+		}
+	}
+}
+
+//endregion
+
+#ame-twm-new-css-tweak-code {
+	width: 99%;
+}
+
+#ame-twm-add-admin-css-dialog {
+	.CodeMirror-scroll {
+		//min-height: 160px;
+	}
+}
+
+.ame-twm-tweak-actions {
+	vertical-align: middle;
+	margin-left: 1em;
+	display: none;
+}
+
+.ame-twm-tweak:hover .ame-twm-tweak-actions {
+	display: inline-block;
+}
+
+.ame-twm-action {
+	text-decoration: none;
+	color: #595959;
+	cursor: pointer;
+	padding: 0 0.5em;
+
+	& > .dashicons {
+		vertical-align: text-bottom;
+	}
+
+	&:hover {
+		text-decoration: none;
+	}
+
+	&.ame-twm-delete-tweak:hover {
+		color: #a00;
+	}
+}
+
+.ame-twm-user-input label .CodeMirror {
+	cursor: auto;
+}
+
+.ame-twm-user-input, .ame-twm-dialog {
+	.CodeMirror {
+		box-sizing: border-box;
+		border: 1px solid #ddd;
+		border-radius: 4px;
+
+		margin-bottom: 4px;
+
+		//Automatically resize CodeMirror text fields to fit the contents.
+		height: auto;
+	}
+
+	//This is also part of the resizing code.
+	.CodeMirror-scroll {
+		overflow-y: hidden;
+		overflow-x: auto;
+		min-height: 100px;
+		max-height: 500px;
+	}
+
+	//Emulate WP textarea focus styles.
+	.CodeMirror:focus-within {
+		border-color: #007cba;
+		box-shadow: 0 0 0 1px #007cba;
+	}
+}
+
+.ame-twm-color-label {
+	margin-right: 0.5em;
+}
+
+#ame-tweak-environment-dependent-colors .ame-twm-color-label {
+	display: inline-block;
+	min-width: 7em;
+}
+
+//region Pro placeholders
+.ame-twm-pro-placeholder {
+	.ws-ame-postbox-content {
+		//Leave space for the banner even if there's not much content.
+		min-height: 170px;
+		//Make sure the overlay covers only the content, not the header.
+		//This also helps position the banner correctly.
+		position: relative;
+	}
+
+	.ws-ame-postbox-header h3 {
+		$badgeTopPadding: 1px;
+		$badgeBottomPadding: 3px;
+		$badgeBorderWidth: 1px;
+
+		&:before {
+			content: "Pro";
+			//text-transform: uppercase;
+
+			display: inline-block;
+			font-size: 13px;
+
+			background: wp-admin-colors.wpColor(yellow-20);
+			border: $badgeBorderWidth solid wp-admin-colors.wpColor(yellow-30);
+			color: wp-admin-colors.wpColor(yellow-80);
+			font-weight: 600;
+			border-radius: 4px;
+
+			padding: $badgeTopPadding 6px $badgeBottomPadding;
+			//Prevent the badge from increasing the header height.
+			margin-top: -$badgeTopPadding - $badgeBorderWidth;
+			margin-bottom: -$badgeBottomPadding - $badgeBorderWidth;
+
+			position: relative;
+			top: -1px;
+		}
+	}
+
+	//Carry the box's border radius all the way to the overlay. Unfortunately, the radius
+	//can vary depending on the admin theme, so we can't just set a fixed value on the overlay.
+	.ws-ame-postbox-content .ame-postbox-section-child:first-child {
+		border-bottom-left-radius: inherit;
+		border-bottom-right-radius: inherit;
+
+		> span {
+			border-bottom-left-radius: inherit;
+			border-bottom-right-radius: inherit;
+		}
+	}
+}
+
+.ame-twm-placeholder-overlay {
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+
+	border-bottom-left-radius: inherit;
+	border-bottom-right-radius: inherit;
+
+	background: rgba(255, 255, 255, 0.4);
+	background: linear-gradient(180deg,rgba(255, 255, 255, 0.4) 75%, rgba(255, 255, 255, 1) 95%);
+
+	//Slight blur effect on the contents under the overlay.
+	backdrop-filter: blur(1.5px);
+}
+
+.ame-twm-pro-banner {
+	box-sizing: border-box;
+	position: absolute;
+
+	display: flex;
+	flex-direction: column;
+
+	min-width: 380px;
+	min-height: 120px;
+	padding: 10px 12px 12px;
+
+	//todo: Position this in the center of the placeholder, add a better background and rounded corners.
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+
+	text-align: left;
+
+	background: wp-admin-colors.wpColor(yellow-0);
+	box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.1);
+	border: 1px solid wp-admin-colors.wpColor(yellow-20);
+	border-radius: 8px;
+
+	.ame-twm-pro-message {
+		font-size: 14px;
+		margin-bottom: 0.5em;
+	}
+
+	.ame-twm-upgrade-button {
+		flex-grow: 0;
+		align-self: center;
+
+		background: wp-admin-colors.wpColor(green-50);
+		border-color: wp-admin-colors.wpColor(green-60);
+		color: #fff;
+		font-weight: 600;
+
+		&:hover {
+			background: wp-admin-colors.wpColor(green-40);
+			border-color: wp-admin-colors.wpColor(green-50);
+			color: #fff;
+		}
+	}
+}
+
+//endregion

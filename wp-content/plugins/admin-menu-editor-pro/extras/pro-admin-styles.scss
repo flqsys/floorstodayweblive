@@ -1,0 +1,264 @@
+@use "sass:color";
+@use "sass:math";
+
+//region Third level menus
+
+#adminmenu, .folded #adminmenu {
+	.ame-deep-submenu {
+		position: absolute;
+	}
+
+	li.menu-top {
+		&.opensub, &.wp-has-current-submenu {
+			.ame-deep-submenu {
+				top: -1000em;
+				position: absolute;
+			}
+		}
+	}
+
+	li.ame-has-deep-submenu {
+		$triangleSize: 23px;
+		$pointerSize: 18px;
+
+		&.ame-has-highlighted-item, &.ame-has-current-deep-submenu {
+			> a:first-of-type {
+				background: #0073aa; //Default active background color in WP 5.6.x.
+				color: #fff;
+
+				&::after {
+					content: "\f140";
+					margin-top: -$pointerSize/2;
+				}
+			}
+
+			> .ame-deep-submenu {
+				top: 0;
+				position: relative;
+
+				padding-top: 0;
+				padding-bottom: 0;
+			}
+		}
+
+		//Don't override the left padding of submenus with icons. Those already have custom padding.
+		&:not(.ame-has-submenu-icons) {
+			&.ame-has-highlighted-item, &.ame-has-current-deep-submenu {
+				> .ame-deep-submenu > li > a {
+					padding-left: 24px;
+				}
+			}
+		}
+
+		> a {
+			position: relative;
+		}
+
+		> a::after {
+			position: absolute;
+			right: 6px;
+			top: 50%;
+			margin-top: -$pointerSize/2;
+
+			height: $pointerSize;
+			width: math.max($pointerSize, 20px);
+
+			font-family: dashicons, serif;
+			content: "\f139";
+			font-size: $triangleSize;
+			line-height: $pointerSize;
+			text-align: right;
+		}
+	}
+}
+
+#adminmenu .wp-submenu li.opensub > ul.ame-deep-submenu,
+.folded #adminmenu .wp-submenu li.opensub > ul.ame-deep-submenu {
+	top: -1px;
+}
+
+.folded #adminmenu li.opensub > ul.ame-deep-submenu,
+.folded #adminmenu .wp-has-current-submenu.opensub > ul.ame-deep-submenu,
+.no-js.folded #adminmenu .ame-has-deep-submenu:hover > ul.ame-deep-submenu {
+	top: 0;
+	left: 160px;
+}
+
+.folded #adminmenu li.opensub li.ame-has-highlighted-item > ul.ame-deep-submenu {
+	//Fix deep submenu layout in the folded state.
+	left: 0;
+	box-shadow: none;
+
+	//Hide the submenu head. The parent item will serve as the head.
+	> li.wp-submenu-head {
+		display: none;
+	}
+}
+
+//Folded state: WP adds a transparent left border to the current submenu, and
+//that gets inherited by the current deep submenu. This messes up text alignment,
+//so let's remove the border.
+.folded #adminmenu li.ame-has-deep-submenu {
+	&.ame-has-highlighted-item, &.ame-has-current-deep-submenu {
+		> .ame-deep-submenu {
+			border-left-width: 0;
+		}
+	}
+}
+
+//endregion
+
+//region Menu heading prototypes
+$inverseMenuLineHeight: (1/1.3) * 1em;
+$defaultHeadingFontSize: 14px;
+
+.ame-menu-heading-item {
+	.wp-menu-name {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+	}
+
+	.ame-mh-title {
+		flex-grow: 1;
+	}
+
+	.ame-mh-divider {
+		width: 1%;
+		flex-grow: 1;
+		flex-shrink: 1;
+		box-sizing: content-box;
+		align-self: center;
+
+		height: 0;
+		border-top-width: 1px;
+		border-top-style: solid;
+
+		background: currentColor;
+		border-color: currentColor;
+	}
+}
+
+//region Heading toggle icons
+.ame-mh-toggle {
+	display: flex;
+	align-items: baseline;
+	cursor: pointer;
+
+	padding: 0 2px 0 2px;
+}
+
+//--------------
+
+.ame-mh-toggle--widget-arrows-alt {
+	font: 400 20px/1 dashicons;
+	padding: 0 2px 0 2px;
+
+	&:before {
+		content: "\f140";
+	}
+}
+
+.ame-is-collapsed-heading .ame-mh-toggle--widget-arrows-alt:before {
+	content: "\f139";
+}
+
+.ame-mh-toggle--widget-arrows {
+	font: 400 20px/1 dashicons;
+
+	&:before {
+		content: "\f142";
+	}
+}
+
+.ame-is-collapsed-heading .ame-mh-toggle--widget-arrows:before {
+	content: "\f140";
+}
+
+
+@mixin char-toggle-icon($name, $collapsedChar, $expandedChar, $fontSizeAdjustment: 0, $collapsedRotation: 0deg, $expandedRotation: 0deg) {
+	.ame-mh-toggle--#{$name} {
+		@if ($fontSizeAdjustment != 0) {
+			font-size: calc(var(--ame-mh-font-size, $defaultHeadingFontSize) + $fontSizeAdjustment);
+			line-height: var(--ame-mh-font-size, $defaultHeadingFontSize);
+		}
+		@content;
+
+		&:before {
+			content: "#{$expandedChar}";
+			@if ($expandedRotation != 0deg) {
+				display: inline-block;
+				transform: rotate($expandedRotation);
+			}
+		}
+
+		.ame-is-collapsed-heading &:before {
+			@if ($collapsedChar != $expandedChar) {
+				content: "#{$collapsedChar}";
+			}
+
+			@if ($collapsedRotation != 0deg) {
+				display: inline-block;
+				transform: rotate($collapsedRotation);
+			} @else if ($expandedRotation != 0deg) {
+				//Reset the rotation if only the expanded state has a rotation.
+				transform: none;
+			}
+		}
+	}
+}
+
+@include char-toggle-icon("black-triangles", "\25b6", "\25bc");
+@include char-toggle-icon("small-black-triangles", "\25b8", "\25be", 5px) {
+	line-height: calc(var(--ame-mh-font-size, $defaultHeadingFontSize) + 3px);
+}
+
+@include char-toggle-icon("white-triangles", "\25b7", "\25bd");
+@include char-toggle-icon("small-white-triangles", "\25b9", "\25bf", 5px) {
+	line-height: calc(var(--ame-mh-font-size, $defaultHeadingFontSize) + 3px);
+}
+
+@include char-toggle-icon("plus-minus", "\002B", "\2212", 4px) {
+	line-height: calc(var(--ame-mh-font-size, $defaultHeadingFontSize) + 2px);
+}
+
+@include char-toggle-icon("circled-plus-minus", "\2295", "\2296", 5px);
+@include char-toggle-icon("squared-plus-minus", "\229e", "\229f", 5px);
+@include char-toggle-icon("hamburger-close", "\2630", "\2715") {
+	min-width: 13px;
+}
+
+@include char-toggle-icon("heavy-arrow", "\279c", "\279c", 0, 0deg, 90deg);
+@include char-toggle-icon("single-chevron", "\203A", "\203A", 6px, 0deg, 90deg) {
+	padding-left: 8px;
+	&:before {
+		transform-origin: center 68%;
+	}
+}
+
+@include char-toggle-icon("double-chevron", "\00BB", "\00BB", 5px, 6deg, 90deg) {
+	padding-left: 8px;
+	&:before {
+		transform-origin: center 70%;
+	}
+}
+
+//endregion
+
+//endregion
+
+//Display module menu items like "Easy Hide" as subordinate to the main "Menu Editor Pro"
+//menu item. This is only a visual effect.
+#adminmenu {
+	li.ws-ame-primary-am-item + li.ws-ame-secondary-am-item,
+	li.ws-ame-secondary-am-item + li.ws-ame-secondary-am-item {
+		//Based on some experimentation, a simple thick dash looks better than
+		//a T-shaped connector.
+		a:first-of-type:before {
+			content: "– ";
+			font-weight: 800;
+			vertical-align: top;
+			line-height: 1;
+		}
+	}
+}

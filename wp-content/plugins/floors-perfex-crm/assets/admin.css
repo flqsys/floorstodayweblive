@@ -1,0 +1,120 @@
+/* XD Sendy admin styles */
+
+.ft-xd-wrap h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+.ft-xd-wrap h1 small {
+    font-size: 13px;
+    font-weight: 400;
+    color: #777;
+}
+
+.ft-xd-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: #1d4ed8;
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+
+.ft-xd-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+}
+
+
+.settings_page_ft-xd-crm .ft-xd-wrap form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    max-width: none;
+}
+
+.settings_page_ft-xd-crm .ft-xd-card {
+    margin-bottom: 0;
+    width: auto;
+}
+
+.settings_page_ft-xd-crm .ft-xd-wrap .submit {
+    grid-column: 1 / -1;
+    margin-top: 0;
+}
+
+@media (max-width: 1200px) {
+    .settings_page_ft-xd-crm .ft-xd-wrap form {
+        grid-template-columns: 1fr;
+    }
+}
+.ft-xd-card h2 {
+    font-size: 15px;
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.ft-xd-mapping-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.ft-xd-mapping-table th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #555;
+    padding: 6px 8px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.ft-xd-mapping-table td {
+    padding: 6px 8px;
+    vertical-align: middle;
+}
+
+.ft-xd-mapping-table td input,
+.ft-xd-mapping-table td select {
+    width: 100%;
+}
+
+#ft-xd-test-result {
+    margin-left: 8px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.ft-xd-status-synced {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #dcfce7;
+    color: #14532d;
+}
+
+.ft-xd-status-error {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #fee2e2;
+    color: #7f1d1d;
+}

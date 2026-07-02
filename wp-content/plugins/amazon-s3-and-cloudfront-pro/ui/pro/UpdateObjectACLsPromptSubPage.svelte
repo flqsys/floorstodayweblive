@@ -1,0 +1,68 @@
+<script>
+	import {getContext, hasContext} from "svelte";
+	import {writable} from "svelte/store";
+	import {strings} from "../js/stores";
+	import {tools} from "./stores";
+	import SubPage from "../components/SubPage.svelte";
+	import Panel from "../components/Panel.svelte";
+	import PanelRow from "../components/PanelRow.svelte";
+	import BackNextButtonsRow from "../components/BackNextButtonsRow.svelte";
+
+	/**
+	 * @typedef {Object} Props
+	 * @property {function} [onRouteEvent]
+	 */
+
+	/** @type {Props} */
+	let { onRouteEvent } = $props();
+
+	const tool = $tools.update_acls;
+
+	// Parent page may want to be locked.
+	let settingsLocked = $state( writable( false ) );
+
+	if ( hasContext( "settingsLocked" ) ) {
+		settingsLocked = getContext( "settingsLocked" );
+	}
+
+	/**
+	 * Handles a Skip button click.
+	 *
+	 * @return {Promise<void>}
+	 */
+	async function handleSkip() {
+		onRouteEvent( { event: "next", default: "/" } );
+	}
+
+	/**
+	 * Handles a Next button click.
+	 *
+	 * @return {Promise<void>}
+	 */
+	async function handleNext() {
+		await tools.start( tool );
+		onRouteEvent( { event: "next", default: "/" } );
+	}
+</script>
+
+<SubPage name="update-acls" route="/storage/update-acls">
+	<Panel
+		heading={tool.title}
+		helpURL={tool.doc_url}
+		helpDesc={tool.doc_desc}
+		multi
+	>
+		<PanelRow class="body flex-column">
+			<p>{@html tool.prompt}</p>
+		</PanelRow>
+	</Panel>
+
+	<BackNextButtonsRow
+		onSkip={handleSkip}
+		onNext={handleNext}
+		skipText={$strings.no}
+		nextText={$strings.yes}
+		skipVisible={true}
+		nextDisabled={$settingsLocked}
+	/>
+</SubPage>

@@ -1,0 +1,252 @@
+@charset "UTF-8";
+#adminmenu .ame-deep-submenu, .folded #adminmenu .ame-deep-submenu {
+  position: absolute;
+}
+#adminmenu li.menu-top.opensub .ame-deep-submenu, #adminmenu li.menu-top.wp-has-current-submenu .ame-deep-submenu, .folded #adminmenu li.menu-top.opensub .ame-deep-submenu, .folded #adminmenu li.menu-top.wp-has-current-submenu .ame-deep-submenu {
+  top: -1000em;
+  position: absolute;
+}
+#adminmenu li.ame-has-deep-submenu.ame-has-highlighted-item > a:first-of-type, #adminmenu li.ame-has-deep-submenu.ame-has-current-deep-submenu > a:first-of-type, .folded #adminmenu li.ame-has-deep-submenu.ame-has-highlighted-item > a:first-of-type, .folded #adminmenu li.ame-has-deep-submenu.ame-has-current-deep-submenu > a:first-of-type {
+  background: #0073aa;
+  color: #fff;
+}
+#adminmenu li.ame-has-deep-submenu.ame-has-highlighted-item > a:first-of-type::after, #adminmenu li.ame-has-deep-submenu.ame-has-current-deep-submenu > a:first-of-type::after, .folded #adminmenu li.ame-has-deep-submenu.ame-has-highlighted-item > a:first-of-type::after, .folded #adminmenu li.ame-has-deep-submenu.ame-has-current-deep-submenu > a:first-of-type::after {
+  content: "\f140";
+  margin-top: -9px;
+}
+#adminmenu li.ame-has-deep-submenu.ame-has-highlighted-item > .ame-deep-submenu, #adminmenu li.ame-has-deep-submenu.ame-has-current-deep-submenu > .ame-deep-submenu, .folded #adminmenu li.ame-has-deep-submenu.ame-has-highlighted-item > .ame-deep-submenu, .folded #adminmenu li.ame-has-deep-submenu.ame-has-current-deep-submenu > .ame-deep-submenu {
+  top: 0;
+  position: relative;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+#adminmenu li.ame-has-deep-submenu:not(.ame-has-submenu-icons).ame-has-highlighted-item > .ame-deep-submenu > li > a, #adminmenu li.ame-has-deep-submenu:not(.ame-has-submenu-icons).ame-has-current-deep-submenu > .ame-deep-submenu > li > a, .folded #adminmenu li.ame-has-deep-submenu:not(.ame-has-submenu-icons).ame-has-highlighted-item > .ame-deep-submenu > li > a, .folded #adminmenu li.ame-has-deep-submenu:not(.ame-has-submenu-icons).ame-has-current-deep-submenu > .ame-deep-submenu > li > a {
+  padding-left: 24px;
+}
+#adminmenu li.ame-has-deep-submenu > a, .folded #adminmenu li.ame-has-deep-submenu > a {
+  position: relative;
+}
+#adminmenu li.ame-has-deep-submenu > a::after, .folded #adminmenu li.ame-has-deep-submenu > a::after {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  margin-top: -9px;
+  height: 18px;
+  width: 20px;
+  font-family: dashicons, serif;
+  content: "\f139";
+  font-size: 23px;
+  line-height: 18px;
+  text-align: right;
+}
+
+#adminmenu .wp-submenu li.opensub > ul.ame-deep-submenu,
+.folded #adminmenu .wp-submenu li.opensub > ul.ame-deep-submenu {
+  top: -1px;
+}
+
+.folded #adminmenu li.opensub > ul.ame-deep-submenu,
+.folded #adminmenu .wp-has-current-submenu.opensub > ul.ame-deep-submenu,
+.no-js.folded #adminmenu .ame-has-deep-submenu:hover > ul.ame-deep-submenu {
+  top: 0;
+  left: 160px;
+}
+
+.folded #adminmenu li.opensub li.ame-has-highlighted-item > ul.ame-deep-submenu {
+  left: 0;
+  box-shadow: none;
+}
+.folded #adminmenu li.opensub li.ame-has-highlighted-item > ul.ame-deep-submenu > li.wp-submenu-head {
+  display: none;
+}
+
+.folded #adminmenu li.ame-has-deep-submenu.ame-has-highlighted-item > .ame-deep-submenu, .folded #adminmenu li.ame-has-deep-submenu.ame-has-current-deep-submenu > .ame-deep-submenu {
+  border-left-width: 0;
+}
+
+.ame-menu-heading-item .wp-menu-name {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+.ame-menu-heading-item .ame-mh-title {
+  flex-grow: 1;
+}
+.ame-menu-heading-item .ame-mh-divider {
+  width: 1%;
+  flex-grow: 1;
+  flex-shrink: 1;
+  box-sizing: content-box;
+  align-self: center;
+  height: 0;
+  border-top-width: 1px;
+  border-top-style: solid;
+  background: currentColor;
+  border-color: currentColor;
+}
+
+.ame-mh-toggle {
+  display: flex;
+  align-items: baseline;
+  cursor: pointer;
+  padding: 0 2px 0 2px;
+}
+
+.ame-mh-toggle--widget-arrows-alt {
+  font: 400 20px/1 dashicons;
+  padding: 0 2px 0 2px;
+}
+.ame-mh-toggle--widget-arrows-alt:before {
+  content: "\f140";
+}
+
+.ame-is-collapsed-heading .ame-mh-toggle--widget-arrows-alt:before {
+  content: "\f139";
+}
+
+.ame-mh-toggle--widget-arrows {
+  font: 400 20px/1 dashicons;
+}
+.ame-mh-toggle--widget-arrows:before {
+  content: "\f142";
+}
+
+.ame-is-collapsed-heading .ame-mh-toggle--widget-arrows:before {
+  content: "\f140";
+}
+
+.ame-mh-toggle--black-triangles:before {
+  content: "▼";
+}
+.ame-is-collapsed-heading .ame-mh-toggle--black-triangles:before {
+  content: "▶";
+}
+
+.ame-mh-toggle--small-black-triangles {
+  font-size: calc(var(--ame-mh-font-size, 14px) + 5px);
+  line-height: var(--ame-mh-font-size, 14px);
+  line-height: calc(var(--ame-mh-font-size, 14px) + 3px);
+}
+.ame-mh-toggle--small-black-triangles:before {
+  content: "▾";
+}
+.ame-is-collapsed-heading .ame-mh-toggle--small-black-triangles:before {
+  content: "▸";
+}
+
+.ame-mh-toggle--white-triangles:before {
+  content: "▽";
+}
+.ame-is-collapsed-heading .ame-mh-toggle--white-triangles:before {
+  content: "▷";
+}
+
+.ame-mh-toggle--small-white-triangles {
+  font-size: calc(var(--ame-mh-font-size, 14px) + 5px);
+  line-height: var(--ame-mh-font-size, 14px);
+  line-height: calc(var(--ame-mh-font-size, 14px) + 3px);
+}
+.ame-mh-toggle--small-white-triangles:before {
+  content: "▿";
+}
+.ame-is-collapsed-heading .ame-mh-toggle--small-white-triangles:before {
+  content: "▹";
+}
+
+.ame-mh-toggle--plus-minus {
+  font-size: calc(var(--ame-mh-font-size, 14px) + 4px);
+  line-height: var(--ame-mh-font-size, 14px);
+  line-height: calc(var(--ame-mh-font-size, 14px) + 2px);
+}
+.ame-mh-toggle--plus-minus:before {
+  content: "−";
+}
+.ame-is-collapsed-heading .ame-mh-toggle--plus-minus:before {
+  content: "+";
+}
+
+.ame-mh-toggle--circled-plus-minus {
+  font-size: calc(var(--ame-mh-font-size, 14px) + 5px);
+  line-height: var(--ame-mh-font-size, 14px);
+}
+.ame-mh-toggle--circled-plus-minus:before {
+  content: "⊖";
+}
+.ame-is-collapsed-heading .ame-mh-toggle--circled-plus-minus:before {
+  content: "⊕";
+}
+
+.ame-mh-toggle--squared-plus-minus {
+  font-size: calc(var(--ame-mh-font-size, 14px) + 5px);
+  line-height: var(--ame-mh-font-size, 14px);
+}
+.ame-mh-toggle--squared-plus-minus:before {
+  content: "⊟";
+}
+.ame-is-collapsed-heading .ame-mh-toggle--squared-plus-minus:before {
+  content: "⊞";
+}
+
+.ame-mh-toggle--hamburger-close {
+  min-width: 13px;
+}
+.ame-mh-toggle--hamburger-close:before {
+  content: "✕";
+}
+.ame-is-collapsed-heading .ame-mh-toggle--hamburger-close:before {
+  content: "☰";
+}
+
+.ame-mh-toggle--heavy-arrow:before {
+  content: "➜";
+  display: inline-block;
+  transform: rotate(90deg);
+}
+.ame-is-collapsed-heading .ame-mh-toggle--heavy-arrow:before {
+  transform: none;
+}
+
+.ame-mh-toggle--single-chevron {
+  font-size: calc(var(--ame-mh-font-size, 14px) + 6px);
+  line-height: var(--ame-mh-font-size, 14px);
+  padding-left: 8px;
+}
+.ame-mh-toggle--single-chevron:before {
+  transform-origin: center 68%;
+}
+.ame-mh-toggle--single-chevron:before {
+  content: "›";
+  display: inline-block;
+  transform: rotate(90deg);
+}
+.ame-is-collapsed-heading .ame-mh-toggle--single-chevron:before {
+  transform: none;
+}
+
+.ame-mh-toggle--double-chevron {
+  font-size: calc(var(--ame-mh-font-size, 14px) + 5px);
+  line-height: var(--ame-mh-font-size, 14px);
+  padding-left: 8px;
+}
+.ame-mh-toggle--double-chevron:before {
+  transform-origin: center 70%;
+}
+.ame-mh-toggle--double-chevron:before {
+  content: "»";
+  display: inline-block;
+  transform: rotate(90deg);
+}
+.ame-is-collapsed-heading .ame-mh-toggle--double-chevron:before {
+  display: inline-block;
+  transform: rotate(6deg);
+}
+
+#adminmenu li.ws-ame-primary-am-item + li.ws-ame-secondary-am-item a:first-of-type:before,
+#adminmenu li.ws-ame-secondary-am-item + li.ws-ame-secondary-am-item a:first-of-type:before {
+  content: "– ";
+  font-weight: 800;
+  vertical-align: top;
+  line-height: 1;
+}
+
+/*# sourceMappingURL=pro-admin-styles.css.map */
