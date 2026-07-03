@@ -12,7 +12,6 @@ if (!defined('ABSPATH')) {
 function ft_pf_fields() {
     return [
         'dimensions' => 'Dimensions',
-        'color' => 'Color',
         'color_shade' => 'Color Shade',
         'flooring_look' => 'Flooring Look',
         'flooring_types' => 'Flooring Types',
@@ -62,6 +61,7 @@ function ft_pf_product_image($post_id) {
 
 function ft_pf_build_data($atts) {
     $fields = ft_pf_fields();
+    $meta_fields = ['color' => 'Color'] + $fields;
     $terms = get_terms([
         'taxonomy' => 'categories',
         'hide_empty' => true,
@@ -114,7 +114,7 @@ function ft_pf_build_data($atts) {
         }
 
         $meta = [];
-        foreach ($fields as $key => $label) {
+        foreach ($meta_fields as $key => $label) {
             $raw = get_post_meta($post->ID, $key, true);
             $values = ft_pf_split_values($raw);
             $meta[$key] = [
@@ -123,8 +123,10 @@ function ft_pf_build_data($atts) {
                 'slugs' => array_map('sanitize_title', $values),
             ];
 
-            foreach ($values as $value) {
-                $options[$key][sanitize_title($value)] = $value;
+            if (isset($fields[$key])) {
+                foreach ($values as $value) {
+                    $options[$key][sanitize_title($value)] = $value;
+                }
             }
         }
 
@@ -228,11 +230,13 @@ function ft_pf_shortcode($atts) {
                 position: sticky;
                 top: 112px;
                 padding: 18px;
+                z-index: 500;
             }
             .ft-pf[data-layout="horizontal"] .ft-pf__panel {
                 position: sticky;
                 top: 112px;
                 padding: 18px;
+                z-index: 500;
             }
             .ft-pf__top {
                 display: flex;
@@ -366,13 +370,17 @@ function ft_pf_shortcode($atts) {
                 top: calc(100% + 8px);
                 left: 0;
                 right: 0;
-                max-height: 250px;
+                max-height: var(--ft-pf-menu-max, 250px);
                 overflow: auto;
                 border: 1px solid #d0d5dd;
                 border-radius: 8px;
                 background: #fff;
                 box-shadow: 0 18px 45px rgba(15, 23, 42, .16);
                 padding: 6px;
+            }
+            .ft-pf__select-wrap.is-drop-up .ft-pf__select-menu {
+                top: auto;
+                bottom: calc(100% + 8px);
             }
             .ft-pf__select-menu[hidden] {
                 display: none !important;
@@ -413,6 +421,27 @@ function ft_pf_shortcode($atts) {
                 margin-top: 0;
                 padding-top: 0;
                 border-top: 0;
+            }
+            .ft-pf__search-input {
+                width: 100% !important;
+                min-height: 42px;
+                border: 1px solid #d0d5dd !important;
+                border-radius: 8px !important;
+                background: #fff !important;
+                color: var(--ft-pf-text) !important;
+                font-size: 15px !important;
+                line-height: 1.3 !important;
+                padding: 0 12px !important;
+                box-shadow: none !important;
+                outline: none !important;
+                transition: border-color .18s ease, box-shadow .18s ease;
+            }
+            .ft-pf__search-input:focus {
+                border-color: var(--ft-pf-accent) !important;
+                box-shadow: 0 0 0 3px rgba(204, 156, 46, .16) !important;
+            }
+            .ft-pf__search-input::placeholder {
+                color: #667085;
             }
             .ft-pf__label {
                 display: block;
@@ -807,7 +836,15 @@ function ft_pf_shortcode($atts) {
         <script id="ft-product-filter-script">
             (function () {
                 function normalize(value) {
-                    return String(value || '').toLowerCase();
+                    return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+                }
+
+                function matchesSearch(product, searchTerm) {
+                    if (!searchTerm) return true;
+                    var title = normalize(product.title);
+                    return searchTerm.split(/\s+/).every(function (term) {
+                        return !term || title.indexOf(term) !== -1;
+                    });
                 }
 
                 function escapeHtml(value) {
@@ -838,6 +875,19 @@ function ft_pf_shortcode($atts) {
                     return selected.some(function (value) {
                         return productValues.indexOf(value) !== -1;
                     });
+                }
+
+                function positionSelectMenu(wrap, menu) {
+                    var rect = wrap.getBoundingClientRect();
+                    var viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+                    var below = Math.max(0, viewportHeight - rect.bottom - 12);
+                    var above = Math.max(0, rect.top - 12);
+                    var desiredHeight = Math.min(menu.scrollHeight || 250, 250);
+                    var dropUp = below < desiredHeight && above > below;
+                    var available = dropUp ? above : below;
+
+                    wrap.classList.toggle('is-drop-up', dropUp);
+                    wrap.style.setProperty('--ft-pf-menu-max', Math.max(140, Math.min(250, available)) + 'px');
                 }
 
                 function renderCard(product) {
@@ -871,6 +921,7 @@ function ft_pf_shortcode($atts) {
                     var lastFiltered = [];
                     var initialCategory = root.dataset.initialCategory || '';
                     var fixedCategory = root.dataset.fixedCategory || '';
+                    var searchInput = root.querySelector('.ft-pf__search-input');
 
                     if (initialCategory) {
                         var categoryInput = root.querySelector('.ft-pf__select-value[data-filter="categories"]');
@@ -914,7 +965,10 @@ function ft_pf_shortcode($atts) {
                             ? [fixedCategory]
                             : (categorySelect ? [categorySelect] : categoryChecks);
 
+                        var searchTerm = normalize(searchInput ? searchInput.value : '').trim();
+
                         lastFiltered = data.products.filter(function (product) {
+                            if (!matchesSearch(product, searchTerm)) return false;
                             if (!matchesMulti(product.categorySlugs, categorySelected)) return false;
 
                             return Object.keys(data.fields).every(function (key) {
@@ -945,7 +999,7 @@ function ft_pf_shortcode($atts) {
 
                             root.querySelectorAll('.ft-pf__select-wrap.is-open').forEach(function (openWrap) {
                                 if (openWrap !== wrap) {
-                                    openWrap.classList.remove('is-open');
+                                    openWrap.classList.remove('is-open', 'is-drop-up');
                                     openWrap.querySelector('.ft-pf__select-menu').hidden = true;
                                     openWrap.querySelector('.ft-pf__select-trigger').setAttribute('aria-expanded', 'false');
                                 }
@@ -954,6 +1008,11 @@ function ft_pf_shortcode($atts) {
                             var opening = menu.hidden;
                             menu.hidden = !opening;
                             wrap.classList.toggle('is-open', opening);
+                            if (opening) {
+                                positionSelectMenu(wrap, menu);
+                            } else {
+                                wrap.classList.remove('is-drop-up');
+                            }
                             trigger.setAttribute('aria-expanded', opening ? 'true' : 'false');
                         }
 
@@ -980,7 +1039,7 @@ function ft_pf_shortcode($atts) {
                                 item.classList.toggle('is-selected', item === option);
                             });
                             optionMenu.hidden = true;
-                            optionWrap.classList.remove('is-open');
+                            optionWrap.classList.remove('is-open', 'is-drop-up');
                             optionTrigger.setAttribute('aria-expanded', 'false');
                             apply();
                         }
@@ -988,7 +1047,7 @@ function ft_pf_shortcode($atts) {
                     document.addEventListener('click', function (event) {
                         if (root.contains(event.target)) return;
                         root.querySelectorAll('.ft-pf__select-wrap.is-open').forEach(function (wrap) {
-                            wrap.classList.remove('is-open');
+                            wrap.classList.remove('is-open', 'is-drop-up');
                             wrap.querySelector('.ft-pf__select-menu').hidden = true;
                             wrap.querySelector('.ft-pf__select-trigger').setAttribute('aria-expanded', 'false');
                         });
@@ -1000,6 +1059,7 @@ function ft_pf_shortcode($atts) {
                     });
                     root.querySelector('.ft-pf__clear').addEventListener('click', function () {
                         root.querySelectorAll('input[type="checkbox"]').forEach(function (input) { input.checked = false; });
+                        root.querySelectorAll('.ft-pf__search-input').forEach(function (input) { input.value = ''; });
                         root.querySelectorAll('.ft-pf__select-wrap').forEach(function (wrap) {
                             var input = wrap.querySelector('.ft-pf__select-value');
                             var current = wrap.querySelector('.ft-pf__select-current');
@@ -1009,7 +1069,7 @@ function ft_pf_shortcode($atts) {
                             wrap.querySelectorAll('.ft-pf__select-option').forEach(function (option, index) {
                                 option.classList.toggle('is-selected', index === 0);
                             });
-                            wrap.classList.remove('is-open');
+                            wrap.classList.remove('is-open', 'is-drop-up');
                             wrap.querySelector('.ft-pf__select-menu').hidden = true;
                             wrap.querySelector('.ft-pf__select-trigger').setAttribute('aria-expanded', 'false');
                         });
@@ -1061,6 +1121,7 @@ function ft_pf_shortcode($atts) {
                 <button class="ft-pf__panel-close" type="button" aria-label="<?php esc_attr_e('Close filters', 'floors-today'); ?>">&times;</button>
             </div>
             <div class="ft-pf__controls">
+                <?php ft_pf_render_search($instance_id); ?>
                 <?php if ($layout === 'horizontal') : ?>
                     <?php if (!$hide_category) : ?>
                         <?php ft_pf_render_select($instance_id, 'categories', 'Category', $data['options']['categories']); ?>
@@ -1094,6 +1155,15 @@ function ft_pf_shortcode($atts) {
     <?php
 
     return ob_get_clean();
+}
+
+function ft_pf_render_search($instance_id) {
+    ?>
+    <div class="ft-pf__field ft-pf__field--search">
+        <label class="ft-pf__label" for="<?php echo esc_attr($instance_id . '-product-search'); ?>"><?php esc_html_e('Search Product', 'floors-today'); ?></label>
+        <input id="<?php echo esc_attr($instance_id . '-product-search'); ?>" class="ft-pf__search-input" type="search" autocomplete="off" placeholder="<?php esc_attr_e('Enter product name', 'floors-today'); ?>" data-filter-search="title">
+    </div>
+    <?php
 }
 
 function ft_pf_render_checks($key, $label, $options) {
