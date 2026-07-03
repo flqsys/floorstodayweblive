@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { Shield, ArrowRight } from "lucide-react"
 import { useHomepageSettings } from "@/components/homepage-settings-provider"
 
@@ -42,13 +41,13 @@ export function GuaranteeSection() {
             <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:mt-6 sm:text-lg">
               {settings.guarantee_text}
             </p>
-            <Link
-              href="#guarantee-details"
+            <a
+              href="/contact/"
               className="inline-flex items-center gap-2 mt-6 text-primary font-semibold hover:underline lg:justify-start"
             >
               {settings.guarantee_link}
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </a>
           </div>
         </div>
       </div>
