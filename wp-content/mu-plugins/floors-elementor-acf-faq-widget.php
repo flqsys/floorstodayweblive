@@ -392,8 +392,8 @@ add_action('elementor/widgets/register', function ($widgets_manager) {
                 ?>
                 <style>
                     #<?php echo esc_attr($widget_id); ?> .ft-acf-faq__item { width:100%; }
-                    #<?php echo esc_attr($widget_id); ?> .ft-acf-faq__question { position:relative !important; display:block !important; width:100% !important; padding-right:56px !important; background:transparent !important; text-align:left !important; }
-                    #<?php echo esc_attr($widget_id); ?> .ft-acf-faq__question-text { display:block !important; width:100% !important; }
+                    #<?php echo esc_attr($widget_id); ?> .ft-acf-faq__question { position:relative !important; display:block !important; width:100% !important; height:auto !important; padding-right:56px !important; background:transparent !important; text-align:left !important; white-space:normal !important; }
+                    #<?php echo esc_attr($widget_id); ?> .ft-acf-faq__question-text { display:block !important; width:100% !important; white-space:normal !important; overflow-wrap:break-word !important; word-break:break-word !important; }
                     #<?php echo esc_attr($widget_id); ?> .ft-acf-faq__icon { position:absolute !important; top:50% !important; right:20px !important; left:auto !important; display:inline-flex !important; width:22px !important; height:22px !important; margin:0 !important; transform:translateY(-50%) !important; }
                     #<?php echo esc_attr($widget_id); ?> .ft-acf-faq__icon > span { position:absolute !important; inset:0 !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; transition:opacity .18s ease, transform .18s ease; }
                     #<?php echo esc_attr($widget_id); ?> .ft-acf-faq__icon-closed { opacity:1 !important; transform:scale(1) rotate(0) !important; }
@@ -476,10 +476,10 @@ function ft_elementor_acf_faq_assets() {
         .ft-acf-faq__item:hover, .ft-acf-faq__item:focus-within { background:var(--ft-faq-tab-hover-bg); }
         .ft-acf-faq__item.is-open { background:var(--ft-faq-tab-active-bg); border-color:rgba(35,91,184,.24); box-shadow:0 12px 28px rgba(15,23,42,.07); }
         .ft-acf-faq__item.is-open:hover, .ft-acf-faq__item.is-open:focus-within { background:var(--ft-faq-tab-active-bg); }
-        .ft-acf-faq .ft-acf-faq__question { appearance:none; -webkit-appearance:none; position:relative; display:block; width:100%; min-height:64px; border:0 !important; border-radius:0 !important; background:transparent !important; color:var(--ft-faq-text) !important; cursor:pointer; font-family:Arial, Helvetica, sans-serif; font-size:16px; font-weight:700; line-height:1.35; padding:18px 56px 18px 20px; text-align:left; box-shadow:none !important; text-transform:none !important; letter-spacing:0 !important; transition:color .2s ease; }
+        .ft-acf-faq .ft-acf-faq__question { appearance:none; -webkit-appearance:none; position:relative; display:block; width:100%; min-height:64px; height:auto !important; border:0 !important; border-radius:0 !important; background:transparent !important; color:var(--ft-faq-text) !important; cursor:pointer; font-family:Arial, Helvetica, sans-serif; font-size:16px; font-weight:700; line-height:1.35; padding:18px 56px 18px 20px; text-align:left; box-shadow:none !important; text-transform:none !important; letter-spacing:0 !important; white-space:normal !important; transition:color .2s ease; }
         .ft-acf-faq .ft-acf-faq__question:hover, .ft-acf-faq .ft-acf-faq__question:focus-visible { color:var(--ft-faq-text-hover) !important; outline:0; }
         .ft-acf-faq .ft-acf-faq__item.is-open .ft-acf-faq__question { color:var(--ft-faq-text-active) !important; }
-        .ft-acf-faq .ft-acf-faq__question-text { display:block; width:100%; min-width:0; }
+        .ft-acf-faq .ft-acf-faq__question-text { display:block; width:100%; min-width:0; white-space:normal !important; overflow-wrap:break-word !important; word-break:break-word !important; }
         .ft-acf-faq .ft-acf-faq__icon { position:absolute !important; top:50% !important; right:20px !important; display:inline-flex !important; width:22px; height:22px; align-items:center; justify-content:center; color:var(--ft-faq-icon); font-size:16px; line-height:1; transform:translateY(-50%) !important; transition:color .2s ease; }
         .ft-acf-faq .ft-acf-faq__icon svg { display:block; width:1em; height:1em; fill:currentColor; }
         .ft-acf-faq .ft-acf-faq__icon > span { position:absolute; inset:0; display:inline-flex; align-items:center; justify-content:center; transition:opacity .18s ease, transform .18s ease; }
