@@ -45,21 +45,42 @@ Colors/sizes come from WP admin at request time in both cases (see
 so you only need to run either deploy when you change component/CSS source
 — not when you change a color in WP admin.
 
-### Database: live → local only
+### Database: live → local
 
 ```
 cd next-homepage-src
 ./scripts/pull-live-db.ps1
 ```
 
-One-way only — pulls the live database down to local WAMP, overwriting the
-local copy. **Never run this in reverse**; the live database holds real
-production data. Always backs up the current local database first
-(timestamped, in `../floorstodayfinal_migration/`, outside the repo) before
-touching anything, and auto-fixes `siteurl`/`home` afterward (imported
-values point to `https://floorstoday.ca` and will 404 the local site
-otherwise). Live DB credentials are read from the server's own
-`wp-config.php` at run time — never hardcoded or committed anywhere.
+Pulls the live database down to local WAMP, overwriting the local copy.
+Low-risk direction — local data is disposable. Always backs up the current
+local database first (timestamped, in `../floorstodayfinal_migration/`,
+outside the repo) before touching anything, and auto-fixes `siteurl`/`home`
+afterward (imported values point to `https://floorstoday.ca` and will 404
+the local site otherwise). Live DB credentials are read from the server's
+own `wp-config.php` at run time — never hardcoded or committed anywhere.
+
+### Database: local → live
+
+```
+cd next-homepage-src
+./scripts/push-local-db.ps1
+```
+
+The dangerous direction — overwrites the **live production database** with
+your local copy. Any real leads/orders/data entered on the live site since
+your last pull are permanently lost; local almost certainly doesn't have
+them. Requires typing `PUSH TO LIVE` to proceed — nothing else confirms it.
+Always backs up the *live* database first (same scratch folder, before
+touching anything — aborts if that backup fails or comes back empty), then
+pushes, then auto-fixes `siteurl`/`home` back to `https://floorstoday.ca`
+(imported from local, so they'd otherwise point at `localhost` and 404 the
+live site). Prints an exact rollback command using the pre-push backup if
+you need to undo it. Same credential handling as the pull script — read
+from the server's own `wp-config.php`, never hardcoded.
+
+Only use this if you're certain local is what should be live right now —
+when in doubt, pull first to see what's different.
 
 ## API endpoints are now dynamic
 
