@@ -954,6 +954,39 @@ add_filter('redirect_canonical', function ($redirect_url) {
     return $redirect_url;
 });
 
+// Next.js's client router fetches RSC prefetch/cache-refresh payloads
+// (__next*.txt, index.txt) relative to the current page URL, i.e. at the
+// site root - not under the /public asset basePath, even though this site
+// exports with basePath=/public. Confirmed via real 404s in production
+// console logs (GET /__next._index.txt, /__next._head.txt, etc.) that
+// broke without this. Serve them from public/ when requested at root.
+add_action('template_redirect', function () {
+    $request_path = (string) wp_parse_url(wp_unslash($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+    $basename     = basename($request_path);
+
+    if (!preg_match('/^(?:__next[._]|__PAGE__|index\.txt$)/i', $basename)) {
+        return;
+    }
+
+    $file = trailingslashit(ABSPATH) . 'public/' . $basename;
+
+    if (!is_readable($file)) {
+        return;
+    }
+
+    $content = file_get_contents($file);
+    if ($content === false) {
+        return;
+    }
+
+    status_header(200);
+    header('Content-Type: text/plain; charset=utf-8');
+    header('Cache-Control: no-cache, no-store, must-revalidate');
+    header('X-Robots-Tag: noindex');
+    echo $content;
+    exit;
+}, 5);
+
 add_action('template_redirect', function () {
     if (!is_front_page() || is_admin() || wp_doing_ajax() || wp_is_json_request() || isset($_GET['elementor-preview']) || is_preview() || is_customize_preview()) {
         return;
