@@ -122,7 +122,11 @@ $remoteFixSqlPath = "/tmp/fix-siteurl-$timestamp.sql"
 Set-Content -Path $fixSqlFile -Value $fixSql -Encoding utf8 -NoNewline
 scp -q $fixSqlFile "${SshUser}@${LiveHost}:${remoteFixSqlPath}"
 $fixResult = ssh "${SshUser}@${LiveHost}" "sudo -u $SiteUser bash $remoteImportScriptPath $LiveSiteRoot/wp-config.php $remoteFixSqlPath"
-ssh "${SshUser}@${LiveHost}" "sudo -u $SiteUser rm -f $remoteFixSqlPath" 2>$null | Out-Null
+# Uploaded via plain scp, so it's owned by $SshUser, not $SiteUser - deleting
+# it via sudo -u $SiteUser fails ("Operation not permitted", /tmp sticky bit).
+# Non-fatal either way: wrapped so a cleanup hiccup can never abort the
+# script after the real work above is already done.
+try { ssh "${SshUser}@${LiveHost}" "rm -f $remoteFixSqlPath" 2>$null } catch {}
 Remove-Item $fixSqlFile -Force -ErrorAction SilentlyContinue
 if ($fixResult -notmatch "IMPORT_OK:") {
     Write-Warning "Could not auto-fix siteurl/home - live site will 404 until you run this manually on the server:"
