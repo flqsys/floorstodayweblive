@@ -4615,10 +4615,45 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
             @media (max-width: 640px) {
                 .ft-ncta-inner { width: min(100% - 24px, 1200px); }
                 .ft-ncta-card { grid-template-columns: 1fr; }
-                .ft-ncta-badges { gap: 8px; margin-bottom: 20px; }
-                .ft-ncta-badges img,
-                .ft-ncta-badge-warranty img { height: 44px !important; }
-                .ft-ncta-warranty-btn { font-size: 10px; }
+                .ft-ncta-badges {
+                    display: grid;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    align-items: end;
+                    justify-items: center;
+                    --ft-ncta-mobile-badge-size: clamp(152px, 45vw, 178px);
+                    --ft-ncta-mobile-warranty-size: clamp(166px, 48vw, 190px);
+                    gap: 12px 6px;
+                    margin-bottom: 26px;
+                }
+                .ft-ncta-badge-warranty {
+                    order: 1;
+                    grid-column: 1 / -1;
+                    gap: 0;
+                    margin-top: -22px;
+                    margin-bottom: -6px;
+                }
+                .ft-ncta-badge-warranty img {
+                    width: var(--ft-ncta-mobile-warranty-size) !important;
+                    height: var(--ft-ncta-mobile-warranty-size) !important;
+                    max-width: 100% !important;
+                    object-fit: contain;
+                }
+                .ft-ncta-badge-warranty .ft-ncta-warranty-btn {
+                    color: #111 !important;
+                    font-size: 20px !important;
+                    line-height: 1.25 !important;
+                    text-decoration-thickness: 1px !important;
+                    text-underline-offset: 3px !important;
+                    margin-top: -10px !important;
+                    white-space: normal;
+                }
+                .ft-ncta-badges > img {
+                    order: 2;
+                    width: var(--ft-ncta-mobile-badge-size) !important;
+                    height: var(--ft-ncta-mobile-badge-size) !important;
+                    max-width: 100% !important;
+                    object-fit: contain;
+                }
                 .ft-ncta-buttons { grid-template-columns: 1fr; }
             }
         </style>
@@ -4727,7 +4762,7 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                     </label>
                     <label class="ft-ncta-consent">
                         <input name="emailConsent" type="checkbox" required>
-                        <span>I agree to receive email marketing communications from Floors Today at the email address provided above. I understand iTech CRM may respond to any messages or emails I send.</span>
+                        <span>I agree to receive email marketing communications from Floors Today at the email address provided above. I understand Floors Today may respond to any messages or emails I send.</span>
                     </label>
                 </div>
                 <div class="ft-ncta-fields">

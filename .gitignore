@@ -16,12 +16,18 @@
 !.env.example
 !/public/.env.example
 
-# Next.js source - build locally, deploy built output only
-/next-homepage-src/
+# Next.js source is tracked (needed for deploy-live.ps1 and future edits);
+# only its installed/generated artifacts are not
+/next-homepage-src/node_modules/
+/next-homepage-src/.next/
+/next-homepage-src/out/
 
 # Dependencies
 /node_modules/
 /public/node_modules/
+
+# Elementor's regenerable CSS cache - churns constantly, no unique content
+/wp-content/uploads/elementor/css/
 
 
 # Next.js generated output (never commit)

@@ -282,7 +282,7 @@ function ft_next_booking_form_products_shortcode($atts) {
                 <div class="ft-bf__consents">
                     <label class="ft-bf__consent"><input name="privacyConsent" type="checkbox" required><span>I agree to receive promotional emails from Floors Today and have read the <a href="/privacy-policy/">Privacy Policy</a> and <a href="/terms-of-use/">Terms &amp; Conditions</a>.</span></label>
                     <label class="ft-bf__consent"><input name="smsConsent" type="checkbox" required><span>I agree to receive SMS marketing and informational messages from Floors Today at the contact information provided above. Message frequency may vary. Message &amp; data rates may apply. Reply STOP to unsubscribe or HELP for assistance.</span></label>
-                    <label class="ft-bf__consent"><input name="emailConsent" type="checkbox" required><span>I agree to receive email marketing communications from Floors Today at the email address provided above. I understand iTech CRM may respond to any messages or emails I send.</span></label>
+                    <label class="ft-bf__consent"><input name="emailConsent" type="checkbox" required><span>I agree to receive email marketing communications from Floors Today at the email address provided above. I understand Floors Today may respond to any messages or emails I send.</span></label>
                 </div>
                 <div class="ft-bf__actions">
                     <button class="ft-bf__back" type="button">&larr; Back</button>
@@ -595,7 +595,7 @@ function ft_next_booking_form_contact_shortcode($atts) {
             <div class="ft-cf__consents">
                 <label class="ft-cf__consent"><input name="privacyConsent" type="checkbox" required><span>I agree to receive promotional emails from Floors Today and have read the <a href="/privacy-policy/">Privacy Policy</a> and <a href="/terms-of-use/">Terms &amp; Conditions</a>.</span></label>
                 <label class="ft-cf__consent"><input name="smsConsent" type="checkbox" required><span>I agree to receive SMS marketing and informational messages from Floors Today at the contact information provided above. Message frequency may vary. Message &amp; data rates may apply. Reply STOP to unsubscribe or HELP for assistance.</span></label>
-                <label class="ft-cf__consent"><input name="emailConsent" type="checkbox" required><span>I agree to receive email marketing communications from Floors Today at the email address provided above. I understand iTech CRM may respond to any messages or emails I send.</span></label>
+                <label class="ft-cf__consent"><input name="emailConsent" type="checkbox" required><span>I agree to receive email marketing communications from Floors Today at the email address provided above. I understand Floors Today may respond to any messages or emails I send.</span></label>
             </div>
             <button class="ft-cf__submit" type="submit">Send Message <span aria-hidden="true">&rarr;</span></button>
             <p class="ft-cf__error" role="alert" hidden></p>

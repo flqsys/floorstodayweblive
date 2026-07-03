@@ -1,0 +1,366 @@
+{
+  "primary_color": "#235bb8",
+  "secondary_color": "#cc9c2e",
+  "background_color": "oklch(0.985 0.002 90)",
+  "foreground_color": "oklch(0.20 0.02 30)",
+  "phone": "1-888-772-7848",
+  "email": "info@floorstoday.ca",
+  "service_area": "Canada's Mobile Flooring Experts • Free In-Home Estimates, Samples & Installation",
+  "logo_text": "Floors Today",
+  "logo_image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/22163002/floors-today-logo-master01.png",
+  "favicon_image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/22143652/floors-today-favicon-1.png",
+  "logo_size": "300px",
+  "cta_label": "Free Estimate",
+  "show_header": "1",
+  "show_footer": "1",
+  "facebook_url": "https://www.facebook.com/people/Floors-Today/61586145526016/",
+  "instagram_url": "https://www.instagram.com/floorstoday/",
+  "linkedin_url": "https://www.linkedin.com/company/floors-today-ca/",
+  "youtube_url": "https://www.facebook.com/people/Floors-Today/61586145526016/",
+  "tiktok_url": "https://www.facebook.com/people/Floors-Today/61586145526016/",
+  "footer_badge_image_1": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/26131325/FloorsToday-Proudly-1.png",
+  "footer_badge_image_2": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/26142643/1000-quality-projects-1.png",
+  "footer_badge_image_3": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/26122439/3-Years-Waranty-floors-today.png",
+  "footer_badge_image_4": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/26151316/15-years-quality-services.png",
+  "footer_badge_image_5": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/26151250/Lower-Price-floors-today.png",
+  "footer_badge_image_6": "",
+  "footer_badge_height": "140px",
+  "seo_title": "Floors Today | Flooring Installation in Ontario",
+  "seo_description": "Shop premium hardwood, laminate, vinyl and carpet flooring with free in-home estimates and professional installation across Ontario.",
+  "seo_canonical_url": "http://floorstoday.ca",
+  "seo_robots": "index, follow, max-image-preview:large",
+  "seo_og_title": "In home Estimate | Premium Flooring in Ontario | floorstoday.ca",
+  "seo_og_description": "Free in-home flooring estimates, transparent pricing and professional installation across Ontario.",
+  "seo_og_image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/24170217/floors-today-hero-1-1.jpg",
+  "button_radius": "8px",
+  "button_font_weight": "700",
+  "button_text_transform": "none",
+  "button_padding_x": "18px",
+  "button_padding_y": "12px",
+  "button_hover_mix": "88%",
+  "button_border_width": "0px",
+  "button_border_style": "solid",
+  "button_border_color": "transparent",
+  "hero_badge": "50•50•50 SALE*",
+  "hero_badge_bg_color": "lab(76 3.16 65.32)",
+  "hero_badge_text_color": "#ff0000",
+  "hero_badge_font_size": "60px",
+  "hero_badge_mobile_font_size": "30px",
+  "hero_badge_padding_x": "15px",
+  "hero_badge_padding_y": "15px",
+  "hero_title": "Transform Your Home with",
+  "hero_highlight": "Premium Flooring",
+  "hero_badge_animation_color_1": "lab(76 3.16 65.32)",
+  "hero_badge_animation_color_2": "#ffffff",
+  "hero_badge_animation_location": "90deg",
+  "hero_badge_animation_speed": "4s",
+  "hero_title_font_size": "49px",
+  "hero_title_mobile_font_size": "30px",
+  "hero_text": "All-inclusive pricing with no hidden fees. Get a complete quote during your free in-home consultation.",
+  "hero_image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/24170217/floors-today-hero-1-1.jpg",
+  "hero_show_background": "1",
+  "hero_show_overlay": "1",
+  "hero_overlay_opacity": "0.72",
+  "form_title": "Get Your FREE In-Home Estimate",
+  "form_subtitle": "Quick and easy. No obligation. Takes less than 1 minute.",
+  "process_title": "How Our Flooring Installation Process Works",
+  "process_text": "Getting new floors should be simple. That's why we bring the showroom to you, provide a clear quote, and handle everything from start to finish.",
+  "process_bg_color_1": "oklch(0.985 0.002 90)",
+  "process_bg_color_2": "oklch(0.985 0.002 90)",
+  "process_bg_location": "to bottom",
+  "comparison_title": "One Price. No Surprises. No Hidden Fees.",
+  "comparison_table_title": "What's Included",
+  "comparison_text": "At Floors Today, we're committed to helping homeowners get beautiful new floors at the best possible value. From exclusive promotions and seasonal sales to installation specials and price-match opportunities, we make it easier to save without compromising on quality.",
+  "comparison_button": "Book An Appointment",
+  "comparison_bg_color_1": "#235bb8",
+  "comparison_bg_color_2": "#094cb7",
+  "comparison_bg_location": "to bottom",
+  "cta_title": "Ready to Transform Your Home with New Flooring?",
+  "cta_subtitle": "Schedule a Free In-Home Flooring Estimate",
+  "cta_text": "Our flooring experts bring hardwood, vinyl, laminate, engineered hardwood, and carpet samples directly to your home. We'll measure your space, answer your questions, and provide a complete all-inclusive estimate before any work begins.",
+  "cta_button": "Get My Free Estimate",
+  "cta_bg_color_1": "#1e73be",
+  "cta_bg_color_2": "#155f99",
+  "cta_bg_location": "to bottom",
+  "category_title": "Explore Our Flooring Collections",
+  "category_text": "Shop with confidence knowing you're getting exceptional value. If you receive a lower written quote on a comparable flooring product and installation package, we'll review it and do our best to beat the price. That's our commitment to helping homeowners get beautiful new floors at the best possible price.",
+  "category_bg_color_1": "oklch(0.96 0.005 90)",
+  "category_bg_color_2": "oklch(0.96 0.005 90)",
+  "category_bg_location": "to bottom",
+  "guarantee_title": "Lowest Price Guarantee on Flooring & Installation",
+  "guarantee_subtitle": "We'll Beat Any Comparable Written Quote",
+  "guarantee_text": "If you find a lower price on a comparable flooring product and professional installation package, we'll do our best to beat it. Our goal is simple: deliver exceptional flooring, expert installation, and unbeatable value for homeowners across the GTA.",
+  "guarantee_link": "Get Your Price Match",
+  "guarantee_image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/22163654/Lowest-Price-Guarantee-on-Flooring-Installation-1.jpg",
+  "guarantee_bg_color_1": "oklch(0.985 0.002 90)",
+  "guarantee_bg_color_2": "oklch(0.985 0.002 90)",
+  "guarantee_bg_location": "to bottom",
+  "deals_badge": "Save big on select flooring products and installation services for a limited time.",
+  "deals_title": "Flooring Deals, Financing & Special Offers",
+  "deals_text": "Save big on select flooring products and installation services for a limited time.",
+  "deals_body": "At Floors Today, we believe quality flooring should be affordable and stress-free. That's why we offer exclusive promotions, financing options, installation specials, and price-match programs to help homeowners get the floors they love while staying within budget.",
+  "deals_card_title": "50•50•50*",
+  "deals_card_subtitle": "SALE",
+  "deals_button": "Claim My Savings",
+  "deals_details_label": "View offer details",
+  "deals_includes_title": "Your project includes",
+  "deals_includes": "Free In-Home Estimate\r\nSamples Brought to Your Home\r\nProfessional Installation\r\nAll-Inclusive Pricing",
+  "deals_popup_eyebrow": "Limited-Time Flooring Sale",
+  "deals_popup_title": "Get up to 50% off select flooring, 50% off installation, and 50 months of financing on approved credit.",
+  "deals_popup_intro": "Choose your floors at home, receive transparent project pricing, and arrange professional installation.",
+  "deals_popup_button": "Book a Free Appointment",
+  "deals_popup_steps_title": "How the offer works",
+  "deals_popup_steps": "Free home estimate|Book online or call {phone}.\r\nShop from home|Compare samples and receive your project estimate on site.\r\nEligible savings|Save up to 60% on select installed flooring styles.\r\nProfessional finish|Your flooring is installed by qualified professionals.",
+  "deals_popup_terms": "*Get 15% off plus up to an additional 45% on carpet, or 25% on hardwood, laminate and vinyl, based on project size. Applies to select styles, basic installation, standard padding and materials. Excludes upgrades, stairs, specialized removal or preparation, non-standard furniture moving, miscellaneous charges and prior purchases. Residential installations only, while supplies last. Offer ends June 29, 2026 and is subject to change.",
+  "deals_popup_terms_extra": "Next-day installation applies only to eligible in-stock products and service areas. Installation may be completed by qualified independent professionals where applicable.",
+  "deals_bg_color_1": "oklch(0.96 0.005 90)",
+  "deals_bg_color_2": "oklch(0.985 0.002 90)",
+  "deals_bg_location": "to bottom",
+  "testimonials_title": "What Our Customers Say",
+  "testimonials_text": "Join thousands of satisfied Ontario homeowners who trust Floors Today for their flooring needs",
+  "show_testimonials": "1",
+  "testimonials_embed_code": "<script id=\"6ab6d50a-fd79-4d65-93f8-97dbca315d4f\" src=\"https://tag.connectxmedia.com/js/app.js\" defer></script>",
+  "testimonials_bg_color_1": "#ffffff",
+  "chat_embed_code": "",
+  "fb_pixel_id": "",
+  "ga4_measurement_id": "",
+  "gtm_container_id": "",
+  "recaptcha_site_key": "",
+  "testimonials_bg_color_2": "#ffffff",
+  "testimonials_bg_location": "to bottom",
+  "newsletter_title": "Subscribe and Get $300 Store Credit",
+  "newsletter_text": "Join our newsletter for exclusive flooring offers, project tips, and your $300 store credit details.",
+  "newsletter_button": "See Details",
+  "newsletter_details_text": "Complete the short form in the newsletter section to receive the latest flooring deals, project tips, and details about your $300 store credit.",
+  "footer_about": "We believe in transparent pricing. That's why our all-inclusive estimates include every essential detail in delivering a seamless flooring experience with no unexpected costs.",
+  "footer_about_title": "About Us",
+  "footer_about_links": [
+    {
+      "label": "About Us",
+      "url": "http://localhost/floorstodayfinal/about/"
+    },
+    {
+      "label": "Contact Us",
+      "url": "http://localhost/floorstodayfinal/contact/"
+    },
+    {
+      "label": "Book Appointment",
+      "url": "http://localhost/floorstodayfinal/#estimate"
+    },
+    {
+      "label": "Our Brands",
+      "url": "http://localhost/floorstodayfinal/brands"
+    }
+  ],
+  "footer_categories_title": "Categories",
+  "footer_help_title": "Help Area",
+  "footer_help_links": [
+    {
+      "label": "How Shop at Home Works",
+      "url": "#how-it-works"
+    },
+    {
+      "label": "Product Care",
+      "url": "http://localhost/floorstodayfinal/product-care/"
+    },
+    {
+      "label": "Employee Support",
+      "url": "https://app.flooringliquidators.ca/"
+    },
+    {
+      "label": "Sitemap",
+      "url": "http://localhost/floorstodayfinal/sitemap"
+    }
+  ],
+  "footer_policies_title": "Our Policies",
+  "footer_policy_links": [
+    {
+      "label": "Terms Of Use",
+      "url": "http://localhost/floorstodayfinal/terms-of-use/"
+    },
+    {
+      "label": "FAQs",
+      "url": "http://localhost/floorstodayfinal/faqs/"
+    },
+    {
+      "label": "Privacy Policy",
+      "url": "http://localhost/floorstodayfinal/privacy-policy/"
+    },
+    {
+      "label": "Warranty Information",
+      "url": "http://localhost/floorstodayfinal/warranty/"
+    }
+  ],
+  "footer_bottom_links": [
+    {
+      "label": "Careers",
+      "url": "http://localhost/floorstodayfinal/careers/"
+    },
+    {
+      "label": "Privacy Policy",
+      "url": "http://localhost/floorstodayfinal/privacy-policy/"
+    },
+    {
+      "label": "Sitemap",
+      "url": "http://localhost/floorstodayfinal/sitemap_index.xml"
+    },
+    {
+      "label": "Terms Of Use",
+      "url": "http://localhost/floorstodayfinal/terms-of-use/"
+    }
+  ],
+  "footer_copyright": "Floors Today Copyright {year} All Rights Reserved",
+  "google_places_api_key": "",
+  "footer_bg_color_1": "#523900",
+  "footer_bg_color_2": "#000000",
+  "footer_bg_location": "to bottom",
+  "nav_items": [
+    {
+      "name": "Solid Hardwood",
+      "href": "/categories/solid-hardwood/"
+    },
+    {
+      "name": "Engineered Hardwood",
+      "href": "/categories/engineered-hardwood/"
+    },
+    {
+      "name": "Laminate",
+      "href": "/categories/laminate/"
+    },
+    {
+      "name": "Vinyl",
+      "href": "/categories/vinyl/"
+    },
+    {
+      "name": "Carpet",
+      "href": "/categories/carpet/"
+    }
+  ],
+  "utility_links": [
+    {
+      "name": "Benefits",
+      "href": "/how-shop-at-home-works/"
+    },
+    {
+      "name": "Financing",
+      "href": "/financing/"
+    },
+    {
+      "name": "Contact",
+      "href": "/contact/"
+    },
+    {
+      "name": "FAQs",
+      "href": "/faqs/"
+    },
+    {
+      "name": "About",
+      "href": "/about/"
+    }
+  ],
+  "process_steps": [
+    {
+      "title": "Free In-Home Consultation",
+      "description": "Our flooring specialist will visit your home with samples, answer your questions, and help you find the perfect floor for your style, budget, and lifestyle.",
+      "button": "Get My Free Estimate",
+      "image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/22161251/Free-In-Home-Consultation.jpg"
+    },
+    {
+      "title": "Honest Pricing, No Surprises",
+      "description": "We'll measure your space and provide a detailed quote that includes everything upfront. No hidden fees, no unexpected costs—just clear pricing you can trust.",
+      "button": "",
+      "image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/22161905/Gemini_Generated_Image_vt4aq6vt4aq6vt4a.jpg"
+    },
+    {
+      "title": "Professional Installation",
+      "description": "Once you're ready, we'll schedule your installation at a time that works for you. Our experienced installers will ensure your new floors look beautiful and are built to last.",
+      "button": "",
+      "image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/22153505/Lowest-Price-Guarantee-on-Flooring-Installation.jpg"
+    }
+  ],
+  "comparison_rows": [
+    "Flooring Materials",
+    "Professional In-Home Measurement",
+    "Certified Installation Team",
+    "Premium Underlayment Included",
+    "Furniture Moving Assistance",
+    "Haul Away of Old Flooring",
+    "Transitions & Finishing Pieces",
+    "Complete Job Site Cleanup",
+    "All-Inclusive Written Estimate"
+  ],
+  "categories": [
+    {
+      "name": "Solid Hardwood",
+      "slug": "/categories/solid-hardwood/",
+      "description": "Timeless elegance with natural wood beauty",
+      "image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/22171602/Solid-Hardwood.jpg"
+    },
+    {
+      "name": "Engineered Hardwood",
+      "slug": "/categories/engineered-hardwood/",
+      "description": "Versatile and durable for any room",
+      "image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/22171844/Engineere-Hardwood.jpg"
+    },
+    {
+      "name": "Laminate",
+      "slug": "/categories/laminate/",
+      "description": "Affordable style with easy maintenance",
+      "image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/22143650/engineered-hardwood.jpg"
+    },
+    {
+      "name": "Vinyl",
+      "slug": "/categories/vinyl/",
+      "description": "Waterproof and pet-friendly options",
+      "image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/22172107/Laminate.jpg"
+    },
+    {
+      "name": "Carpet",
+      "slug": "/categories/carpet/",
+      "description": "Soft comfort for bedrooms and living areas",
+      "image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/22173130/Carpet.jpg"
+    }
+  ],
+  "offers": [
+    {
+      "title": "Free In-Home Estimate",
+      "description": "No obligation. Expert advice and accurate pricing brought directly to your home."
+    },
+    {
+      "title": "Samples Brought To You",
+      "description": "See flooring samples in your own space before making a decision."
+    },
+    {
+      "title": "All-Inclusive Pricing",
+      "description": "Know exactly what's included before your project begins."
+    },
+    {
+      "title": "Professional Installation",
+      "description": "Experienced installers ensuring quality workmanship from start to finish."
+    }
+  ],
+  "testimonials": [
+    {
+      "name": "Sarah M.",
+      "location": "Toronto, ON",
+      "floorType": "Solid Hardwood",
+      "text": "The team at Floors Today was incredible. From the initial consultation to the final installation, everything was seamless. Our new hardwood floors look absolutely stunning!"
+    },
+    {
+      "name": "Michael R.",
+      "location": "Mississauga, ON",
+      "floorType": "Engineered Hardwood",
+      "text": "I was worried about hidden fees after bad experiences elsewhere, but Floors Today delivered exactly what they promised. The all-inclusive pricing is the real deal."
+    },
+    {
+      "name": "Jennifer L.",
+      "location": "Hamilton, ON",
+      "floorType": "Luxury Vinyl",
+      "text": "Best decision we made for our home renovation. The vinyl flooring is perfect for our busy family with kids and pets. Highly recommend their professional installation."
+    }
+  ],
+  "testimonials_script_src": "https://tag.connectxmedia.com/js/app.js",
+  "testimonials_script_id": "6ab6d50a-fd79-4d65-93f8-97dbca315d4f",
+  "chat_script_src": "",
+  "chat_script_id": ""
+}

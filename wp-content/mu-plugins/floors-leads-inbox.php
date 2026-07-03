@@ -185,7 +185,7 @@ function ft_inbox_consent_references() {
         ],
         'email_consent' => [
             'label' => 'Email Consent',
-            'text' => 'I agree to receive email marketing communications from Floors Today at the email address provided above. I understand iTech CRM may respond to any messages or emails I send.',
+            'text' => 'I agree to receive email marketing communications from Floors Today at the email address provided above. I understand Floors Today may respond to any messages or emails I send.',
         ],
     ];
 }
