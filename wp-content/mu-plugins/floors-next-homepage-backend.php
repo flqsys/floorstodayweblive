@@ -2215,7 +2215,7 @@ add_action('admin_post_ft_next_homepage_save', function () {
         'category_title', 'guarantee_title', 'guarantee_subtitle', 'guarantee_link',
         'guarantee_image', 'deals_badge', 'deals_title', 'deals_card_title',
         'deals_card_subtitle', 'deals_button', 'deals_details_label',
-        'deals_includes_title', 'deals_popup_eyebrow', 'deals_popup_title',
+        'deals_includes_title', 'deals_popup_eyebrow',
         'deals_popup_button', 'deals_popup_steps_title', 'testimonials_title',
         'newsletter_title', 'newsletter_popup_title', 'newsletter_text', 'newsletter_button', 'newsletter_claim_button',
         'warranty_popup_title', 'warranty_see_more_text', 'warranty_see_more_url',
@@ -2227,7 +2227,7 @@ add_action('admin_post_ft_next_homepage_save', function () {
         'hero_text', 'process_text', 'comparison_text', 'cta_text', 'footer_about',
         'seo_description', 'seo_og_description',
         'category_text', 'guarantee_text', 'deals_text', 'deals_body',
-        'deals_includes', 'deals_popup_intro', 'deals_popup_steps',
+        'deals_includes', 'deals_popup_title', 'deals_popup_intro', 'deals_popup_steps',
         'deals_popup_terms', 'deals_popup_terms_extra',
         'testimonials_text', 'newsletter_details_text', 'warranty_details_content',
     ];
@@ -3015,10 +3015,6 @@ function ft_next_homepage_render_admin() {
                                 <input name="deals_popup_eyebrow" type="text" value="<?php echo esc_attr($settings['deals_popup_eyebrow']); ?>">
                             </label>
                             <label>
-                                Popup title
-                                <input name="deals_popup_title" type="text" value="<?php echo esc_attr($settings['deals_popup_title']); ?>">
-                            </label>
-                            <label>
                                 Steps heading
                                 <input name="deals_popup_steps_title" type="text" value="<?php echo esc_attr($settings['deals_popup_steps_title']); ?>">
                             </label>
@@ -3028,6 +3024,11 @@ function ft_next_homepage_render_admin() {
                             </label>
                         </div>
                         <div class="ft-next-popup-fields">
+                            <label>
+                                Popup title
+                                <textarea name="deals_popup_title" rows="3" class="large-text"><?php echo esc_textarea($settings['deals_popup_title']); ?></textarea>
+                                <small>Use &lt;br&gt; tags for line breaks.</small>
+                            </label>
                             <label>
                                 Popup introduction
                                 <textarea name="deals_popup_intro" rows="3" class="large-text"><?php echo esc_textarea($settings['deals_popup_intro']); ?></textarea>

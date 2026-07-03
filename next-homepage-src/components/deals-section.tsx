@@ -243,9 +243,11 @@ export function DealsSection() {
                   <p className="text-sm font-bold uppercase text-[#cc9c2e]">
                     {settings.deals_card_title} {settings.deals_card_subtitle}
                   </p>
-                  <h2 id="offer-details-title" className="mt-3 font-serif text-2xl font-bold leading-tight sm:text-3xl">
-                    {settings.deals_popup_title}
-                  </h2>
+                  <h2
+                    id="offer-details-title"
+                    className="mt-3 font-serif text-2xl font-bold leading-tight sm:text-3xl"
+                    dangerouslySetInnerHTML={{ __html: settings.deals_popup_title }}
+                  />
                   <p className="mt-4 max-w-md text-sm leading-relaxed text-white/75">
                     {settings.deals_popup_intro}
                   </p>
