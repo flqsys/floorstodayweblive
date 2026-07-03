@@ -86,6 +86,7 @@ export type HomepageSettings = {
   comparison_title: string
   comparison_table_title: string
   comparison_text: string
+  comparison_disclaimer: string
   comparison_rows: string[]
   comparison_button: string
   comparison_bg_color_1: string
@@ -243,6 +244,7 @@ export const homepageDefaults: HomepageSettings = {
   comparison_title: "",
   comparison_table_title: "",
   comparison_text: "",
+  comparison_disclaimer: "",
   comparison_rows: [],
   comparison_button: "",
   comparison_bg_color_1: "var(--primary)",

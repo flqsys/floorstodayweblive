@@ -25,6 +25,12 @@ export function ComparisonSection() {
             <p className="mt-4 text-base leading-relaxed opacity-90 sm:mt-6 sm:text-lg">
               {settings.comparison_text}
             </p>
+            {settings.comparison_disclaimer && (
+              <p
+                className="mt-4 text-sm leading-relaxed sm:text-base"
+                dangerouslySetInnerHTML={{ __html: settings.comparison_disclaimer }}
+              />
+            )}
           </div>
 
           {/* Right Comparison Table */}

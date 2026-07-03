@@ -88,6 +88,7 @@ function ft_next_homepage_defaults() {
         'comparison_title' => 'All-Inclusive Price Estimate, No Hidden Fees',
         'comparison_table_title' => 'What\'s Included',
         'comparison_text' => 'Floors Today makes it easy with one, easy to understand price, complete with all the commonly up-charged items required for your floor to be installed. You will know the full project price during your free in-home appointment, upfront, before any installation work begins.',
+        'comparison_disclaimer' => '',
         'comparison_button' => 'Book An Appointment',
         'comparison_bg_color_1' => 'var(--primary)',
         'comparison_bg_color_2' => 'var(--primary)',
@@ -2226,7 +2227,7 @@ add_action('admin_post_ft_next_homepage_save', function () {
         'fb_pixel_id', 'recaptcha_site_key',
     ];
     $textarea_fields = [
-        'hero_text', 'process_text', 'comparison_text', 'cta_text', 'footer_about',
+        'hero_text', 'process_text', 'comparison_text', 'comparison_disclaimer', 'cta_text', 'footer_about',
         'seo_description', 'seo_og_description',
         'category_text', 'guarantee_text', 'deals_text', 'deals_body',
         'deals_includes', 'deals_popup_title', 'deals_popup_intro', 'deals_popup_steps',
@@ -2860,6 +2861,11 @@ function ft_next_homepage_render_admin() {
                             <label>
                                 Section paragraph
                                 <textarea name="comparison_text" rows="4"><?php echo esc_textarea($settings['comparison_text']); ?></textarea>
+                            </label>
+                            <label>
+                                Disclaimer (optional, shown in a smaller line below the paragraph)
+                                <textarea name="comparison_disclaimer" rows="3"><?php echo esc_textarea($settings['comparison_disclaimer']); ?></textarea>
+                                <small>Supports HTML, e.g. &lt;span style="color:#cc9c2e;"&gt;...&lt;/span&gt; or &lt;br&gt;.</small>
                             </label>
                         </div>
                         <div class="ft-next-field-stack">
