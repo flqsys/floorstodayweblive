@@ -69,12 +69,32 @@ Write-Host "== Uploading to $LiveHost =="
 scp -q $archivePath "${SshUser}@${LiveHost}:/tmp/live-build.tar.gz"
 
 Write-Host "== Deploying on server (backup, extract, swap, cleanup) =="
+# .htaccess is hand-maintained in public/, not part of Next's build output -
+# excluded from the wipe (! -name '.htaccess') so it survives every deploy,
+# and rewritten below in case it's missing (e.g. a fresh site).
 $remoteScript = @"
 set -e
 sudo -u $SiteUser tar -czf /tmp/public-backup-`$(date +%Y%m%d-%H%M%S).tar.gz -C $LiveSiteRoot public
 sudo -u $SiteUser mkdir -p /tmp/new-public-extract
 sudo -u $SiteUser tar -xzf /tmp/live-build.tar.gz -C /tmp/new-public-extract
-sudo -u $SiteUser bash -c 'cd $LiveSiteRoot/public && find . -mindepth 1 -delete && cp -r /tmp/new-public-extract/. .'
+sudo -u $SiteUser bash -c 'cd $LiveSiteRoot/public && find . -mindepth 1 ! -name ".htaccess" -delete && cp -r /tmp/new-public-extract/. .'
+sudo -u $SiteUser bash -c 'cat > $LiveSiteRoot/public/.htaccess' <<'HTACCESS_EOF'
+# Next.js emits RSC/prefetch payload files (__next*.txt, index.txt,
+# _not-found.txt) on every build. The client router actively fetches these
+# at runtime for its cache - do not block them.
+
+# Debug/log files should never be written here, but block them defensively
+# in case a future debugging session leaves one behind again.
+<FilesMatch "\.log`$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+HTACCESS_EOF
 sudo -u $SiteUser rm -rf /tmp/new-public-extract
 rm -f /tmp/live-build.tar.gz
 echo DEPLOY_OK

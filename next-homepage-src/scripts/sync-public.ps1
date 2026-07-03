@@ -15,11 +15,14 @@ $destination = Resolve-Path (Join-Path $scriptDir "..\..\public")
 Write-Host "Syncing $source -> $destination"
 
 # /MIR   mirror (deletes files in destination not present in source)
-# /XF    exclude these files: Next's RSC prefetch payloads are unused by
-#        this single-page static export and are blocked by public/.htaccess
-#        anyway; keep them out of the deploy target entirely.
+# /XF    exclude .htaccess from the purge - it's hand-maintained in public/,
+#        not part of Next's build output, so /MIR would delete it every run
 # /NFL /NDL /NJH /NJS  quiet the noisy per-file/per-dir logging
-robocopy $source $destination /MIR /XF "__next.*.txt" "index.txt" "_not-found.txt" /NFL /NDL /NJH /NJS
+#
+# Next's RSC prefetch payload files (__next*.txt, index.txt, _not-found.txt)
+# ARE actively fetched by the client router at runtime (confirmed via
+# console 404s when they were excluded) - keep them in the sync.
+robocopy $source $destination /MIR /XF ".htaccess" /NFL /NDL /NJH /NJS
 
 $exitCode = $LASTEXITCODE
 # robocopy exit codes 0-7 are success (see `robocopy /?`); 8+ indicates failure.
