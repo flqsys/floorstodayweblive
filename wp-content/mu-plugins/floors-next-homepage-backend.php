@@ -1649,6 +1649,7 @@ add_action('admin_enqueue_scripts', function ($hook) {
         }
         .ft-next-popup-fields {
             display: grid;
+            grid-template-columns: repeat(2, minmax(280px, 1fr));
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -1979,7 +1980,8 @@ add_action('admin_enqueue_scripts', function ($hook) {
             .ft-next-button-style-grid,
             .ft-next-style-grid,
             .ft-next-repeater--offers,
-            .ft-next-repeater--categories {
+            .ft-next-repeater--categories,
+            .ft-next-popup-fields {
                 grid-template-columns: minmax(0, 1fr);
             }
         }
@@ -3009,7 +3011,7 @@ function ft_next_homepage_render_admin() {
                         </label>
 
                         <h3>Offer details popup</h3>
-                        <div class="ft-next-inline-grid ft-next-inline-grid--2">
+                        <div class="ft-next-inline-grid ft-next-inline-grid--3">
                             <label>
                                 Eyebrow
                                 <input name="deals_popup_eyebrow" type="text" value="<?php echo esc_attr($settings['deals_popup_eyebrow']); ?>">
