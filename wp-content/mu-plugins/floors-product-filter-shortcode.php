@@ -894,12 +894,8 @@ function ft_pf_shortcode($atts) {
                     var image = product.image
                         ? '<span class="ft-pf__image" role="img" aria-label="' + escapeHtml(product.title) + '" style="background-image:url(&quot;' + escapeHtml(product.image) + '&quot;)"></span>'
                         : '<span class="ft-pf__image-placeholder"></span>';
-                    var chips = ['flooring_types', 'color', 'gloss_level'].map(function (key) {
-                        var value = product.meta[key] && product.meta[key].raw ? product.meta[key].raw : '';
-                        return value ? '<span class="ft-pf__chip">' + escapeHtml(value) + '</span>' : '';
-                    }).join('');
 
-                    return '<a class="ft-pf__card" href="' + escapeHtml(product.url) + '">' + image + '<div class="ft-pf__card-content"><h3 class="ft-pf__card-title">' + escapeHtml(product.title) + '</h3><div class="ft-pf__chips">' + chips + '</div></div></a>';
+                    return '<a class="ft-pf__card" href="' + escapeHtml(product.url) + '">' + image + '<div class="ft-pf__card-content"><h3 class="ft-pf__card-title">' + escapeHtml(product.title) + '</h3></div></a>';
                 }
 
                 function init(root) {
