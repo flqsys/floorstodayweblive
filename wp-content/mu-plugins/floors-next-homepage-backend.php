@@ -761,8 +761,8 @@ function ft_next_homepage_runtime_bridge($settings) {
         . '}'
         . '@media(min-width:641px) and (max-width:1366px){'
         . '.ft-homepage-shell main>section:first-child>div.relative{padding-inline:15px!important;}'
-        . '.ft-homepage-shell .ft-hero-badge{display:flex!important;width:100%!important;max-width:100%!important;justify-content:flex-start;text-align:left;}'
-        . '.ft-homepage-shell .ft-hero-badge+button{display:flex!important;width:100%!important;}'
+        . '.ft-homepage-shell .ft-hero-badge{display:flex!important;width:100%!important;max-width:100%!important;justify-content:center!important;text-align:center!important;}'
+        . '.ft-homepage-shell .ft-hero-badge+button{display:flex!important;width:100%!important;justify-content:center!important;}'
         . '}'
         . '@media(max-width:640px){'
         . ($hero_background_image_mobile !== '' ? '.ft-homepage-shell main>section:first-child>div.absolute.inset-0{background-image:url("' . esc_url($hero_background_image_mobile) . '")!important;}' : '')
