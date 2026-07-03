@@ -75,6 +75,7 @@ function ft_next_homepage_defaults() {
         'hero_title_mobile_font_size' => '30px',
         'hero_text' => 'All-inclusive pricing with no hidden fees. Get a complete quote during your free in-home consultation.',
         'hero_image' => '',
+        'hero_image_mobile' => '',
         'hero_show_background' => '1',
         'hero_show_overlay' => '1',
         'hero_overlay_opacity' => '0.72',
@@ -668,6 +669,7 @@ function ft_next_homepage_runtime_bridge($settings) {
     $hero_title_font_size = ft_next_homepage_css_length($settings['hero_title_font_size'] ?? '', '60px');
     $hero_title_mobile_font_size = ft_next_homepage_css_length($settings['hero_title_mobile_font_size'] ?? '', '30px');
     $hero_background_image = ft_next_homepage_normalize_saved_url((string) ($settings['hero_image'] ?? ''));
+    $hero_background_image_mobile = ft_next_homepage_normalize_saved_url((string) ($settings['hero_image_mobile'] ?? ''));
     $category_links = [];
     $nav_items = [];
     $phone = (string) ($settings['phone'] ?? '');
@@ -756,8 +758,12 @@ function ft_next_homepage_runtime_bridge($settings) {
         . '@media(min-width:1025px){.ft-homepage-shell .ft-runtime-mobile-menu{display:none!important;}}'
         . '@media(min-width:641px) and (max-width:1024px){'
         . '.ft-homepage-shell main>section:first-child h1+p+div.grid span{font-size:20px!important;}'
+        . '.ft-homepage-shell main>section:first-child>div.relative{padding-inline:15px!important;}'
+        . '.ft-homepage-shell .ft-hero-badge{display:flex!important;width:100%!important;max-width:100%!important;justify-content:flex-start;text-align:left;}'
+        . '.ft-homepage-shell .ft-hero-badge+button{display:flex!important;width:100%!important;}'
         . '}'
         . '@media(max-width:640px){'
+        . ($hero_background_image_mobile !== '' ? '.ft-homepage-shell main>section:first-child>div.absolute.inset-0{background-image:url("' . esc_url($hero_background_image_mobile) . '")!important;}' : '')
         . 'body:has(.ft-homepage-shell>header){padding-top:112px!important;}'
         . '.ft-homepage-shell>header{position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:1000!important;width:100%!important;}'
         . '.admin-bar .ft-homepage-shell>header{top:46px!important;}'
@@ -777,7 +783,7 @@ function ft_next_homepage_runtime_bridge($settings) {
         . '<script id="ft-homepage-runtime-bridge-script">(function(){'
         . 'var s=' . wp_json_encode($bridge_settings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES) . ';'
         . 'function text(el,value){if(el&&value)el.textContent=value;}'
-        . 'function styleHeroBadge(){var el=document.querySelector(".ft-homepage-shell .ft-hero-badge");if(!el)return;var mobile=window.matchMedia("(max-width:640px)").matches;el.style.setProperty("display",mobile?"flex":"inline-flex","important");el.style.setProperty("font-size",mobile?s.hero_badge_mobile_font_size:s.hero_badge_font_size,"important");el.style.setProperty("width",mobile?"100%":"auto","important");el.style.setProperty("max-width","100%","important");el.style.setProperty("height","auto","important");el.style.setProperty("min-height","0","important");el.style.setProperty("padding-inline",s.hero_badge_padding_x||"16px","important");el.style.setProperty("padding-block",s.hero_badge_padding_y||"8px","important");}'
+        . 'function styleHeroBadge(){var el=document.querySelector(".ft-homepage-shell .ft-hero-badge");if(!el)return;var mobile=window.matchMedia("(max-width:640px)").matches;var tablet=window.matchMedia("(min-width:641px) and (max-width:1024px)").matches;var stacked=mobile||tablet;el.style.setProperty("display",stacked?"flex":"inline-flex","important");el.style.setProperty("font-size",mobile?s.hero_badge_mobile_font_size:s.hero_badge_font_size,"important");el.style.setProperty("width",stacked?"100%":"auto","important");el.style.setProperty("max-width","100%","important");el.style.setProperty("height","auto","important");el.style.setProperty("min-height","0","important");el.style.setProperty("padding-inline",s.hero_badge_padding_x||"16px","important");el.style.setProperty("padding-block",s.hero_badge_padding_y||"8px","important");var detailsBtn=el.nextElementSibling;if(detailsBtn&&detailsBtn.tagName==="BUTTON"){if(stacked){detailsBtn.style.setProperty("display","flex","important");detailsBtn.style.setProperty("width","100%","important");}else{detailsBtn.style.removeProperty("display");detailsBtn.style.removeProperty("width");}}}'
         . 'function updateHeaderLogo(){var logo=s.logo_image||"";var title=s.logo_text||"Floors Today";var mobile=window.matchMedia("(max-width:640px)").matches;var links=document.querySelectorAll(".ft-homepage-shell header a");links.forEach(function(link){if(link.querySelector("img"))link.setAttribute("aria-label",title);});document.querySelectorAll(".ft-homepage-shell header img").forEach(function(img){if(logo&&img.getAttribute("src")!==logo){img.setAttribute("src",logo);}if(logo){img.removeAttribute("srcset");img.removeAttribute("sizes");}if(img.getAttribute("alt")!==title)img.setAttribute("alt",title);var width=mobile?"230px":s.logo_size;if(width&&img.style.getPropertyValue("width")!==width)img.style.setProperty("width",width,"important");if(mobile){img.style.setProperty("max-width","230px","important");img.style.setProperty("max-height","66px","important");}});}'
         . 'function updateHeaderServiceArea(){var header=document.querySelector(".ft-homepage-shell header");if(!header)return;var value=s.service_area||"";var topbar=header.querySelector(".bg-primary")||header.firstElementChild;if(!topbar)return;var spans=[].slice.call(topbar.querySelectorAll("span"));var target=spans[0];if(target)target.textContent=value;}'
         . 'function updateGuaranteeImage(){var img=document.querySelector(".ft-homepage-shell section[aria-labelledby=\"guarantee-heading\"] img");if(!img||!s.guarantee_image)return;img.setAttribute("src",s.guarantee_image);img.removeAttribute("srcset");img.removeAttribute("sizes");if(s.guarantee_title)img.setAttribute("alt",s.guarantee_title);}'
@@ -2208,7 +2214,7 @@ add_action('admin_post_ft_next_homepage_save', function () {
         'hero_title', 'hero_highlight', 'hero_title_font_size', 'hero_title_mobile_font_size',
         'hero_badge_animation_location', 'hero_badge_animation_speed', 'form_title', 'form_subtitle',
         'process_title', 'comparison_title', 'comparison_table_title', 'comparison_button',
-        'cta_title', 'cta_subtitle', 'cta_button', 'hero_image', 'hero_overlay_opacity',
+        'cta_title', 'cta_subtitle', 'cta_button', 'hero_image', 'hero_image_mobile', 'hero_overlay_opacity',
         'button_radius', 'button_font_weight', 'button_text_transform',
         'button_padding_x', 'button_padding_y', 'button_hover_mix',
         'button_border_width', 'button_border_style',
@@ -2789,6 +2795,17 @@ function ft_next_homepage_render_admin() {
                                                 <button type="button" class="button ft-next-image-button">Select</button>
                                             </div>
                                             <img class="ft-next-image-preview" src="<?php echo esc_url($settings['hero_image']); ?>" alt="">
+                                        </div>
+                                        <label>
+                                            Mobile hero image (optional)
+                                            <span class="description">Used on phones only (max-width:640px). Falls back to the image above if not set.</span>
+                                        </label>
+                                        <div class="ft-next-image-field">
+                                            <div class="ft-next-image-row">
+                                                <input name="hero_image_mobile" type="text" class="ft-next-image-input" value="<?php echo esc_attr($settings['hero_image_mobile']); ?>">
+                                                <button type="button" class="button ft-next-image-button">Select</button>
+                                            </div>
+                                            <img class="ft-next-image-preview" src="<?php echo esc_url($settings['hero_image_mobile']); ?>" alt="">
                                         </div>
                                     </div>
                                 </div>
