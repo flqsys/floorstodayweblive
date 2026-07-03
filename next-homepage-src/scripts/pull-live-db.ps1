@@ -76,7 +76,12 @@ if (-not (Test-Path $liveDumpFile) -or (Get-Item $liveDumpFile).Length -eq 0) {
 Write-Host "Downloaded dump size: $((Get-Item $liveDumpFile).Length) bytes"
 
 Write-Host "== Backing up current local database to $localBackupFile (safety net) =="
-& "$MysqlBin\mysqldump.exe" -u $LocalDbUser -h $LocalDbHost $LocalDbName | Out-File -FilePath $localBackupFile -Encoding utf8
+# --result-file writes raw bytes directly, bypassing PowerShell's text
+# pipeline - `Out-File -Encoding utf8` was confirmed (in push-local-db.ps1's
+# equivalent step) to corrupt byte-length-prefixed PHP serialized data via
+# re-encoding + a prepended BOM. Same fix applied here for the same reason,
+# even though this file is only a safety backup, not directly re-imported.
+& "$MysqlBin\mysqldump.exe" -u $LocalDbUser -h $LocalDbHost $LocalDbName --result-file="$localBackupFile"
 if (-not (Test-Path $localBackupFile) -or (Get-Item $localBackupFile).Length -eq 0) {
     throw "Local backup failed or is empty - aborting before overwriting local DB"
 }

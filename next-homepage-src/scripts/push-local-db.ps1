@@ -93,7 +93,14 @@ if (-not (Test-Path $liveBackupFile) -or (Get-Item $liveBackupFile).Length -eq 0
 Write-Host "Live DB backed up: $liveBackupFile ($((Get-Item $liveBackupFile).Length) bytes)"
 
 Write-Host "== Dumping local database ($LocalDbName) =="
-& "$MysqlBin\mysqldump.exe" -u $LocalDbUser -h $LocalDbHost $LocalDbName | Out-File -FilePath $localDumpFile -Encoding utf8
+# --result-file writes raw bytes directly from mysqldump itself, bypassing
+# PowerShell's text pipeline entirely. Piping through `Out-File -Encoding
+# utf8` (the previous approach) forces a full text re-encode of the dump
+# and prepends a UTF-8 BOM - confirmed via hex dump to corrupt
+# byte-length-prefixed PHP serialized data (any non-ASCII character whose
+# byte length shifts during re-encoding breaks the length prefix, and
+# unserialize() cascades garbage from that point on).
+& "$MysqlBin\mysqldump.exe" -u $LocalDbUser -h $LocalDbHost $LocalDbName --result-file="$localDumpFile"
 if (-not (Test-Path $localDumpFile) -or (Get-Item $localDumpFile).Length -eq 0) {
     throw "Local dump failed or is empty - aborting before touching live DB"
 }
