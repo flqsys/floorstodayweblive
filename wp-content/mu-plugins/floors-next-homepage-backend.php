@@ -2789,14 +2789,18 @@ function ft_next_homepage_render_admin() {
                                             <input name="hero_overlay_opacity" type="text" value="<?php echo esc_attr($settings['hero_overlay_opacity']); ?>">
                                             <span class="description">Use 0 to 1. Example: <code>0.72</code>, <code>0.35</code>, or <code>0</code>.</span>
                                         </label>
-                                        <div class="ft-next-image-field">
+                                        <label style="margin-bottom:6px;">
+                                            Desktop hero image
+                                            <span class="description">Used on tablets and desktop (min-width:641px).</span>
+                                        </label>
+                                        <div class="ft-next-image-field" style="margin-bottom:24px;">
                                             <div class="ft-next-image-row">
                                                 <input name="hero_image" type="text" class="ft-next-image-input" value="<?php echo esc_attr($settings['hero_image']); ?>">
                                                 <button type="button" class="button ft-next-image-button">Select</button>
                                             </div>
                                             <img class="ft-next-image-preview" src="<?php echo esc_url($settings['hero_image']); ?>" alt="">
                                         </div>
-                                        <label>
+                                        <label style="margin-bottom:6px;">
                                             Mobile hero image (optional)
                                             <span class="description">Used on phones only (max-width:640px). Falls back to the image above if not set.</span>
                                         </label>
