@@ -45,6 +45,22 @@ Colors/sizes come from WP admin at request time in both cases (see
 so you only need to run either deploy when you change component/CSS source
 — not when you change a color in WP admin.
 
+### Database: live → local only
+
+```
+cd next-homepage-src
+./scripts/pull-live-db.ps1
+```
+
+One-way only — pulls the live database down to local WAMP, overwriting the
+local copy. **Never run this in reverse**; the live database holds real
+production data. Always backs up the current local database first
+(timestamped, in `../floorstodayfinal_migration/`, outside the repo) before
+touching anything, and auto-fixes `siteurl`/`home` afterward (imported
+values point to `https://floorstoday.ca` and will 404 the local site
+otherwise). Live DB credentials are read from the server's own
+`wp-config.php` at run time — never hardcoded or committed anywhere.
+
 ## API endpoints are now dynamic
 
 `NEXT_PUBLIC_WORDPRESS_HOMEPAGE_ENDPOINT` and `NEXT_PUBLIC_WORDPRESS_INBOX_ENDPOINT`

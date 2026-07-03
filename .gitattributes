@@ -1,0 +1,4 @@
+# Shell scripts must keep LF line endings - they run on the Linux server,
+# and Windows CRLF endings silently break them there (confirmed: a CRLF/BOM
+# issue broke DB credential extraction while building pull-live-db.ps1).
+*.sh text eol=lf
