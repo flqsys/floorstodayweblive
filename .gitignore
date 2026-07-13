@@ -26,8 +26,6 @@
 /node_modules/
 /public/node_modules/
 
-# Elementor's regenerable CSS cache - churns constantly, no unique content
-
 # Next.js generated output (never commit)
 /_next/
 /_not-found/
