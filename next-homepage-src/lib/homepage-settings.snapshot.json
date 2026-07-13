@@ -123,7 +123,8 @@
   "show_testimonials": "1",
   "testimonials_embed_code": "<script id=\"6ab6d50a-fd79-4d65-93f8-97dbca315d4f\" src=\"https://tag.connectxmedia.com/js/app.js\" defer></script>",
   "testimonials_bg_color_1": "#ffffff",
-  "chat_embed_code": "",
+  "chat_embed_code": "<script>window.chatbotPortalBase=\"https://app.floorstoday.ca\";</script>\r\n<script src=\"https://app.floorstoday.ca/modules/chatbot/assets/js/chatbotEmbed.js?v=1783970035\"></script>",
+  "estimate_form_embed_code": "<iframe id=\"ft-estimate-frame\"\r\n        src=\"https://app.floorstoday.ca/xd_appointment/xd_clients_controller/estimate_form?embed=1\"\r\n        style=\"width:100%;border:none;display:block;overflow:hidden;min-height:520px;\"\r\n        scrolling=\"no\"></iframe>\r\n<script>\r\nwindow.addEventListener('message', function (e) {\r\n  var d = e.data;\r\n  if (d && d.type === 'iframeResize' && typeof d.height === 'number') {\r\n    var frame = document.getElementById('ft-estimate-frame');\r\n    if (frame) frame.style.height = (d.height + 8) + 'px';\r\n  }\r\n});\r\n</script>",
   "fb_pixel_id": "",
   "ga4_measurement_id": "",
   "gtm_container_id": "",
@@ -165,15 +166,11 @@
   "footer_help_links": [
     {
       "label": "How Shop at Home Works",
-      "url": "#how-it-works"
+      "url": "https://floorstoday.ca/how-shop-at-home-works/"
     },
     {
       "label": "Product Care",
       "url": "https://floorstoday.ca/product-care/"
-    },
-    {
-      "label": "Employee Support",
-      "url": "https://app.flooringliquidators.ca/"
     },
     {
       "label": "Sitemap",
@@ -210,7 +207,7 @@
     },
     {
       "label": "Sitemap",
-      "url": "https://floorstoday.ca/sitemap/"
+      "url": "https://floorstoday.ca/sitemap_index.xml"
     },
     {
       "label": "Terms Of Use",
@@ -369,6 +366,6 @@
   ],
   "testimonials_script_src": "https://tag.connectxmedia.com/js/app.js",
   "testimonials_script_id": "6ab6d50a-fd79-4d65-93f8-97dbca315d4f",
-  "chat_script_src": "",
+  "chat_script_src": "https://app.floorstoday.ca/modules/chatbot/assets/js/chatbotEmbed.js?v=1783970035",
   "chat_script_id": ""
 }

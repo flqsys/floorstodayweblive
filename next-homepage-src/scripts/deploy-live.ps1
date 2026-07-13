@@ -75,6 +75,14 @@ if (Test-Path $envLocalFile) {
     Write-Host "Stashed .env.local for the duration of the build"
 }
 
+Write-Host "== Refreshing settings snapshot from live before build =="
+# homepage-settings.snapshot.json is compiled directly into the JS bundle as
+# the pre-hydration fallback - if it's stale (e.g. still holding local dev
+# data), that's what ships to visitors until their own client-side fetch
+# completes. Regenerate it from live on every deploy so it can't drift.
+node (Join-Path $scriptDir "sync-settings-snapshot.mjs")
+if ($LASTEXITCODE -ne 0) { throw "Failed to refresh homepage-settings.snapshot.json from live" }
+
 Write-Host "== Cleaning previous build output =="
 if (Test-Path $outDir) { Remove-Item -Recurse -Force $outDir }
 
