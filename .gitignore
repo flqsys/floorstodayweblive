@@ -27,8 +27,6 @@
 /public/node_modules/
 
 # Elementor's regenerable CSS cache - churns constantly, no unique content
-/wp-content/uploads/elementor/css/
-
 
 # Next.js generated output (never commit)
 /_next/

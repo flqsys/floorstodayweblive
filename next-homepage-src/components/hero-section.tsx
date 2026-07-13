@@ -64,6 +64,92 @@ function endpointUrl(endpoint: string) {
   return `${installPath}${path}`
 }
 
+function CustomSelect({
+  id,
+  value,
+  onChange,
+  options,
+  placeholder = "Select...",
+}: {
+  id: string
+  value: string
+  onChange: (value: string) => void
+  options: string[] | { value: string; label: string }[]
+  placeholder?: string
+}) {
+  const [open, setOpen] = useState(false)
+  const wrapRef = useRef<HTMLDivElement>(null)
+
+  const normalizedOptions = options.map((option) =>
+    typeof option === "string" ? { value: option, label: option } : option,
+  )
+  const selectedLabel = normalizedOptions.find((option) => option.value === value)?.label
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (wrapRef.current && !wrapRef.current.contains(event.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener("click", handleClickOutside)
+    return () => document.removeEventListener("click", handleClickOutside)
+  }, [])
+
+  return (
+    <div ref={wrapRef} className="relative">
+      <button
+        type="button"
+        id={id}
+        onClick={() => setOpen((prev) => !prev)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className={`flex h-12 w-full items-center rounded-lg border bg-white pl-4 pr-11 text-left text-base font-medium outline-none transition-[border-color,box-shadow] hover:border-stone-300 ${
+          selectedLabel ? "text-slate-900" : "text-slate-400"
+        } ${
+          open
+            ? "border-primary shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
+            : "border-stone-200 shadow-sm"
+        }`}
+      >
+        <span className="truncate">{selectedLabel || placeholder}</span>
+      </button>
+      <span
+        className={`pointer-events-none absolute right-4 top-1/2 block -translate-y-1/2 bg-slate-400 transition-transform duration-150 ${
+          open ? "rotate-180" : ""
+        }`}
+        style={{ width: "0.65em", height: "0.42em", clipPath: "polygon(100% 0%, 0% 0%, 50% 100%)" }}
+        aria-hidden="true"
+      />
+      {open && (
+        <div
+          role="listbox"
+          className="absolute z-30 mt-2 max-h-64 w-full overflow-auto rounded-lg border border-stone-200 bg-white p-1.5 shadow-[0_18px_45px_rgba(15,23,42,0.16)]"
+        >
+          {normalizedOptions.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              role="option"
+              aria-selected={value === option.value}
+              onClick={() => {
+                onChange(option.value)
+                setOpen(false)
+              }}
+              className={`block w-full rounded-md px-2.5 py-2 text-left text-sm transition-colors ${
+                value === option.value
+                  ? "bg-primary/20 font-bold text-slate-900"
+                  : "text-slate-900 hover:bg-primary/10"
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function HeroSection() {
   const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -95,6 +181,7 @@ export function HeroSection() {
     flooringType: "",
     propertyType: "",
     startTime: "ASAP",
+    preferredVisitTime: "Morning",
     ftInboxTrap: "",
   })
 
@@ -352,7 +439,7 @@ export function HeroSection() {
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-[1340px] px-4 py-10 sm:py-14 lg:py-16">
-        <div className="grid items-center gap-9 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(625px,625px)] lg:gap-10">
+        <div className="grid items-center gap-9 sm:gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(625px,625px)] xl:gap-10">
           {/* Left Content */}
           <div className="text-background">
             {/* Trust Badge */}
@@ -423,8 +510,8 @@ export function HeroSection() {
                 href={`tel:${settings.phone.replace(/[^\d+]/g, "")}`} 
                 className="group flex flex-none items-center gap-3"
               >
-                <div className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-secondary transition-transform group-hover:scale-110">
-                  <Phone className="h-5 w-5 text-secondary-foreground" />
+                <div className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-secondary! transition-transform group-hover:scale-110">
+                  <Phone className="h-5 w-5 text-secondary-foreground!" />
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm text-background/70">Call Us Now</p>
@@ -441,7 +528,7 @@ export function HeroSection() {
 
           <Card
             id="estimate"
-            className="scroll-mt-28 w-full max-w-[625px] justify-self-center rounded-[1.05rem] border border-white/50 bg-white shadow-2xl shadow-black/20 lg:justify-self-end"
+            className="scroll-mt-28 w-full max-w-[625px] justify-self-center overflow-visible rounded-[1.05rem] border border-white/50 bg-white shadow-2xl shadow-black/20 xl:justify-self-end"
           >
             <CardContent className="px-5 py-6 min-[390px]:px-6 min-[390px]:py-7 sm:p-9 lg:p-9">
               <div className="text-center">
@@ -563,27 +650,28 @@ export function HeroSection() {
                       </div>
                     </div>
 
-                    <div>
-                      <label htmlFor="startTime" className="mb-3 block text-base font-semibold text-slate-950">
-                        When are you looking to start?
-                      </label>
-                      <div className="relative">
-                        <select
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label htmlFor="startTime" className="mb-3 block text-base font-semibold text-slate-950">
+                          When are you looking to start?
+                        </label>
+                        <CustomSelect
                           id="startTime"
                           value={formData.startTime}
-                          onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                          className="h-12 w-full appearance-none rounded-lg border border-stone-200 bg-white pl-4 pr-11 text-base font-medium text-slate-900 shadow-sm outline-none transition-[border-color,box-shadow] hover:border-stone-300 focus:border-primary focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
-                        >
-                          <option>ASAP</option>
-                          <option>Within 1 month</option>
-                          <option>1-3 months</option>
-                          <option>3+ months</option>
-                          <option>Just researching</option>
-                        </select>
-                        <span
-                          className="pointer-events-none absolute right-4 top-1/2 block -translate-y-1/2 bg-slate-400"
-                          style={{ width: "0.65em", height: "0.42em", clipPath: "polygon(100% 0%, 0% 0%, 50% 100%)" }}
-                          aria-hidden="true"
+                          onChange={(value) => setFormData({ ...formData, startTime: value })}
+                          options={["ASAP", "Within 1 month", "1-3 months", "3+ months", "Just researching"]}
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="preferredVisitTime" className="mb-3 block text-base font-semibold text-slate-950">
+                          Preferred visit time
+                        </label>
+                        <CustomSelect
+                          id="preferredVisitTime"
+                          value={formData.preferredVisitTime}
+                          onChange={(value) => setFormData({ ...formData, preferredVisitTime: value })}
+                          options={["Morning", "Afternoon", "Evening"]}
                         />
                       </div>
                     </div>
@@ -714,36 +802,27 @@ export function HeroSection() {
                         <label htmlFor="province" className="mb-2 block text-sm font-medium text-slate-600">
                           Province
                         </label>
-                        <div className="relative">
-                          <select
-                            id="province"
-                            name="province"
-                            value={formData.province}
-                            onChange={(e) => setFormData({ ...formData, province: e.target.value })}
-                            className="h-12 w-full appearance-none rounded-lg border border-stone-200 bg-white pl-4 pr-11 text-base font-medium text-slate-900 shadow-sm outline-none transition-[border-color,box-shadow] hover:border-stone-300 focus:border-primary focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
-                            required
-                          >
-                            <option value="">Select...</option>
-                            <option value="AB">Alberta</option>
-                            <option value="BC">British Columbia</option>
-                            <option value="MB">Manitoba</option>
-                            <option value="NB">New Brunswick</option>
-                            <option value="NL">Newfoundland and Labrador</option>
-                            <option value="NS">Nova Scotia</option>
-                            <option value="NT">Northwest Territories</option>
-                            <option value="NU">Nunavut</option>
-                            <option value="ON">Ontario</option>
-                            <option value="PE">Prince Edward Island</option>
-                            <option value="QC">Quebec</option>
-                            <option value="SK">Saskatchewan</option>
-                            <option value="YT">Yukon</option>
-                          </select>
-                          <span
-                            className="pointer-events-none absolute right-4 top-1/2 block -translate-y-1/2 bg-slate-400"
-                            style={{ width: "0.65em", height: "0.42em", clipPath: "polygon(100% 0%, 0% 0%, 50% 100%)" }}
-                            aria-hidden="true"
-                          />
-                        </div>
+                        <CustomSelect
+                          id="province"
+                          value={formData.province}
+                          onChange={(value) => setFormData({ ...formData, province: value })}
+                          placeholder="Select..."
+                          options={[
+                            { value: "AB", label: "Alberta" },
+                            { value: "BC", label: "British Columbia" },
+                            { value: "MB", label: "Manitoba" },
+                            { value: "NB", label: "New Brunswick" },
+                            { value: "NL", label: "Newfoundland and Labrador" },
+                            { value: "NS", label: "Nova Scotia" },
+                            { value: "NT", label: "Northwest Territories" },
+                            { value: "NU", label: "Nunavut" },
+                            { value: "ON", label: "Ontario" },
+                            { value: "PE", label: "Prince Edward Island" },
+                            { value: "QC", label: "Quebec" },
+                            { value: "SK", label: "Saskatchewan" },
+                            { value: "YT", label: "Yukon" },
+                          ]}
+                        />
                       </div>
                     </div>
                     {/* Postal + Country */}

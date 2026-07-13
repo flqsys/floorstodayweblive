@@ -7,6 +7,10 @@ import { useHomepageSettings } from "@/components/homepage-settings-provider"
 export function ProcessSection() {
   const settings = useHomepageSettings()
   const icons = [Calendar, FileText, Wrench]
+  const scrollToEstimate = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault()
+    document.getElementById("estimate")?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
 
   return (
     <section
@@ -61,6 +65,7 @@ export function ProcessSection() {
                 {step.button && (
                   <Link
                     href="#estimate"
+                    onClick={scrollToEstimate}
                     className="mt-4 inline-flex min-h-10 w-full items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 sm:w-auto"
                   >
                     {step.button}

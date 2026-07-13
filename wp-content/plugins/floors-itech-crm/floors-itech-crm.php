@@ -149,6 +149,35 @@ add_action('wp_ajax_ft_xd_sendy_test_connection', function () {
     wp_send_json_success($msg);
 });
 
+// ─── AJAX: Create Appointment from a Lead ────────────────────────────────────
+
+add_action('wp_ajax_ft_xd_crm_create_appointment', function () {
+    $lead_id = (int) ($_POST['lead_id'] ?? 0);
+    check_ajax_referer('ft_xd_crm_create_appointment_' . $lead_id, 'nonce');
+
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Permission denied.');
+    }
+
+    $date  = sanitize_text_field(wp_unslash($_POST['appointment_date']       ?? ''));
+    $time  = sanitize_text_field(wp_unslash($_POST['appointment_start_time'] ?? ''));
+    $settings = get_option(FT_XD_CRM_SETTINGS_KEY, []);
+
+    if (!$lead_id || !$date || !$time || empty($settings['base_url']) || empty($settings['api_token'])) {
+        wp_send_json_error('Missing lead ID, date/time, or CRM credentials.');
+    }
+
+    $api  = new FT_XD_CRM_API($settings['base_url'], $settings['api_token']);
+    $sync = new FT_XD_Lead_Sync($api);
+    $result = $sync->create_appointment_for_lead($lead_id, $date, $time);
+
+    if (is_wp_error($result)) {
+        wp_send_json_error($result->get_error_message());
+    }
+
+    wp_send_json_success('Appointment created in CRM.');
+});
+
 // ─── AJAX: Re-sync a Lead ────────────────────────────────────────────────────
 
 add_action('wp_ajax_ft_xd_crm_resync_lead', function () {
@@ -167,7 +196,7 @@ add_action('wp_ajax_ft_xd_crm_resync_lead', function () {
 
     $meta_keys = [
         'full_name', 'email', 'phone', 'street', 'unit', 'city', 'province',
-        'postal_code', 'flooring_type', 'property_type', 'start_time', 'source',
+        'postal_code', 'flooring_type', 'property_type', 'start_time', 'preferred_visit_time', 'source',
         'traffic_source', 'utm_source', 'utm_medium', 'utm_campaign',
         'utm_content', 'utm_term', 'referrer_url', 'page_url', 'device_platform',
     ];
@@ -204,6 +233,19 @@ add_action('admin_post_ft_xd_crm_save_settings', function () {
     $api_token      = sanitize_text_field(wp_unslash($_POST['api_token']    ?? ''));
     $enabled        = !empty($_POST['enabled']) ? '1' : '';
     $default_source = sanitize_text_field(wp_unslash($_POST['default_source'] ?? 'Direct'));
+    $default_status = sanitize_text_field(wp_unslash($_POST['default_status'] ?? ''));
+    $default_country = sanitize_text_field(wp_unslash($_POST['default_country'] ?? ''));
+
+    // Old settings may have a stale field-options cache from before this
+    // save (e.g. base URL/key just changed) - clear it so the page re-fetches
+    // fresh data instead of showing dropdowns for the wrong CRM.
+    $old_settings = get_option(FT_XD_CRM_SETTINGS_KEY, []);
+    if (!empty($old_settings['base_url']) && !empty($old_settings['api_token'])) {
+        delete_transient('ft_xd_crm_field_options_' . md5($old_settings['base_url'] . $old_settings['api_token']));
+    }
+    if ($base_url && $api_token) {
+        delete_transient('ft_xd_crm_field_options_' . md5($base_url . $api_token));
+    }
 
     $newsletter_settings = [
         'destination' => sanitize_text_field(wp_unslash($_POST['newsletter_destination'] ?? 'sendy')),
@@ -235,7 +277,7 @@ add_action('admin_post_ft_xd_crm_save_settings', function () {
     }
 
     $cf_fields = [
-        'flooring_type', 'property_type', 'start_time',
+        'flooring_type', 'property_type', 'start_time', 'preferred_visit_time',
         'utm_campaign', 'utm_medium', 'utm_content', 'utm_term',
         'page_url', 'device_platform',
     ];
@@ -252,6 +294,8 @@ add_action('admin_post_ft_xd_crm_save_settings', function () {
         'api_token'        => $api_token,
         'enabled'          => $enabled,
         'default_source'   => $default_source,
+        'default_status'   => $default_status,
+        'default_country'  => $default_country,
         'source_mapping'   => $source_mapping ?: FT_XD_Lead_Sync::default_source_mapping(),
         'custom_field_ids' => $custom_field_ids,
     ]);
@@ -275,14 +319,37 @@ function ft_xd_crm_render_settings_page(): void {
     $api_token      = $settings['api_token']        ?? '';
     $enabled        = $settings['enabled']          ?? '';
     $default_source = $settings['default_source']   ?? 'Direct';
+    $default_status = $settings['default_status']   ?? '';
+    $default_country = $settings['default_country'] ?? '';
     $source_mapping = $settings['source_mapping']   ?? FT_XD_Lead_Sync::default_source_mapping();
     $cf_ids         = $settings['custom_field_ids'] ?? [];
     $newsletter     = FT_XD_Newsletter_Integration::get_settings();
+
+    // Live lookup data from the CRM (lead statuses, countries, custom
+    // fields) so this page can render real dropdowns instead of asking the
+    // admin to type in raw numeric IDs. Cached briefly since it's the same
+    // data on every page load and the CRM doesn't need to be hit every time.
+    $field_options = null;
+    if ($base_url && $api_token) {
+        $cache_key = 'ft_xd_crm_field_options_' . md5($base_url . $api_token);
+        $field_options = get_transient($cache_key);
+        if ($field_options === false) {
+            $api    = new FT_XD_CRM_API($base_url, $api_token);
+            $result = $api->get_lead_field_options();
+            if (!is_wp_error($result)) {
+                $field_options = $result;
+                set_transient($cache_key, $field_options, 5 * MINUTE_IN_SECONDS);
+            } else {
+                $field_options = null;
+            }
+        }
+    }
 
     $cf_fields = [
         'flooring_type'   => 'Flooring Type',
         'property_type'   => 'Property Type',
         'start_time'      => 'Start Time',
+        'preferred_visit_time' => 'Preferred Visit Time',
         'utm_campaign'    => 'UTM Campaign',
         'utm_medium'      => 'UTM Medium',
         'utm_content'     => 'UTM Content',
@@ -328,15 +395,55 @@ function ft_xd_crm_render_settings_page(): void {
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="api_token">API Token</label></th>
+                        <th><label for="api_token">API Key</label></th>
                         <td>
                             <input type="password" name="api_token" id="api_token" value="<?php echo esc_attr($api_token); ?>" class="regular-text" autocomplete="new-password">
-                            <p class="description">Found in your CRM under Setup &rarr; API.</p>
+                            <p class="description">The static integration key stored in the CRM's <code>xd_integration_api_key</code> option — not a personal login token.</p>
                         </td>
                     </tr>
                 </table>
                 <button type="button" id="ft-xd-test-btn" class="button button-secondary">Test Connection</button>
                 <span id="ft-xd-test-result"></span>
+            </div>
+
+            <div class="ft-xd-card">
+                <h2>Default Lead Values</h2>
+                <p class="description">Pulled live from your CRM — no more guessing at numeric IDs. Save your connection above first if this list is empty.</p>
+                <table class="form-table">
+                    <tr>
+                        <th><label for="default_status">Default Lead Status</label></th>
+                        <td>
+                            <?php if ($field_options && !empty($field_options['statuses'])): ?>
+                                <select name="default_status" id="default_status">
+                                    <option value="">— Leave as CRM default —</option>
+                                    <?php foreach ($field_options['statuses'] as $s): ?>
+                                        <option value="<?php echo esc_attr($s['id']); ?>" <?php selected($default_status, $s['id']); ?>><?php echo esc_html($s['name']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <p class="description">New leads from the website are created with this status. Most CRMs use "New Lead" — note some CRMs mark a different status as their technical default (e.g. "Converted"), so don't assume ID 1 is safe without checking here.</p>
+                            <?php else: ?>
+                                <input type="text" name="default_status" id="default_status" value="<?php echo esc_attr($default_status); ?>" class="small-text" placeholder="e.g. 2">
+                                <p class="description">Connect to the CRM above to pick this from a dropdown instead.</p>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="default_country">Default Country</label></th>
+                        <td>
+                            <?php if ($field_options && !empty($field_options['countries'])): ?>
+                                <select name="default_country" id="default_country">
+                                    <option value="">— None —</option>
+                                    <?php foreach ($field_options['countries'] as $c): ?>
+                                        <option value="<?php echo esc_attr($c['short_name']); ?>" <?php selected($default_country, $c['short_name']); ?>><?php echo esc_html($c['short_name']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            <?php else: ?>
+                                <input type="text" name="default_country" id="default_country" value="<?php echo esc_attr($default_country); ?>" class="regular-text" placeholder="e.g. Canada">
+                                <p class="description">Connect to the CRM above to pick this from a dropdown instead.</p>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                </table>
             </div>
 
             <div class="ft-xd-card">
@@ -444,16 +551,26 @@ function ft_xd_crm_render_settings_page(): void {
             </div>
 
             <div class="ft-xd-card">
-                <h2>Custom Field IDs</h2>
-                <p class="description">Enter your CRM custom field numeric IDs. Leave blank to skip.</p>
+                <h2>Custom Field Mapping</h2>
+                <p class="description">Which CRM lead custom field each website field should be saved into. Leave as "Don't sync" to skip.</p>
                 <table class="form-table">
                     <?php foreach ($cf_fields as $field_key => $label): ?>
                         <tr>
                             <th><label for="cf_<?php echo esc_attr($field_key); ?>"><?php echo esc_html($label); ?></label></th>
                             <td>
-                                <input type="number" name="cf_<?php echo esc_attr($field_key); ?>" id="cf_<?php echo esc_attr($field_key); ?>"
-                                    value="<?php echo esc_attr($cf_ids[$field_key] ?? ''); ?>"
-                                    class="small-text" placeholder="e.g. 3">
+                                <?php if ($field_options && !empty($field_options['custom_fields'])): ?>
+                                    <select name="cf_<?php echo esc_attr($field_key); ?>" id="cf_<?php echo esc_attr($field_key); ?>">
+                                        <option value="">— Don't sync —</option>
+                                        <?php foreach ($field_options['custom_fields'] as $cf): ?>
+                                            <option value="<?php echo esc_attr($cf['id']); ?>" <?php selected($cf_ids[$field_key] ?? '', $cf['id']); ?>><?php echo esc_html($cf['name']); ?> (#<?php echo esc_html($cf['id']); ?>)</option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                <?php else: ?>
+                                    <input type="number" name="cf_<?php echo esc_attr($field_key); ?>" id="cf_<?php echo esc_attr($field_key); ?>"
+                                        value="<?php echo esc_attr($cf_ids[$field_key] ?? ''); ?>"
+                                        class="small-text" placeholder="e.g. 3">
+                                    <p class="description">Connect to the CRM above to pick this from a dropdown instead.</p>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>

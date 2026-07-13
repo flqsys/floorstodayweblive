@@ -61,6 +61,61 @@ class FT_XD_Newsletter_Integration {
             'permission_callback' => '__return_true',
             'callback' => [$this, 'handle_newsletter'],
         ]);
+
+        register_rest_route('floors-integrations/v1', '/newsletter-status', [
+            'methods' => 'GET',
+            'permission_callback' => [$this, 'check_status_auth'],
+            'callback' => [$this, 'handle_status'],
+        ]);
+    }
+
+    /**
+     * Reuses the same shared secret already configured for the WP->CRM
+     * direction (FT_XD_CRM_SETTINGS_KEY api_token) so this reverse,
+     * CRM->WP direction doesn't need a second credential to keep in sync.
+     */
+    public function check_status_auth(WP_REST_Request $request): bool {
+        $crm = get_option(FT_XD_CRM_SETTINGS_KEY, []);
+        $expected = trim((string) ($crm['api_token'] ?? ''));
+        if ($expected === '') {
+            return false;
+        }
+
+        $provided = trim((string) $request->get_header('X-Api-Key'));
+
+        return $provided !== '' && hash_equals($expected, $provided);
+    }
+
+    /**
+     * Live subscription-status lookup for the CRM's promotion badges - "is
+     * this email currently subscribed to the active promotion's Sendy list."
+     */
+    public function handle_status(WP_REST_Request $request): WP_REST_Response {
+        $email = sanitize_email((string) $request->get_param('email'));
+        $list_id = sanitize_text_field((string) $request->get_param('list_id'));
+
+        if ($email === '' || !is_email($email)) {
+            return rest_ensure_response(['subscribed' => false, 'raw' => 'invalid_email']);
+        }
+
+        $settings = self::get_settings();
+        $list_id = $list_id !== '' ? $list_id : (string) ($settings['sendy_list_id'] ?? '');
+
+        if (empty($settings['sendy_url']) || empty($settings['sendy_api_key']) || $list_id === '') {
+            return rest_ensure_response(['subscribed' => false, 'raw' => 'sendy_not_configured']);
+        }
+
+        $api = new FT_XD_Sendy_API($settings['sendy_url'], $settings['sendy_api_key']);
+        $status = $api->subscription_status($list_id, $email);
+
+        if (is_wp_error($status)) {
+            return rest_ensure_response(['subscribed' => false, 'raw' => $status->get_error_message()]);
+        }
+
+        return rest_ensure_response([
+            'subscribed' => strtolower(trim($status)) === 'subscribed',
+            'raw' => $status,
+        ]);
     }
 
     public function handle_newsletter(WP_REST_Request $request): WP_REST_Response|WP_Error {

@@ -15,6 +15,7 @@ never be relied on to update the live homepage.
 
 ```
 cd next-homepage-src
+Remove-Item -Recurse -Force out -ErrorAction SilentlyContinue
 npm run build
 ./scripts/sync-public.ps1
 git add public/

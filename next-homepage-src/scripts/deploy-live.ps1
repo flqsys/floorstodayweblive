@@ -47,6 +47,9 @@ NEXT_PUBLIC_WORDPRESS_HOMEPAGE_ENDPOINT=/wp-json/floors-today/v1/homepage
 NEXT_PUBLIC_WORDPRESS_INBOX_ENDPOINT=/wp-json/floors-today/v1/inbox-leads
 "@ | Set-Content -Path $envFile -Encoding ascii
 
+Write-Host "== Cleaning previous build output =="
+if (Test-Path $outDir) { Remove-Item -Recurse -Force $outDir }
+
 Push-Location $projectRoot
 try {
     npm run build
@@ -56,9 +59,18 @@ try {
 }
 
 Write-Host "== Verifying no local WAMP paths leaked into the build =="
-$badPath = Select-String -Path (Join-Path $outDir "_next\static\chunks\turbopack-*.js") -Pattern "/floorstodayfinal/public" -ErrorAction SilentlyContinue
+# Scans every chunk, not just turbopack-*.js - a stale committed fallback
+# (homepage-settings.snapshot.json, statically bundled into whichever
+# chunk imports it) leaked "localhost/floorstodayfinal" URLs into a
+# completely different chunk once already, undetected, because this check
+# used to only look at the turbopack runtime chunk. Matches the specific
+# site path, not bare "localhost" - that alone false-positives inside a
+# bundled URL-parsing polyfill that legitimately compares against the
+# literal string "localhost" per the WHATWG URL spec.
+$badPath = Select-String -Path (Join-Path $outDir "_next\static\chunks\*.js") -Pattern "/floorstodayfinal/public", "localhost/floorstodayfinal" -ErrorAction SilentlyContinue
 if ($badPath) {
-    throw "Build still contains /floorstodayfinal/public in the turbopack runtime chunk - aborting deploy"
+    Write-Host ($badPath | Format-Table Filename, LineNumber -AutoSize | Out-String)
+    throw "Build still contains a local WAMP path in a chunk - aborting deploy"
 }
 
 Write-Host "== Packaging build =="

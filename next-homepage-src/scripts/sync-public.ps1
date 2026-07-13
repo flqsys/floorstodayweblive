@@ -12,6 +12,19 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $source = Resolve-Path (Join-Path $scriptDir "..\out")
 $destination = Resolve-Path (Join-Path $scriptDir "..\..\public")
 
+# `next build` never wipes out/ between runs - it only adds a new
+# randomly-named build-ID folder under out/_next/static/ (chunks/ and
+# media/ are always present and not build-IDs). If more than one build-ID
+# folder exists, a stale one from a previous build could get shipped
+# alongside the fresh one - refuse to sync rather than silently mirroring
+# stale cruft.
+$buildIdDirs = Get-ChildItem (Join-Path $source "_next\static") -Directory |
+    Where-Object { $_.Name -notin @("chunks", "media") }
+if ($buildIdDirs.Count -gt 1) {
+    Write-Error "Found $($buildIdDirs.Count) build-ID folders in out/_next/static/ (expected 1): $($buildIdDirs.Name -join ', '). Delete out/ and run 'npm run build' again before syncing."
+    exit 1
+}
+
 Write-Host "Syncing $source -> $destination"
 
 # /MIR   mirror (deletes files in destination not present in source)

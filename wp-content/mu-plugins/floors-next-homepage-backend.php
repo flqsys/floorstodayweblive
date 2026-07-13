@@ -141,6 +141,7 @@ function ft_next_homepage_defaults() {
         'testimonials_embed_code' => '',
         'testimonials_bg_color_1' => 'oklch(0.985 0.002 90)',
         'chat_embed_code' => '',
+        'estimate_form_embed_code' => '',
         'fb_pixel_id' => '',
         'ga4_measurement_id' => '',
         'gtm_container_id' => '',
@@ -180,7 +181,7 @@ function ft_next_homepage_defaults() {
         'footer_bottom_links' => [
             ['label' => 'Careers', 'url' => '/careers/'],
             ['label' => 'Privacy Policy', 'url' => '/privacy-policy/'],
-            ['label' => 'Sitemap', 'url' => '/sitemap_index.xml'],
+            ['label' => 'Sitemap', 'url' => '/sitemap/'],
             ['label' => 'Terms Of Use', 'url' => '/terms-of-use/'],
         ],
         'footer_copyright' => 'Floors Today Copyright {year} All Rights Reserved',
@@ -2274,6 +2275,7 @@ add_action('admin_post_ft_next_homepage_save', function () {
     // Saved without tag-stripping — only admins can reach this page (verified by manage_options cap check above).
     $data['testimonials_embed_code'] = isset($_POST['testimonials_embed_code']) ? wp_unslash($_POST['testimonials_embed_code']) : ($current['testimonials_embed_code'] ?? '');
     $data['chat_embed_code'] = isset($_POST['chat_embed_code']) ? wp_unslash($_POST['chat_embed_code']) : ($current['chat_embed_code'] ?? '');
+    $data['estimate_form_embed_code'] = isset($_POST['estimate_form_embed_code']) ? wp_unslash($_POST['estimate_form_embed_code']) : ($current['estimate_form_embed_code'] ?? '');
     $data['hero_show_background'] = isset($_POST['hero_show_background']) ? '1' : '0';
     $data['hero_show_overlay'] = isset($_POST['hero_show_overlay']) ? '1' : '0';
 
@@ -3435,6 +3437,11 @@ function ft_next_homepage_render_admin() {
                             <input name="fb_pixel_id" type="text" value="<?php echo esc_attr($settings['fb_pixel_id'] ?? ''); ?>" placeholder="1234567890123456" style="font-family:monospace">
                             <span class="description">Your numeric Pixel ID — fires a PageView event on every page automatically. No need to paste the full script. <a href="https://www.facebook.com/events_manager2/list/pixel/" target="_blank" rel="noopener">Get Pixel ID →</a></span>
                         </label>
+                        <label>
+                            reCAPTCHA v3 Site Key
+                            <input name="recaptcha_site_key" type="text" value="<?php echo esc_attr($settings['recaptcha_site_key'] ?? ''); ?>" placeholder="6Lc..." style="font-family:monospace">
+                            <span class="description">Adds invisible bot protection to the homepage booking form — visitors never see a challenge. <a href="https://www.google.com/recaptcha/admin/create" target="_blank" rel="noopener">Create reCAPTCHA v3 key →</a></span>
+                        </label>
                     </div>
                     <div class="ft-next-field-stack" style="gap:28px;">
                         <label>
@@ -3443,9 +3450,9 @@ function ft_next_homepage_render_admin() {
                             <span class="description">Paste the <code>&lt;script&gt;</code> tag from your chat provider. Loads on every page — homepage and all other pages. Works with Tidio, LiveChat, Intercom, and others.</span>
                         </label>
                         <label>
-                            reCAPTCHA v3 Site Key
-                            <input name="recaptcha_site_key" type="text" value="<?php echo esc_attr($settings['recaptcha_site_key'] ?? ''); ?>" placeholder="6Lc..." style="font-family:monospace">
-                            <span class="description">Adds invisible bot protection to the homepage booking form — visitors never see a challenge. <a href="https://www.google.com/recaptcha/admin/create" target="_blank" rel="noopener">Create reCAPTCHA v3 key →</a></span>
+                            Estimate Form Embed Code
+                            <textarea name="estimate_form_embed_code" rows="6" placeholder="&lt;iframe id=&quot;...&quot; src=&quot;https://...&quot;&gt;&lt;/iframe&gt;&#10;&lt;script&gt;...&lt;/script&gt;" style="font-family:monospace"><?php echo esc_textarea($settings['estimate_form_embed_code'] ?? ''); ?></textarea>
+                            <span class="description">Paste the itech-core CRM estimate form's embed code here (iframe + resize script) so it can be updated anytime without a code change. Stored here for reference/use — not automatically placed on the page yet.</span>
                         </label>
                     </div>
                 </div>
@@ -4923,6 +4930,7 @@ function ft_next_booking_form_shortcode() {
         'Business' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/><path d="M12 13v2"/></svg>',
     ];
     $start_times = ['ASAP', 'Within 1 month', '1-3 months', '3+ months', 'Just researching'];
+    $visit_times = ['Morning', 'Afternoon', 'Evening'];
 
     ob_start();
 
@@ -4950,7 +4958,7 @@ function ft_next_booking_form_shortcode() {
                 max-width: 100% !important;
                 margin-inline: 0 !important;
                 padding: clamp(20px, 5vw, 36px);
-                overflow: hidden;
+                overflow: visible;
                 border: 1px solid rgba(255, 255, 255, .5);
                 border-radius: 20px;
                 background: #fff;
@@ -5143,6 +5151,18 @@ function ft_next_booking_form_shortcode() {
             .ft-bf__sel-wrap::after { content: ""; grid-area: sel; width: .65em; height: .42em; margin-right: 14px; justify-self: end; background-color: #94a3b8; clip-path: polygon(100% 0%, 0% 0%, 50% 100%); pointer-events: none; transition: background-color .18s ease; }
             .ft-bf__sel-wrap:focus-within::after { background-color: var(--ft-bf-primary); }
             .ft-bf__sel-wrap .ft-bf__select { grid-area: sel; padding-right: 36px; }
+            .ft-bf__cselect { position: relative; }
+            .ft-bf__cselect-trigger { display: flex; align-items: center; width: 100%; height: 48px; padding: 0 36px 0 14px; border: 1px solid #d6d3d1 !important; border-radius: 8px !important; background: #fff !important; color: #0f172a !important; font: inherit; font-size: 16px; text-align: left; cursor: pointer; box-shadow: none !important; transition: border-color .18s ease, box-shadow .18s ease; }
+            .ft-bf__cselect-trigger.is-placeholder { color: #94a3b8 !important; }
+            .ft-bf__cselect.is-open .ft-bf__cselect-trigger, .ft-bf__cselect-trigger:focus-visible { border-color: var(--ft-bf-primary) !important; outline: 0; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ft-bf-primary) 18%, transparent) !important; }
+            .ft-bf__cselect-current { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .ft-bf__cselect-arrow { position: absolute; right: 14px; top: 50%; width: .65em; height: .42em; margin-top: -.21em; background-color: #94a3b8; clip-path: polygon(100% 0%,0% 0%,50% 100%); pointer-events: none; transition: transform .18s ease, background-color .18s ease; }
+            .ft-bf__cselect.is-open .ft-bf__cselect-arrow { background-color: var(--ft-bf-primary); transform: rotate(180deg); }
+            .ft-bf__cselect-menu { position: absolute; z-index: 30; top: calc(100% + 8px); left: 0; right: 0; max-height: 260px; overflow: auto; border: 1px solid #d6d3d1; border-radius: 8px; background: #fff; box-shadow: 0 18px 45px rgba(15,23,42,.16); padding: 6px; }
+            .ft-bf__cselect-menu[hidden] { display: none !important; }
+            .ft-bf button.ft-bf__cselect-option { display: block; width: 100%; min-height: 36px; border: 0 !important; border-radius: 6px !important; background: transparent !important; color: #0f172a !important; cursor: pointer; font: inherit; padding: 8px 10px; text-align: left; box-shadow: none !important; transition: background .16s ease, color .16s ease; }
+            .ft-bf button.ft-bf__cselect-option:hover, .ft-bf button.ft-bf__cselect-option:focus-visible { background: color-mix(in srgb, var(--ft-bf-primary) 12%, white) !important; outline: none; }
+            .ft-bf button.ft-bf__cselect-option.is-selected { background: color-mix(in srgb, var(--ft-bf-primary) 20%, white) !important; font-weight: 700; }
             .ft-bf__phone-wrap { display: flex; align-items: stretch; border: 1px solid #d6d3d1; border-radius: 8px; overflow: hidden; background: #fff; transition: border-color .18s ease, box-shadow .18s ease; }
             .ft-bf__phone-wrap:focus-within { border-color: var(--ft-bf-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ft-bf-primary) 18%, transparent); }
             .ft-bf__phone-pfx { display: flex; align-items: center; padding: 0 12px; background: #f5f5f4; border-right: 1px solid #d6d3d1; font-size: 15px; color: #64748b; user-select: none; flex-shrink: 0; }
@@ -5219,14 +5239,38 @@ function ft_next_booking_form_shortcode() {
                         <button class="ft-bf__choice ft-bf__property" type="button" data-field="propertyType" data-value="<?php echo esc_attr($property_type); ?>"><span class="ft-bf__property-icon"><?php echo $property_icons[$property_type] ?? ''; ?></span><span><?php echo esc_html($property_type); ?></span></button>
                     <?php endforeach; ?>
                 </div>
-                <label class="ft-bf__field" style="margin-top:20px">
-                    <span>When are you looking to start?</span>
-                    <select class="ft-bf__select" name="startTime">
-                        <?php foreach ($start_times as $start_time) : ?>
-                            <option value="<?php echo esc_attr($start_time); ?>"><?php echo esc_html($start_time); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </label>
+                <div class="ft-bf__columns" style="margin-top:20px">
+                    <label class="ft-bf__field">
+                        <span>When are you looking to start?</span>
+                        <div class="ft-bf__cselect" data-name="startTime">
+                            <input type="hidden" name="startTime" value="<?php echo esc_attr($start_times[0]); ?>">
+                            <button type="button" class="ft-bf__cselect-trigger" aria-haspopup="listbox" aria-expanded="false">
+                                <span class="ft-bf__cselect-current"><?php echo esc_html($start_times[0]); ?></span>
+                            </button>
+                            <span class="ft-bf__cselect-arrow" aria-hidden="true"></span>
+                            <div class="ft-bf__cselect-menu" hidden role="listbox">
+                                <?php foreach ($start_times as $i => $start_time) : ?>
+                                    <button type="button" class="ft-bf__cselect-option<?php echo $i === 0 ? ' is-selected' : ''; ?>" data-value="<?php echo esc_attr($start_time); ?>" role="option"><?php echo esc_html($start_time); ?></button>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="ft-bf__field">
+                        <span>Preferred visit time</span>
+                        <div class="ft-bf__cselect" data-name="preferredVisitTime">
+                            <input type="hidden" name="preferredVisitTime" value="<?php echo esc_attr($visit_times[0]); ?>">
+                            <button type="button" class="ft-bf__cselect-trigger" aria-haspopup="listbox" aria-expanded="false">
+                                <span class="ft-bf__cselect-current"><?php echo esc_html($visit_times[0]); ?></span>
+                            </button>
+                            <span class="ft-bf__cselect-arrow" aria-hidden="true"></span>
+                            <div class="ft-bf__cselect-menu" hidden role="listbox">
+                                <?php foreach ($visit_times as $i => $visit_time) : ?>
+                                    <button type="button" class="ft-bf__cselect-option<?php echo $i === 0 ? ' is-selected' : ''; ?>" data-value="<?php echo esc_attr($visit_time); ?>" role="option"><?php echo esc_html($visit_time); ?></button>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </label>
+                </div>
                 <div class="ft-bf__actions"><button class="ft-bf__back" type="button">&larr; Back</button><button class="ft-bf__next" type="button">Continue <span class="ft-bf__arrow" aria-hidden="true">&rarr;</span></button></div>
             </section>
             <section class="ft-bf__step" data-step="3" hidden>
@@ -5261,23 +5305,25 @@ function ft_next_booking_form_shortcode() {
                     </label>
                     <label class="ft-bf__field">
                         <span>Province</span>
-                        <div class="ft-bf__sel-wrap">
-                        <select class="ft-bf__select ft-bf__province" name="province" required>
-                            <option value="">Select...</option>
-                            <option value="AB">Alberta</option>
-                            <option value="BC">British Columbia</option>
-                            <option value="MB">Manitoba</option>
-                            <option value="NB">New Brunswick</option>
-                            <option value="NL">Newfoundland and Labrador</option>
-                            <option value="NS">Nova Scotia</option>
-                            <option value="NT">Northwest Territories</option>
-                            <option value="NU">Nunavut</option>
-                            <option value="ON" selected>Ontario</option>
-                            <option value="PE">Prince Edward Island</option>
-                            <option value="QC">Quebec</option>
-                            <option value="SK">Saskatchewan</option>
-                            <option value="YT">Yukon</option>
-                        </select>
+                        <?php
+                        $provinces = [
+                            'AB' => 'Alberta', 'BC' => 'British Columbia', 'MB' => 'Manitoba',
+                            'NB' => 'New Brunswick', 'NL' => 'Newfoundland and Labrador', 'NS' => 'Nova Scotia',
+                            'NT' => 'Northwest Territories', 'NU' => 'Nunavut', 'ON' => 'Ontario',
+                            'PE' => 'Prince Edward Island', 'QC' => 'Quebec', 'SK' => 'Saskatchewan', 'YT' => 'Yukon',
+                        ];
+                        ?>
+                        <div class="ft-bf__cselect" data-name="province">
+                            <input type="hidden" class="ft-bf__province" name="province" value="ON" required>
+                            <button type="button" class="ft-bf__cselect-trigger" aria-haspopup="listbox" aria-expanded="false">
+                                <span class="ft-bf__cselect-current">Ontario</span>
+                            </button>
+                            <span class="ft-bf__cselect-arrow" aria-hidden="true"></span>
+                            <div class="ft-bf__cselect-menu" hidden role="listbox">
+                                <?php foreach ($provinces as $code => $name) : ?>
+                                    <button type="button" class="ft-bf__cselect-option<?php echo $code === 'ON' ? ' is-selected' : ''; ?>" data-value="<?php echo esc_attr($code); ?>" role="option"><?php echo esc_html($name); ?></button>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
                     </label>
                 </div>
@@ -5316,6 +5362,19 @@ function ft_next_booking_form_shortcode() {
                 error.hidden = !message;
             }
 
+            function setCselectValue(name, value) {
+                var wrap = root.querySelector('.ft-bf__cselect[data-name="' + name + '"]');
+                if (!wrap) return;
+                var input   = wrap.querySelector('input[type="hidden"]');
+                var current = wrap.querySelector('.ft-bf__cselect-current');
+                var option  = wrap.querySelector('.ft-bf__cselect-option[data-value="' + value + '"]');
+                if (input) input.value = value;
+                if (current) current.textContent = option ? option.textContent : value;
+                wrap.querySelectorAll('.ft-bf__cselect-option').forEach(function (item) {
+                    item.classList.toggle('is-selected', item === option);
+                });
+            }
+
             function showStep(step) {
                 state.step = step;
                 root.querySelectorAll('[data-step]').forEach(function (panel) {
@@ -5337,12 +5396,38 @@ function ft_next_booking_form_shortcode() {
                 var choice = event.target.closest('.ft-bf__choice');
                 var next = event.target.closest('.ft-bf__next');
                 var back = event.target.closest('.ft-bf__back');
+                var trigger = event.target.closest('.ft-bf__cselect-trigger');
+                var option = event.target.closest('.ft-bf__cselect-option');
 
                 if (choice) {
                     state[choice.dataset.field] = choice.dataset.value;
                     root.querySelectorAll('[data-field="' + choice.dataset.field + '"]').forEach(function (item) {
                         item.classList.toggle('is-selected', item === choice);
                     });
+                }
+
+                if (trigger) {
+                    var wrap = trigger.closest('.ft-bf__cselect');
+                    var menu = wrap.querySelector('.ft-bf__cselect-menu');
+                    root.querySelectorAll('.ft-bf__cselect.is-open').forEach(function (openWrap) {
+                        if (openWrap !== wrap) {
+                            openWrap.classList.remove('is-open');
+                            openWrap.querySelector('.ft-bf__cselect-menu').hidden = true;
+                            openWrap.querySelector('.ft-bf__cselect-trigger').setAttribute('aria-expanded', 'false');
+                        }
+                    });
+                    var opening = menu.hidden;
+                    menu.hidden = !opening;
+                    wrap.classList.toggle('is-open', opening);
+                    trigger.setAttribute('aria-expanded', opening ? 'true' : 'false');
+                }
+
+                if (option) {
+                    var optionWrap = option.closest('.ft-bf__cselect');
+                    setCselectValue(optionWrap.dataset.name, option.dataset.value);
+                    optionWrap.querySelector('.ft-bf__cselect-menu').hidden = true;
+                    optionWrap.classList.remove('is-open');
+                    optionWrap.querySelector('.ft-bf__cselect-trigger').setAttribute('aria-expanded', 'false');
                 }
 
                 if (next) {
@@ -5415,6 +5500,7 @@ function ft_next_booking_form_shortcode() {
                             flooringType: state.flooringType,
                             propertyType: state.propertyType,
                             startTime: data.get('startTime'),
+                            preferredVisitTime: data.get('preferredVisitTime'),
                             ftInboxTrap: data.get('ftInboxTrap'),
                             source: 'WordPress booking form shortcode',
                             pageUrl: window.location.href,
@@ -5471,10 +5557,9 @@ function ft_next_booking_form_shortcode() {
                     var route = map['route'] ? map['route'].long_name : '';
                     streetInput.value = (streetNumber + ' ' + route).trim();
                     var cityEl = root.querySelector('.ft-bf__city');
-                    var provinceEl = root.querySelector('.ft-bf__province');
                     var postalEl = root.querySelector('.ft-bf__postal');
                     if (cityEl && map['locality']) cityEl.value = map['locality'].long_name;
-                    if (provinceEl && map['administrative_area_level_1']) provinceEl.value = map['administrative_area_level_1'].short_name;
+                    if (map['administrative_area_level_1']) setCselectValue('province', map['administrative_area_level_1'].short_name);
                     if (postalEl && map['postal_code']) postalEl.value = map['postal_code'].long_name;
                 });
             }
@@ -5484,6 +5569,15 @@ function ft_next_booking_form_shortcode() {
             } else {
                 document.addEventListener('ft:places:ready', ftInitPlaces);
             }
+
+            document.addEventListener('click', function (event) {
+                if (root.contains(event.target)) return;
+                root.querySelectorAll('.ft-bf__cselect.is-open').forEach(function (wrap) {
+                    wrap.classList.remove('is-open');
+                    wrap.querySelector('.ft-bf__cselect-menu').hidden = true;
+                    wrap.querySelector('.ft-bf__cselect-trigger').setAttribute('aria-expanded', 'false');
+                });
+            });
         }());
     </script>
     <?php

@@ -30,7 +30,7 @@ $LiveSiteRoot = "/home/floorstodayfinal/htdocs/floorstoday.ca"
 $LiveUrl = "https://floorstoday.ca"
 
 $MysqlBin = "C:\wamp64\bin\mysql\mysql8.4.7\bin"
-$LocalDbName = "floorstoday-data"
+$LocalDbName = "floortodays"
 $LocalDbUser = "root"
 $LocalDbHost = "localhost"
 

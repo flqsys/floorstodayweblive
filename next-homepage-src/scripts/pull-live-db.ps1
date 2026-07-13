@@ -23,7 +23,7 @@ $SiteUser = "floorstodayfinal"
 $LiveSiteRoot = "/home/floorstodayfinal/htdocs/floorstoday.ca"
 
 $MysqlBin = "C:\wamp64\bin\mysql\mysql8.4.7\bin"
-$LocalDbName = "floorstoday-data"
+$LocalDbName = "floortodays"
 $LocalDbUser = "root"
 $LocalDbHost = "localhost"
 
@@ -88,7 +88,14 @@ if (-not (Test-Path $localBackupFile) -or (Get-Item $localBackupFile).Length -eq
 Write-Host "Local backup complete: $((Get-Item $localBackupFile).Length) bytes"
 
 Write-Host "== Importing live dump into local database ($LocalDbName) =="
-Get-Content $liveDumpFile -Raw | & "$MysqlBin\mysql.exe" -u $LocalDbUser -h $LocalDbHost $LocalDbName
+# `Get-Content -Raw | mysql.exe` was the same class of bug as the
+# --result-file fix above: Get-Content decodes a BOM-less file using the
+# system ANSI codepage (not UTF-8), then piping the string to mysql.exe
+# re-encodes it again via $OutputEncoding - two lossy conversions of every
+# multi-byte character. Routing through cmd.exe's native `<` redirection
+# hands mysql.exe the file's raw bytes directly, with no PowerShell text
+# pipeline in between.
+cmd /c "`"$MysqlBin\mysql.exe`" -u $LocalDbUser -h $LocalDbHost $LocalDbName < `"$liveDumpFile`""
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Import failed. Local DB may be in a partial state. Restore from: $localBackupFile"
     exit 1
@@ -96,8 +103,8 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "== Fixing siteurl/home (imported values point to the live domain) =="
 $fixSql = @"
-UPDATE floors1_options SET option_value = 'http://localhost/floorstodayfinal' WHERE option_name = 'siteurl';
-UPDATE floors1_options SET option_value = 'http://localhost/floorstodayfinal' WHERE option_name = 'home';
+UPDATE floors1_options SET option_value = 'http://localhost/floortoday' WHERE option_name = 'siteurl';
+UPDATE floors1_options SET option_value = 'http://localhost/floortoday' WHERE option_name = 'home';
 "@
 $fixSql | & "$MysqlBin\mysql.exe" -u $LocalDbUser -h $LocalDbHost $LocalDbName
 if ($LASTEXITCODE -ne 0) {

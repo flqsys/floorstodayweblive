@@ -90,6 +90,19 @@ class FT_XD_Sendy_API {
         ]);
     }
 
+    public function subscription_status(string $list_id, string $email): string|WP_Error {
+        $email = sanitize_email($email);
+        if ($email === '' || !is_email($email)) {
+            return new WP_Error('xd_sendy_invalid_email', 'Please enter a valid email address.');
+        }
+
+        return $this->post_plain('/api/subscribers/subscription-status.php', [
+            'api_key' => $this->api_key,
+            'email'   => $email,
+            'list_id' => sanitize_text_field($list_id),
+        ]);
+    }
+
     public function active_subscriber_count(string $list_id): int|WP_Error {
         $response = $this->post_plain('/api/subscribers/active-subscriber-count.php', [
             'api_key' => $this->api_key,

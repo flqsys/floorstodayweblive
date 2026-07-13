@@ -5,26 +5,26 @@
   "foreground_color": "oklch(0.20 0.02 30)",
   "phone": "1-888-772-7848",
   "email": "info@floorstoday.ca",
-  "service_area": "Canada's Mobile Flooring Experts • Free In-Home Estimates, Samples & Installation",
+  "service_area": "Canada's Mobile Flooring Experts. Free In-Home Estimates, Samples & Installation",
   "logo_text": "Floors Today",
   "logo_image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/22163002/floors-today-logo-master01.png",
-  "favicon_image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/22143652/floors-today-favicon-1.png",
+  "favicon_image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/24134210/cropped-floors-today-favicon-1.png",
   "logo_size": "300px",
   "cta_label": "Free Estimate",
   "show_header": "1",
   "show_footer": "1",
   "facebook_url": "https://www.facebook.com/people/Floors-Today/61586145526016/",
-  "instagram_url": "https://www.instagram.com/floorstoday/",
+  "instagram_url": "https://www.instagram.com/floorstoday",
   "linkedin_url": "https://www.linkedin.com/company/floors-today-ca/",
-  "youtube_url": "https://www.facebook.com/people/Floors-Today/61586145526016/",
-  "tiktok_url": "https://www.facebook.com/people/Floors-Today/61586145526016/",
-  "footer_badge_image_1": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/26131325/FloorsToday-Proudly-1.png",
-  "footer_badge_image_2": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/26142643/1000-quality-projects-1.png",
-  "footer_badge_image_3": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/26122439/3-Years-Waranty-floors-today.png",
+  "youtube_url": "https://www.youtube.com/@FloorsToday",
+  "tiktok_url": "https://www.tiktok.com/@floorstoday",
+  "footer_badge_image_1": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/07/03151423/Canadian-Floors-Today.png",
+  "footer_badge_image_2": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/07/02124942/10000-homes-floors.png",
+  "footer_badge_image_3": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/07/02131610/3Years-Warranty.png",
   "footer_badge_image_4": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/26151316/15-years-quality-services.png",
   "footer_badge_image_5": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/26151250/Lower-Price-floors-today.png",
   "footer_badge_image_6": "",
-  "footer_badge_height": "140px",
+  "footer_badge_height": "160px",
   "seo_title": "Floors Today | Flooring Installation in Ontario",
   "seo_description": "Shop premium hardwood, laminate, vinyl and carpet flooring with free in-home estimates and professional installation across Ontario.",
   "seo_canonical_url": "http://floorstoday.ca",
@@ -58,6 +58,7 @@
   "hero_title_mobile_font_size": "30px",
   "hero_text": "All-inclusive pricing with no hidden fees. Get a complete quote during your free in-home consultation.",
   "hero_image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/24170217/floors-today-hero-1-1.jpg",
+  "hero_image_mobile": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/07/03150638/floors-today-hero-bacground-1.jpg",
   "hero_show_background": "1",
   "hero_show_overlay": "1",
   "hero_overlay_opacity": "0.72",
@@ -68,9 +69,10 @@
   "process_bg_color_1": "oklch(0.985 0.002 90)",
   "process_bg_color_2": "oklch(0.985 0.002 90)",
   "process_bg_location": "to bottom",
-  "comparison_title": "One Price. No Surprises. No Hidden Fees.",
+  "comparison_title": "All inclusive*. No Surprises. No Hidden Fees.",
   "comparison_table_title": "What's Included",
   "comparison_text": "At Floors Today, we're committed to helping homeowners get beautiful new floors at the best possible value. From exclusive promotions and seasonal sales to installation specials and price-match opportunities, we make it easier to save without compromising on quality.",
+  "comparison_disclaimer": "<span style=\"color:#cc9c2e\">All-inclusive pricing does not include unforeseen subfloor preparation or repairs that may only become visible after the existing flooring has been removed. Any additional work will require your approval before proceeding.</span>",
   "comparison_button": "Book An Appointment",
   "comparison_bg_color_1": "#235bb8",
   "comparison_bg_color_2": "#094cb7",
@@ -106,13 +108,13 @@
   "deals_includes_title": "Your project includes",
   "deals_includes": "Free In-Home Estimate\r\nSamples Brought to Your Home\r\nProfessional Installation\r\nAll-Inclusive Pricing",
   "deals_popup_eyebrow": "Limited-Time Flooring Sale",
-  "deals_popup_title": "Get up to 50% off select flooring, 50% off installation, and 50 months of financing on approved credit.",
+  "deals_popup_title": "Up to 50% Off Hardwood, Engineered Hardwood, Vinyl, Laminate &amp; Carpet Flooring",
   "deals_popup_intro": "Choose your floors at home, receive transparent project pricing, and arrange professional installation.",
   "deals_popup_button": "Book a Free Appointment",
   "deals_popup_steps_title": "How the offer works",
   "deals_popup_steps": "Free home estimate|Book online or call {phone}.\r\nShop from home|Compare samples and receive your project estimate on site.\r\nEligible savings|Save up to 60% on select installed flooring styles.\r\nProfessional finish|Your flooring is installed by qualified professionals.",
-  "deals_popup_terms": "*Get 15% off plus up to an additional 45% on carpet, or 25% on hardwood, laminate and vinyl, based on project size. Applies to select styles, basic installation, standard padding and materials. Excludes upgrades, stairs, specialized removal or preparation, non-standard furniture moving, miscellaneous charges and prior purchases. Residential installations only, while supplies last. Offer ends June 29, 2026 and is subject to change.",
-  "deals_popup_terms_extra": "Next-day installation applies only to eligible in-stock products and service areas. Installation may be completed by qualified independent professionals where applicable.",
+  "deals_popup_terms": "Offer Details: Receive up to 50% off select Hardwood, Engineered Hardwood, Vinyl, Laminate, and Carpet flooring, based on product selection and project size. Discount applies to select styles only. Basic installation, standard underlayment or padding (where applicable), and standard installation materials are included where specified. Excludes premium upgrades, stairs, subfloor repairs, specialty removal or preparation, non-standard furniture moving, custom work, miscellaneous charges, and previous purchases. Valid for residential installations only, while supplies last. Offer ends August 31, 2026, and may be modified or withdrawn without notice.",
+  "deals_popup_terms_extra": "Installation is scheduled based on product availability, service area, and installer availability. Our team will coordinate the earliest convenient installation date and keep you informed throughout the process.",
   "deals_bg_color_1": "oklch(0.96 0.005 90)",
   "deals_bg_color_2": "oklch(0.985 0.002 90)",
   "deals_bg_location": "to bottom",
@@ -128,28 +130,34 @@
   "recaptcha_site_key": "",
   "testimonials_bg_color_2": "#ffffff",
   "testimonials_bg_location": "to bottom",
-  "newsletter_title": "Subscribe and Get $300 Store Credit",
-  "newsletter_text": "Join our newsletter for exclusive flooring offers, project tips, and your $300 store credit details.",
+  "newsletter_title": "Subscribe and Get $300* Coupon",
+  "newsletter_popup_title": "Promo Terms & Conditions",
+  "newsletter_text": "Join our newsletter for exclusive flooring offers, project tips, and your $300* Coupon details. Condition Applies",
   "newsletter_button": "See Details",
-  "newsletter_details_text": "Complete the short form in the newsletter section to receive the latest flooring deals, project tips, and details about your $300 store credit.",
+  "newsletter_claim_button": "Claim $300*",
+  "newsletter_details_text": "$300* discount applies to qualifying purchases of $3,000 or more. Offer available to new email subscribers only. Limit one offer per household. Cannot be combined with certain promotions or previous purchases. Additional exclusions may apply.\r\n\r\nBy clicking \"Get My $300* Off\", you agree to receive marketing emails from Flooring Liquidators. You may unsubscribe at any time using the link in our emails. Your information will be handled in accordance with our Privacy Policy and Terms &amp; Conditions.",
+  "warranty_popup_title": "Floors Today 3 Years Warranty Details",
+  "warranty_details_content": "At Floors Today, we stand behind both our flooring products and professional installation. Your purchase is backed by a 3-Year Limited Warranty covering manufacturing defects and installation workmanship under normal residential use. Warranty coverage requires proper care and maintenance and does not cover normal wear and tear, accidental damage, moisture-related issues, misuse, or damage caused by improper maintenance.\r\n\r\nView our full Warranty Terms &amp; Conditions for complete coverage details.",
+  "warranty_see_more_text": "See More",
+  "warranty_see_more_url": "/3-year-limited-flooring-warranty/",
   "footer_about": "We believe in transparent pricing. That's why our all-inclusive estimates include every essential detail in delivering a seamless flooring experience with no unexpected costs.",
   "footer_about_title": "About Us",
   "footer_about_links": [
     {
       "label": "About Us",
-      "url": "http://localhost/floorstodayfinal/about/"
+      "url": "https://floorstoday.ca/about/"
     },
     {
       "label": "Contact Us",
-      "url": "http://localhost/floorstodayfinal/contact/"
+      "url": "https://floorstoday.ca/contact/"
     },
     {
       "label": "Book Appointment",
-      "url": "http://localhost/floorstodayfinal/#estimate"
+      "url": "https://floorstoday.ca/#estimate"
     },
     {
       "label": "Our Brands",
-      "url": "http://localhost/floorstodayfinal/brands"
+      "url": "https://floorstoday.ca/brands"
     }
   ],
   "footer_categories_title": "Categories",
@@ -161,7 +169,7 @@
     },
     {
       "label": "Product Care",
-      "url": "http://localhost/floorstodayfinal/product-care/"
+      "url": "https://floorstoday.ca/product-care/"
     },
     {
       "label": "Employee Support",
@@ -169,44 +177,44 @@
     },
     {
       "label": "Sitemap",
-      "url": "http://localhost/floorstodayfinal/sitemap"
+      "url": "https://floorstoday.ca/sitemap"
     }
   ],
   "footer_policies_title": "Our Policies",
   "footer_policy_links": [
     {
       "label": "Terms Of Use",
-      "url": "http://localhost/floorstodayfinal/terms-of-use/"
+      "url": "https://floorstoday.ca/terms-of-use/"
     },
     {
       "label": "FAQs",
-      "url": "http://localhost/floorstodayfinal/faqs/"
+      "url": "https://floorstoday.ca/faqs/"
     },
     {
       "label": "Privacy Policy",
-      "url": "http://localhost/floorstodayfinal/privacy-policy/"
+      "url": "https://floorstoday.ca/privacy-policy/"
     },
     {
       "label": "Warranty Information",
-      "url": "http://localhost/floorstodayfinal/warranty/"
+      "url": "https://floorstoday.ca/warranty/"
     }
   ],
   "footer_bottom_links": [
     {
       "label": "Careers",
-      "url": "http://localhost/floorstodayfinal/careers/"
+      "url": "https://floorstoday.ca/careers/"
     },
     {
       "label": "Privacy Policy",
-      "url": "http://localhost/floorstodayfinal/privacy-policy/"
+      "url": "https://floorstoday.ca/privacy-policy/"
     },
     {
       "label": "Sitemap",
-      "url": "http://localhost/floorstodayfinal/sitemap_index.xml"
+      "url": "https://floorstoday.ca/sitemap/"
     },
     {
       "label": "Terms Of Use",
-      "url": "http://localhost/floorstodayfinal/terms-of-use/"
+      "url": "https://floorstoday.ca/terms-of-use/"
     }
   ],
   "footer_copyright": "Floors Today Copyright {year} All Rights Reserved",
@@ -262,12 +270,12 @@
     {
       "title": "Free In-Home Consultation",
       "description": "Our flooring specialist will visit your home with samples, answer your questions, and help you find the perfect floor for your style, budget, and lifestyle.",
-      "button": "Get My Free Estimate",
+      "button": "Don't Miss Out on Up to 50% Off",
       "image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/22161251/Free-In-Home-Consultation.jpg"
     },
     {
       "title": "Honest Pricing, No Surprises",
-      "description": "We'll measure your space and provide a detailed quote that includes everything upfront. No hidden fees, no unexpected costs—just clear pricing you can trust.",
+      "description": "We'll measure your space and provide a detailed quote that includes everything upfront. No hidden fees, no unexpected cost, just clear pricing you can trust.",
       "button": "",
       "image": "https://floors-today-media.s3.amazonaws.com/wp-content/uploads/2026/06/22161905/Gemini_Generated_Image_vt4aq6vt4aq6vt4a.jpg"
     },
@@ -284,7 +292,7 @@
     "Certified Installation Team",
     "Premium Underlayment Included",
     "Furniture Moving Assistance",
-    "Haul Away of Old Flooring",
+    "Disposal of old flooring",
     "Transitions & Finishing Pieces",
     "Complete Job Site Cleanup",
     "All-Inclusive Written Estimate"

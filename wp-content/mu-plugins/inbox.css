@@ -409,10 +409,11 @@
 .ft-inbox-data-grid div[data-key="province"]    { grid-column: span 2; }
 .ft-inbox-data-grid div[data-key="postal_code"] { grid-column: span 2; }
 
-/* Row 3: Flooring Type | Property Type | Start Time | Source (4 × 25%) */
+/* Row 3: Flooring Type | Property Type | Start Time | Preferred Visit Time (4 × 25%) */
 .ft-inbox-data-grid div[data-key="flooring_type"],
 .ft-inbox-data-grid div[data-key="property_type"],
 .ft-inbox-data-grid div[data-key="start_time"],
+.ft-inbox-data-grid div[data-key="preferred_visit_time"],
 .ft-inbox-data-grid div[data-key="source"] { grid-column: span 3; }
 
 /* Tracking Row 1: Traffic Source | UTM Source | UTM Medium | UTM Campaign (4 × 25%) */

@@ -6,6 +6,10 @@ import { useHomepageSettings } from "@/components/homepage-settings-provider"
 
 export function ComparisonSection() {
   const settings = useHomepageSettings()
+  const scrollToEstimate = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault()
+    document.getElementById("estimate")?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
 
   return (
     <section
@@ -26,8 +30,8 @@ export function ComparisonSection() {
               {settings.comparison_text}
             </p>
             {settings.comparison_disclaimer && (
-              <p
-                className="mt-4 text-sm leading-relaxed sm:text-base"
+              <div
+                className="mt-4 rounded-md bg-secondary px-4 py-3 text-sm leading-relaxed text-secondary-foreground sm:text-base [&_span]:!text-secondary-foreground"
                 dangerouslySetInnerHTML={{ __html: settings.comparison_disclaimer }}
               />
             )}
@@ -63,6 +67,7 @@ export function ComparisonSection() {
             <div className="border-t border-border p-4 text-center sm:p-6">
               <Link
                 href="#estimate"
+                onClick={scrollToEstimate}
                 className="inline-flex min-h-11 w-full items-center justify-center rounded-md bg-secondary px-5 py-2.5 font-bold text-secondary-foreground transition-colors hover:bg-secondary/90 sm:w-auto"
               >
                 {settings.comparison_button}
