@@ -85,7 +85,7 @@ function Convert-ToBashPath {
 function Copy-ToRemote {
     param([string]$LocalPath, [string]$RemotePath)
     $bashPath = Convert-ToBashPath $LocalPath
-    & "C:\Program Files\Git\bin\bash.exe" -lc "cat '$bashPath' | ssh '${SshUser}@${LiveHost}' 'cat > \"$RemotePath\"'"
+    & "C:\Program Files\Git\bin\bash.exe" -lc "cat '$bashPath' | ssh '${SshUser}@${LiveHost}' 'cat > `"$RemotePath`"'"
     if ($LASTEXITCODE -ne 0) {
         throw "Upload failed: $LocalPath -> ${SshUser}@${LiveHost}:$RemotePath"
     }
@@ -95,7 +95,7 @@ function Copy-FromRemote {
     param([string]$RemotePath, [string]$LocalPath, [string]$RemoteReader = "")
     $bashPath = Convert-ToBashPath $LocalPath
     if ($RemoteReader -eq "") {
-        $RemoteReader = "cat \"$RemotePath\""
+        $RemoteReader = "cat `"$RemotePath`""
     }
     & "C:\Program Files\Git\bin\bash.exe" -lc "ssh '${SshUser}@${LiveHost}' '$RemoteReader' > '$bashPath'"
     if ($LASTEXITCODE -ne 0) {
@@ -118,7 +118,7 @@ $backupResult = ssh "${SshUser}@${LiveHost}" "sudo -u $SiteUser bash $remoteDump
 if ($backupResult -notmatch "DUMP_OK:") {
     throw "Live backup did not confirm success. Output: $backupResult. Aborting before touching live DB."
 }
-Copy-FromRemote $remoteBackupPath $liveBackupFile "sudo -u $SiteUser cat \"$remoteBackupPath\""
+Copy-FromRemote $remoteBackupPath $liveBackupFile "sudo -u $SiteUser cat `"$remoteBackupPath`""
 if (-not (Test-Path $liveBackupFile) -or (Get-Item $liveBackupFile).Length -eq 0) {
     throw "Live backup download is missing or empty - aborting before touching live DB"
 }
