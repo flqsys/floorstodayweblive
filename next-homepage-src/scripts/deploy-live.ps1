@@ -1,6 +1,7 @@
 # Builds the Next.js homepage specifically for the live server (different
-# NEXT_PUBLIC_BASE_PATH than local WAMP: /public vs /floorstodayfinal/public)
-# and deploys it straight to the server over SSH, bypassing git entirely.
+# NEXT_PUBLIC_BASE_PATH than local WAMP: /public vs whatever .env.local
+# currently has) and deploys it straight to the server over SSH, bypassing
+# git entirely.
 #
 # This exists because the base path gets baked into compiled JS at build
 # time (Turbopack's chunk loader, the Next Image loader, etc.) - a single
@@ -15,30 +16,37 @@ $ErrorActionPreference = "Stop"
 
 $LiveHost = "16.54.143.52"
 $SshUser = "ubuntu"
-$SiteDomain = "floorstoday.ca"
+# Hardcoded rather than auto-discovered via `find /home/...`: the ubuntu
+# SSH user can't traverse into /home/floorstodayfinal without sudo (the
+# host restricts other-user access to home dirs), so a `find`-based lookup
+# silently comes back empty and every deploy fails with SITE_NOT_FOUND.
+# push-local-db.ps1 hit the same issue and was fixed the same way - mirror
+# that here instead of re-introducing auto-discovery.
+$SiteUser = "floorstodayfinal"
+$LiveSiteRoot = "/home/floorstodayfinal/htdocs/floorstoday.ca"
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $projectRoot = Resolve-Path (Join-Path $scriptDir "..")
 $envFile = Join-Path $projectRoot ".env.production"
 $backupFile = Join-Path $projectRoot ".env.production.local-backup"
+# Next.js gives .env.local higher priority than .env.production during
+# `next build` - so even after we overwrite .env.production with live
+# values below, a committed/local .env.local silently wins and the local
+# WAMP base path gets baked into the live build instead. Must be moved
+# out of the way for the duration of the build, not just .env.production.
+$envLocalFile = Join-Path $projectRoot ".env.local"
+$envLocalBackup = Join-Path $projectRoot ".env.local.live-backup"
 $outDir = Join-Path $projectRoot "out"
 $archivePath = Join-Path $projectRoot "live-build.tar.gz"
-
-function Resolve-LiveSite {
-    $result = (ssh "${SshUser}@${LiveHost}" "set -e; root=\$(find /home -maxdepth 3 -type d -path '*/htdocs/$SiteDomain' 2>/dev/null | head -n 1); if [ -z \"\$root\" ]; then echo SITE_NOT_FOUND; exit 2; fi; user=\$(basename \$(dirname \$(dirname \"\$root\"))); echo \"\$user|\$root\"") -join "`n"
-    if ($result -notmatch '^([^|]+)\|(.+)$') {
-        throw "Could not find live site root for $SiteDomain on $LiveHost. Output: $result"
-    }
-    return @{
-        User = $Matches[1]
-        Root = $Matches[2]
-    }
-}
 
 function Restore-LocalEnv {
     if (Test-Path $backupFile) {
         Move-Item -Force $backupFile $envFile
         Write-Host "Restored local .env.production"
+    }
+    if (Test-Path $envLocalBackup) {
+        Move-Item -Force $envLocalBackup $envLocalFile
+        Write-Host "Restored local .env.local"
     }
 }
 
@@ -48,11 +56,6 @@ trap {
     exit 1
 }
 
-$liveSite = Resolve-LiveSite
-$SiteUser = $liveSite.User
-$LiveSiteRoot = $liveSite.Root
-Write-Host "Live site resolved: $SiteUser -> $LiveSiteRoot"
-
 Write-Host "== Building for live (NEXT_PUBLIC_BASE_PATH=/public) =="
 Copy-Item $envFile $backupFile -Force
 @"
@@ -61,6 +64,16 @@ NEXT_PUBLIC_WORDPRESS_ORIGIN=https://floorstoday.ca
 NEXT_PUBLIC_WORDPRESS_HOMEPAGE_ENDPOINT=/wp-json/floors-today/v1/homepage
 NEXT_PUBLIC_WORDPRESS_INBOX_ENDPOINT=/wp-json/floors-today/v1/inbox-leads
 "@ | Set-Content -Path $envFile -Encoding ascii
+
+# .env.local outranks .env.production in Next.js's own precedence order, so
+# it must be out of the way entirely during the live build, not overwritten.
+$localBasePath = $null
+if (Test-Path $envLocalFile) {
+    $localBasePathLine = Select-String -Path $envLocalFile -Pattern '^NEXT_PUBLIC_BASE_PATH=(.+)$'
+    if ($localBasePathLine) { $localBasePath = $localBasePathLine.Matches[0].Groups[1].Value.Trim() }
+    Move-Item -Force $envLocalFile $envLocalBackup
+    Write-Host "Stashed .env.local for the duration of the build"
+}
 
 Write-Host "== Cleaning previous build output =="
 if (Test-Path $outDir) { Remove-Item -Recurse -Force $outDir }
@@ -76,16 +89,23 @@ try {
 Write-Host "== Verifying no local WAMP paths leaked into the build =="
 # Scans every chunk, not just turbopack-*.js - a stale committed fallback
 # (homepage-settings.snapshot.json, statically bundled into whichever
-# chunk imports it) leaked "localhost/floorstodayfinal" URLs into a
-# completely different chunk once already, undetected, because this check
-# used to only look at the turbopack runtime chunk. Matches the specific
-# site path, not bare "localhost" - that alone false-positives inside a
-# bundled URL-parsing polyfill that legitimately compares against the
-# literal string "localhost" per the WHATWG URL spec.
-$badPath = Select-String -Path (Join-Path $outDir "_next\static\chunks\*.js") -Pattern "/floorstodayfinal/public", "localhost/floorstodayfinal" -ErrorAction SilentlyContinue
-if ($badPath) {
-    Write-Host ($badPath | Format-Table Filename, LineNumber -AutoSize | Out-String)
-    throw "Build still contains a local WAMP path in a chunk - aborting deploy"
+# chunk imports it) leaked a local base path into a completely different
+# chunk once already, undetected, because this check used to only look at
+# the turbopack runtime chunk. Built from the *actual* current .env.local
+# value (read above, before it was stashed) rather than a hardcoded old
+# folder name - a hardcoded string silently stops matching the moment the
+# local folder is renamed, same as it did for "floorstodayfinal" -> "floortoday".
+# Matches the specific local site path, not bare "localhost" - that alone
+# false-positives inside a bundled URL-parsing polyfill that legitimately
+# compares against the literal string "localhost" per the WHATWG URL spec.
+if ($localBasePath -and $localBasePath -ne "/public") {
+    $escapedLocalBasePath = [Regex]::Escape($localBasePath)
+    $badPathPatterns = @($escapedLocalBasePath, "localhost$escapedLocalBasePath")
+    $badPath = Select-String -Path (Join-Path $outDir "_next\static\chunks\*.js") -Pattern $badPathPatterns -ErrorAction SilentlyContinue
+    if ($badPath) {
+        Write-Host ($badPath | Format-Table Filename, LineNumber -AutoSize | Out-String)
+        throw "Build still contains a local WAMP path ($localBasePath) in a chunk - aborting deploy"
+    }
 }
 
 Write-Host "== Packaging build =="
@@ -136,6 +156,16 @@ Start-Sleep -Seconds 2
 $check = Invoke-WebRequest -Uri "https://floorstoday.ca/" -UseBasicParsing
 if ($check.StatusCode -ne 200) {
     throw "Live homepage did not return 200 after deploy (got $($check.StatusCode))"
+}
+# A 200 alone isn't enough - the page shell loads fine even when every
+# asset it references 404s (this is exactly how the local-path-baked-in
+# bug above went unnoticed). Confirm the HTML actually references the
+# live asset path, and if a bad local path was captured, that it's gone.
+if ($check.Content -notmatch [Regex]::Escape('/public/_next/')) {
+    throw "Live homepage HTML does not reference /public/_next/ - asset paths look wrong, deploy likely broken"
+}
+if ($localBasePath -and $localBasePath -ne "/public" -and $check.Content -match [Regex]::Escape($localBasePath + "/_next/")) {
+    throw "Live homepage HTML still references local path $localBasePath - deploy is broken"
 }
 
 Remove-Item $archivePath -Force -ErrorAction SilentlyContinue

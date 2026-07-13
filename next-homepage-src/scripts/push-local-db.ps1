@@ -25,7 +25,8 @@ $ErrorActionPreference = "Stop"
 
 $LiveHost = "16.54.143.52"
 $SshUser = "ubuntu"
-$SiteDomain = "floorstoday.ca"
+$SiteUser = "floorstodayfinal"
+$LiveSiteRoot = "/home/floorstodayfinal/htdocs/floorstoday.ca"
 $LiveUrl = "https://floorstoday.ca"
 
 $MysqlBin = "C:\wamp64\bin\mysql\mysql8.4.7\bin"
@@ -50,17 +51,6 @@ if (-not (Test-Path $scratchDir)) {
     New-Item -ItemType Directory -Path $scratchDir | Out-Null
 }
 
-function Resolve-LiveSite {
-    $result = (ssh "${SshUser}@${LiveHost}" "set -e; root=\$(find /home -maxdepth 3 -type d -path '*/htdocs/$SiteDomain' 2>/dev/null | head -n 1); if [ -z \"\$root\" ]; then echo SITE_NOT_FOUND; exit 2; fi; user=\$(basename \$(dirname \$(dirname \"\$root\"))); echo \"\$user|\$root\"") -join "`n"
-    if ($result -notmatch '^([^|]+)\|(.+)$') {
-        throw "Could not find live site root for $SiteDomain on $LiveHost. Output: $result"
-    }
-    return @{
-        User = $Matches[1]
-        Root = $Matches[2]
-    }
-}
-
 Write-Host "==============================================================" -ForegroundColor Yellow
 Write-Host " This overwrites the LIVE production database with your LOCAL" -ForegroundColor Yellow
 Write-Host " copy. Any real leads/orders/data entered on the live site" -ForegroundColor Yellow
@@ -72,9 +62,6 @@ if ($confirmation -ne "PUSH TO LIVE") {
     exit 1
 }
 
-$liveSite = Resolve-LiveSite
-$SiteUser = $liveSite.User
-$LiveSiteRoot = $liveSite.Root
 Write-Host "Live site resolved: $SiteUser -> $LiveSiteRoot"
 
 function Remove-RemoteTemp {
@@ -84,6 +71,36 @@ function Remove-RemoteTemp {
     # abort the script, the important data has already moved by this point.
     try { ssh "${SshUser}@${LiveHost}" "sudo -u $SiteUser rm -f $remoteBackupPath $remotePushPath" 2>$null } catch {}
     try { ssh "${SshUser}@${LiveHost}" "rm -f $remoteDumpScriptPath $remoteImportScriptPath" 2>$null } catch {}
+}
+
+function Convert-ToBashPath {
+    param([string]$Path)
+    $full = [System.IO.Path]::GetFullPath($Path).Replace('\', '/')
+    if ($full -match '^([A-Za-z]):/(.*)$') {
+        return '/' + $Matches[1].ToLower() + '/' + $Matches[2]
+    }
+    return $full
+}
+
+function Copy-ToRemote {
+    param([string]$LocalPath, [string]$RemotePath)
+    $bashPath = Convert-ToBashPath $LocalPath
+    & "C:\Program Files\Git\bin\bash.exe" -lc "cat '$bashPath' | ssh '${SshUser}@${LiveHost}' 'cat > \"$RemotePath\"'"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Upload failed: $LocalPath -> ${SshUser}@${LiveHost}:$RemotePath"
+    }
+}
+
+function Copy-FromRemote {
+    param([string]$RemotePath, [string]$LocalPath, [string]$RemoteReader = "")
+    $bashPath = Convert-ToBashPath $LocalPath
+    if ($RemoteReader -eq "") {
+        $RemoteReader = "cat \"$RemotePath\""
+    }
+    & "C:\Program Files\Git\bin\bash.exe" -lc "ssh '${SshUser}@${LiveHost}' '$RemoteReader' > '$bashPath'"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Download failed: ${SshUser}@${LiveHost}:$RemotePath -> $LocalPath"
+    }
 }
 
 trap {
@@ -96,12 +113,12 @@ trap {
 }
 
 Write-Host "== Backing up LIVE database first (safety net, credentials never leave the server) =="
-scp -q $dumpScript "${SshUser}@${LiveHost}:${remoteDumpScriptPath}"
+Copy-ToRemote $dumpScript $remoteDumpScriptPath
 $backupResult = ssh "${SshUser}@${LiveHost}" "sudo -u $SiteUser bash $remoteDumpScriptPath $LiveSiteRoot/wp-config.php $remoteBackupPath"
 if ($backupResult -notmatch "DUMP_OK:") {
     throw "Live backup did not confirm success. Output: $backupResult. Aborting before touching live DB."
 }
-scp -q "${SshUser}@${LiveHost}:${remoteBackupPath}" $liveBackupFile
+Copy-FromRemote $remoteBackupPath $liveBackupFile "sudo -u $SiteUser cat \"$remoteBackupPath\""
 if (-not (Test-Path $liveBackupFile) -or (Get-Item $liveBackupFile).Length -eq 0) {
     throw "Live backup download is missing or empty - aborting before touching live DB"
 }
@@ -122,8 +139,8 @@ if (-not (Test-Path $localDumpFile) -or (Get-Item $localDumpFile).Length -eq 0) 
 Write-Host "Local dump complete: $((Get-Item $localDumpFile).Length) bytes"
 
 Write-Host "== Uploading local dump to server =="
-scp -q $localDumpFile "${SshUser}@${LiveHost}:${remotePushPath}"
-scp -q $importScript "${SshUser}@${LiveHost}:${remoteImportScriptPath}"
+Copy-ToRemote $localDumpFile $remotePushPath
+Copy-ToRemote $importScript $remoteImportScriptPath
 
 Write-Host "== Importing local dump into LIVE database =="
 $importResult = ssh "${SshUser}@${LiveHost}" "sudo -u $SiteUser bash $remoteImportScriptPath $LiveSiteRoot/wp-config.php $remotePushPath"
@@ -142,7 +159,7 @@ $fixSql = "UPDATE floors1_options SET option_value = '$LiveUrl' WHERE option_nam
 $fixSqlFile = Join-Path $scratchDir "fix-siteurl-$timestamp.sql"
 $remoteFixSqlPath = "/tmp/fix-siteurl-$timestamp.sql"
 Set-Content -Path $fixSqlFile -Value $fixSql -Encoding utf8 -NoNewline
-scp -q $fixSqlFile "${SshUser}@${LiveHost}:${remoteFixSqlPath}"
+Copy-ToRemote $fixSqlFile $remoteFixSqlPath
 $fixResult = ssh "${SshUser}@${LiveHost}" "sudo -u $SiteUser bash $remoteImportScriptPath $LiveSiteRoot/wp-config.php $remoteFixSqlPath"
 # Uploaded via plain scp, so it's owned by $SshUser, not $SiteUser - deleting
 # it via sudo -u $SiteUser fails ("Operation not permitted", /tmp sticky bit).
