@@ -19,8 +19,7 @@ $ErrorActionPreference = "Stop"
 
 $LiveHost = "16.54.143.52"
 $SshUser = "ubuntu"
-$SiteUser = "floorstodayfinal"
-$LiveSiteRoot = "/home/floorstodayfinal/htdocs/floorstoday.ca"
+$SiteDomain = "floorstoday.ca"
 
 $MysqlBin = "C:\wamp64\bin\mysql\mysql8.4.7\bin"
 $LocalDbName = "floortodays"
@@ -41,6 +40,17 @@ if (-not (Test-Path $scratchDir)) {
     New-Item -ItemType Directory -Path $scratchDir | Out-Null
 }
 
+function Resolve-LiveSite {
+    $result = (ssh "${SshUser}@${LiveHost}" "set -e; root=\$(find /home -maxdepth 3 -type d -path '*/htdocs/$SiteDomain' 2>/dev/null | head -n 1); if [ -z \"\$root\" ]; then echo SITE_NOT_FOUND; exit 2; fi; user=\$(basename \$(dirname \$(dirname \"\$root\"))); echo \"\$user|\$root\"") -join "`n"
+    if ($result -notmatch '^([^|]+)\|(.+)$') {
+        throw "Could not find live site root for $SiteDomain on $LiveHost. Output: $result"
+    }
+    return @{
+        User = $Matches[1]
+        Root = $Matches[2]
+    }
+}
+
 function Remove-RemoteTemp {
     # The dump is owned by $SiteUser (created via sudo -u), the uploaded
     # script is owned by $SshUser (plain scp) - different owners need
@@ -55,6 +65,11 @@ trap {
     Remove-RemoteTemp
     exit 1
 }
+
+$liveSite = Resolve-LiveSite
+$SiteUser = $liveSite.User
+$LiveSiteRoot = $liveSite.Root
+Write-Host "Live site resolved: $SiteUser -> $LiveSiteRoot"
 
 Write-Host "== Dumping live database on the server (credentials never leave the server) =="
 scp -q $dumpScript "${SshUser}@${LiveHost}:${remoteScriptPath}"

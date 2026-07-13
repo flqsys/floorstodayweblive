@@ -25,8 +25,7 @@ $ErrorActionPreference = "Stop"
 
 $LiveHost = "16.54.143.52"
 $SshUser = "ubuntu"
-$SiteUser = "floorstodayfinal"
-$LiveSiteRoot = "/home/floorstodayfinal/htdocs/floorstoday.ca"
+$SiteDomain = "floorstoday.ca"
 $LiveUrl = "https://floorstoday.ca"
 
 $MysqlBin = "C:\wamp64\bin\mysql\mysql8.4.7\bin"
@@ -51,6 +50,17 @@ if (-not (Test-Path $scratchDir)) {
     New-Item -ItemType Directory -Path $scratchDir | Out-Null
 }
 
+function Resolve-LiveSite {
+    $result = (ssh "${SshUser}@${LiveHost}" "set -e; root=\$(find /home -maxdepth 3 -type d -path '*/htdocs/$SiteDomain' 2>/dev/null | head -n 1); if [ -z \"\$root\" ]; then echo SITE_NOT_FOUND; exit 2; fi; user=\$(basename \$(dirname \$(dirname \"\$root\"))); echo \"\$user|\$root\"") -join "`n"
+    if ($result -notmatch '^([^|]+)\|(.+)$') {
+        throw "Could not find live site root for $SiteDomain on $LiveHost. Output: $result"
+    }
+    return @{
+        User = $Matches[1]
+        Root = $Matches[2]
+    }
+}
+
 Write-Host "==============================================================" -ForegroundColor Yellow
 Write-Host " This overwrites the LIVE production database with your LOCAL" -ForegroundColor Yellow
 Write-Host " copy. Any real leads/orders/data entered on the live site" -ForegroundColor Yellow
@@ -61,6 +71,11 @@ if ($confirmation -ne "PUSH TO LIVE") {
     Write-Host "Aborted - confirmation phrase did not match." -ForegroundColor Red
     exit 1
 }
+
+$liveSite = Resolve-LiveSite
+$SiteUser = $liveSite.User
+$LiveSiteRoot = $liveSite.Root
+Write-Host "Live site resolved: $SiteUser -> $LiveSiteRoot"
 
 function Remove-RemoteTemp {
     # Backup/push dumps are owned by $SiteUser (created/read via sudo -u),

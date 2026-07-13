@@ -15,8 +15,7 @@ $ErrorActionPreference = "Stop"
 
 $LiveHost = "16.54.143.52"
 $SshUser = "ubuntu"
-$SiteUser = "floorstodayfinal"
-$LiveSiteRoot = "/home/floorstodayfinal/htdocs/floorstoday.ca"
+$SiteDomain = "floorstoday.ca"
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $projectRoot = Resolve-Path (Join-Path $scriptDir "..")
@@ -24,6 +23,17 @@ $envFile = Join-Path $projectRoot ".env.production"
 $backupFile = Join-Path $projectRoot ".env.production.local-backup"
 $outDir = Join-Path $projectRoot "out"
 $archivePath = Join-Path $projectRoot "live-build.tar.gz"
+
+function Resolve-LiveSite {
+    $result = (ssh "${SshUser}@${LiveHost}" "set -e; root=\$(find /home -maxdepth 3 -type d -path '*/htdocs/$SiteDomain' 2>/dev/null | head -n 1); if [ -z \"\$root\" ]; then echo SITE_NOT_FOUND; exit 2; fi; user=\$(basename \$(dirname \$(dirname \"\$root\"))); echo \"\$user|\$root\"") -join "`n"
+    if ($result -notmatch '^([^|]+)\|(.+)$') {
+        throw "Could not find live site root for $SiteDomain on $LiveHost. Output: $result"
+    }
+    return @{
+        User = $Matches[1]
+        Root = $Matches[2]
+    }
+}
 
 function Restore-LocalEnv {
     if (Test-Path $backupFile) {
@@ -37,6 +47,11 @@ trap {
     Restore-LocalEnv
     exit 1
 }
+
+$liveSite = Resolve-LiveSite
+$SiteUser = $liveSite.User
+$LiveSiteRoot = $liveSite.Root
+Write-Host "Live site resolved: $SiteUser -> $LiveSiteRoot"
 
 Write-Host "== Building for live (NEXT_PUBLIC_BASE_PATH=/public) =="
 Copy-Item $envFile $backupFile -Force
