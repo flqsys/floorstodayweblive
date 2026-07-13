@@ -41,14 +41,44 @@
 /icon-light-32x32.png
 /icon.svg
 
-# Build output
-/public/.next/
-/public/out/
-/public/_next/static/*
-!/public/_next/static/chunks/
-!/public/_next/static/media/
-!/public/_next/static/*/
+# public/ is a pure build artifact now, never tracked: populated locally
+# by sync-public.ps1, deployed live only by deploy-live.ps1. It used to
+# be partially tracked, which is exactly what let a plain `git pull` on
+# the live server overwrite it with the local build (wrong asset paths -
+# caused a full homepage outage). Never again - see Info.md.
+/public/
 /live-build/
+
+# WordPress core - not hand-tracked, updates itself / is only ever
+# touched on live. wp-config-sample.php stays as a template reference.
+/wp-admin/
+/wp-includes/
+/wp-*.php
+!/wp-config-sample.php
+/xmlrpc.php
+/license.txt
+/readme.html
+
+# wp-content: only track code we actually write and review. Everything
+# else (third-party plugins/themes, uploads, languages, cache) is
+# WordPress/Elementor content and updates on the live site directly per
+# the "no WP changes locally" policy - see Info.md.
+/wp-content/*
+!/wp-content/mu-plugins
+!/wp-content/plugins
+!/wp-content/themes
+!/wp-content/index.php
+
+/wp-content/mu-plugins/*.bak-*
+/wp-content/mu-plugins/floors-leads-export-tool.php
+
+/wp-content/plugins/*
+!/wp-content/plugins/floors-itech-crm
+!/wp-content/plugins/index.php
+
+/wp-content/themes/*
+!/wp-content/themes/FloorsTodayTheme
+!/wp-content/themes/index.php
 
 # Vercel / AI tools
 /public/.vercel/
