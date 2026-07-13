@@ -77,6 +77,7 @@ export type HomepageSettings = {
   hero_overlay_opacity: string
   form_title: string
   form_subtitle: string
+  estimate_form_embed_code: string
   process_title: string
   process_text: string
   process_bg_color_1: string
@@ -235,6 +236,7 @@ export const homepageDefaults: HomepageSettings = {
   hero_overlay_opacity: "0.72",
   form_title: "",
   form_subtitle: "",
+  estimate_form_embed_code: "",
   process_title: "",
   process_text: "",
   process_bg_color_1: "#ffffff",
