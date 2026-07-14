@@ -44,9 +44,34 @@ function Get-UrlStatus($url) {
     }
 }
 
-Write-Host "== 0. Live public/ still has git skip-worktree set (root cause of past clobber incidents) ==" -ForegroundColor Cyan
-$swResult = (ssh "${SshUser}@${LiveHost}" "sudo -u $SiteUser bash -c 'cd $LiveSiteRoot && total=`$(git ls-files public | wc -l); flagged=`$(git ls-files -v public | grep -c ""^S"" || true); echo `$flagged/`$total'") -join "`n"
-Test-Check "all tracked public/ files have skip-worktree set" ($swResult -match '^(\d+)/(\d+)$' -and $Matches[1] -eq $Matches[2] -and [int]$Matches[2] -gt 0) "(flagged/total: $swResult)"
+Write-Host "== 0. WordPress core/plugins/theme/public are genuinely untracked on live (root cause of the 2026-07-13 clobber incident) ==" -ForegroundColor Cyan
+# A prior session tried to protect these paths with git's skip-worktree flag,
+# but that didn't actually stop a `git reset --hard` from deleting them - it
+# happened anyway on 2026-07-13, wiping wp-admin/wp-includes/the parent theme/
+# every plugin/the Elementor CSS cache in one shot. The only protection that
+# actually works against reset/checkout/pull is not being in the git index at
+# all, so this checks that directly instead of trusting a flag.
+$protectedPaths = @(
+    "public", "wp-admin", "wp-includes",
+    "wp-activate.php", "wp-blog-header.php", "wp-comments-post.php",
+    "wp-cron.php", "wp-links-opml.php", "wp-load.php", "wp-login.php",
+    "wp-mail.php", "wp-settings.php", "wp-signup.php", "wp-trackback.php",
+    "xmlrpc.php", "license.txt", "readme.html",
+    "wp-content/themes/hello-elementor", "wp-content/uploads",
+    "wp-content/plugins/admin-menu-editor-pro",
+    "wp-content/plugins/advanced-custom-fields-pro",
+    "wp-content/plugins/amazon-s3-and-cloudfront-pro",
+    "wp-content/plugins/child-theme-configurator",
+    "wp-content/plugins/classic-editor",
+    "wp-content/plugins/elementor-pro",
+    "wp-content/plugins/elementor",
+    "wp-content/plugins/filebird-pro",
+    "wp-content/plugins/lara-google-analytics-pro",
+    "wp-content/plugins/wpvivid-backuprestore"
+)
+$pathArgs = ($protectedPaths | ForEach-Object { "'$_'" }) -join ' '
+$trackedResult = (ssh "${SshUser}@${LiveHost}" "sudo -u $SiteUser bash -c 'cd $LiveSiteRoot && git ls-files $pathArgs | wc -l'") -join "`n"
+Test-Check "no protected WP core/plugin/theme paths are git-tracked on live" ($trackedResult -match '^0$') "(tracked file count: $trackedResult - if nonzero, a future reset/pull WILL delete these again)"
 
 Write-Host "== 1. Homepage loads and settings inject ==" -ForegroundColor Cyan
 $homeResp = Invoke-WebRequest -Uri "$LiveUrl/" -UseBasicParsing -TimeoutSec 20
