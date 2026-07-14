@@ -2,6 +2,11 @@
 /opcache-reset.php
 /sendy-test.php
 
+# Stale static sitemap leftover - causes wp-sitemap.xml to redirect into
+# it, which loops back to wp-sitemap.xml (Google Search Console can't
+# fetch it as a result). Handled manually on live, not tracked here.
+/sitemap_index.xml
+
 # Notes file may contain credentials - never commit
 /Info.md
 
