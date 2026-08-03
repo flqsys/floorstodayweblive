@@ -90,6 +90,7 @@ function ft_next_booking_form_products_shortcode($atts) {
             .ft-bf__property svg { width: 24px; height: 24px; }
             .ft-bf__field { display: block; margin: 0 0 16px; }
             .ft-bf__field > span { display: block; margin-bottom: 7px; color: #475569; font-size: 14px; font-weight: 600; }
+            .ft-bf__req { color: #dc2626; margin-left: 2px; }
             .ft-bf__input, .ft-bf__select, .elementor-widget-container .ft-bf__input, .elementor-widget-container .ft-bf__select { display: block; width: 100%; height: 48px; padding: 0 14px; border: 1px solid #d6d3d1 !important; border-radius: 8px !important; background: #fff !important; color: #0f172a; font: inherit; font-size: 16px; box-shadow: none !important; transition: border-color .18s ease, box-shadow .18s ease; }
             .ft-bf__input:focus, .ft-bf__select:focus, .elementor-widget-container .ft-bf__input:focus, .elementor-widget-container .ft-bf__select:focus { border-color: var(--ft-bf-primary) !important; outline: 0; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ft-bf-primary) 18%, transparent) !important; }
             .ft-bf__columns { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
@@ -250,10 +251,10 @@ function ft_next_booking_form_products_shortcode($atts) {
 
             <section class="ft-bf__step" data-step="2" hidden>
                 <h3 class="ft-bf__question">Your contact details</h3>
-                <label class="ft-bf__field"><span>Full name</span><input class="ft-bf__input" name="fullName" type="text" autocomplete="name" placeholder="Jane Doe" required></label>
-                <label class="ft-bf__field"><span>Email</span><input class="ft-bf__input" name="email" type="email" autocomplete="email" placeholder="jane@email.com" required></label>
+                <label class="ft-bf__field"><span>Full name<span class="ft-bf__req" aria-hidden="true">*</span></span><input class="ft-bf__input" name="fullName" type="text" autocomplete="name" placeholder="Jane Doe" required></label>
+                <label class="ft-bf__field"><span>Email<span class="ft-bf__req" aria-hidden="true">*</span></span><input class="ft-bf__input" name="email" type="email" autocomplete="email" placeholder="jane@email.com" required></label>
                 <label class="ft-bf__field">
-                    <span>Phone</span>
+                    <span>Phone<span class="ft-bf__req" aria-hidden="true">*</span></span>
                     <div class="ft-bf__phone-wrap">
                         <span class="ft-bf__phone-pfx" aria-hidden="true">+1</span>
                         <input class="ft-bf__input" name="phoneLocal" type="tel" autocomplete="tel" placeholder="(416) 555-0199" required>
@@ -269,7 +270,7 @@ function ft_next_booking_form_products_shortcode($atts) {
                 <h3 class="ft-bf__question">Where should we visit?</h3>
                 <div class="ft-bf__addr-row">
                     <label class="ft-bf__field">
-                        <span>Street address</span>
+                        <span>Street address<span class="ft-bf__req" aria-hidden="true">*</span></span>
                         <input class="ft-bf__input ft-bf__street" name="street" type="text" autocomplete="address-line1" placeholder="123 Main St" required>
                     </label>
                     <label class="ft-bf__field">
@@ -279,11 +280,11 @@ function ft_next_booking_form_products_shortcode($atts) {
                 </div>
                 <div class="ft-bf__columns">
                     <label class="ft-bf__field">
-                        <span>City</span>
+                        <span>City<span class="ft-bf__req" aria-hidden="true">*</span></span>
                         <input class="ft-bf__input ft-bf__city" name="city" type="text" autocomplete="address-level2" placeholder="Toronto" required>
                     </label>
                     <label class="ft-bf__field">
-                        <span>Province</span>
+                        <span>Province<span class="ft-bf__req" aria-hidden="true">*</span></span>
                         <?php
                         $provinces = [
                             'AB' => 'Alberta', 'BC' => 'British Columbia', 'MB' => 'Manitoba',
@@ -308,7 +309,7 @@ function ft_next_booking_form_products_shortcode($atts) {
                 </div>
                 <div class="ft-bf__columns">
                     <label class="ft-bf__field">
-                        <span>Postal code</span>
+                        <span>Postal code<span class="ft-bf__req" aria-hidden="true">*</span></span>
                         <input class="ft-bf__input ft-bf__postal" name="postalCode" type="text" autocomplete="postal-code" placeholder="A1A 1A1" required>
                     </label>
                     <label class="ft-bf__field">
@@ -611,6 +612,7 @@ function ft_next_booking_form_contact_shortcode($atts) {
             .ft-cf__subtitle { margin: 8px 0 0; color: #475569; font-size: 14px; }
             .ft-cf__field { display: block; margin: 0 0 16px; }
             .ft-cf__field > span { display: block; margin-bottom: 7px; color: #475569; font-size: 14px; font-weight: 600; }
+            .ft-cf__req { color: #dc2626; margin-left: 2px; }
             .ft-cf__input, .elementor-widget-container .ft-cf__input { display: block; width: 100%; height: 48px; padding: 0 14px; border: 1px solid #d6d3d1 !important; border-radius: 8px !important; background: #fff !important; color: #0f172a; font: inherit; font-size: 16px; box-shadow: none !important; transition: border-color .18s ease, box-shadow .18s ease; }
             .ft-cf__input:focus, .elementor-widget-container .ft-cf__input:focus { border-color: var(--ft-cf-primary) !important; outline: 0; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ft-cf-primary) 18%, transparent) !important; }
             .ft-cf__textarea { display: block; width: 100%; min-height: 120px; padding: 12px 14px; border: 1px solid #d6d3d1 !important; border-radius: 8px !important; background: #fff !important; color: #0f172a; font: inherit; font-size: 16px; line-height: 1.5; resize: vertical; box-shadow: none !important; transition: border-color .18s ease, box-shadow .18s ease; }
@@ -659,15 +661,15 @@ function ft_next_booking_form_contact_shortcode($atts) {
                 <label>Leave this field empty<input name="ftInboxTrap" type="text" tabindex="-1" autocomplete="new-password"></label>
             </div>
             <label class="ft-cf__field">
-                <span>Full name</span>
+                <span>Full name<span class="ft-cf__req" aria-hidden="true">*</span></span>
                 <input class="ft-cf__input" name="fullName" type="text" autocomplete="name" placeholder="Jane Doe" required>
             </label>
             <label class="ft-cf__field">
-                <span>Email</span>
+                <span>Email<span class="ft-cf__req" aria-hidden="true">*</span></span>
                 <input class="ft-cf__input" name="email" type="email" autocomplete="email" placeholder="jane@email.com" required>
             </label>
             <label class="ft-cf__field">
-                <span>Phone</span>
+                <span>Phone<span class="ft-cf__req" aria-hidden="true">*</span></span>
                 <div class="ft-cf__phone-wrap">
                     <span class="ft-cf__phone-pfx" aria-hidden="true">+1</span>
                     <input class="ft-cf__input" name="phoneLocal" type="tel" autocomplete="tel" placeholder="(416) 555-0199" required>
