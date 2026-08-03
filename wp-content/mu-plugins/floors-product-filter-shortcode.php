@@ -21,6 +21,20 @@ function ft_pf_fields() {
     ];
 }
 
+// Which fields apply per category - not derived from product data, because
+// some fields (e.g. Flooring Look) are fully populated across every product
+// in a category yet still aren't meaningful filters there (per the agreed
+// spec). Explicit allowlist, not auto-detection.
+function ft_pf_category_field_allowlist() {
+    return [
+        'carpet' => ['dimensions', 'color_shade', 'flooring_types', 'surface_texture'],
+        'engineered-hardwood' => ['dimensions', 'color_shade', 'flooring_types', 'surface_texture', 'gloss_level', 'species'],
+        'laminate' => ['dimensions', 'color_shade', 'flooring_look', 'gloss_level'],
+        'solid-hardwood' => ['dimensions', 'color_shade', 'flooring_types', 'surface_texture', 'gloss_level', 'species'],
+        'vinyl' => ['dimensions', 'color_shade', 'flooring_look', 'flooring_types', 'surface_texture', 'gloss_level'],
+    ];
+}
+
 function ft_pf_clean_product_title($title) {
     $title = (string) $title;
 
@@ -156,6 +170,16 @@ function ft_pf_build_data($atts, $fixed_category = '') {
             'categorySlugs' => array_column($product_categories, 'slug'),
             'meta' => $meta,
         ];
+    }
+
+    $allowlist = ft_pf_category_field_allowlist();
+    if ($fixed_category !== '' && isset($allowlist[$fixed_category])) {
+        $allowed = $allowlist[$fixed_category];
+        foreach ($fields as $key => $label) {
+            if (!in_array($key, $allowed, true)) {
+                $options[$key] = [];
+            }
+        }
     }
 
     foreach ($options as $key => $values) {
