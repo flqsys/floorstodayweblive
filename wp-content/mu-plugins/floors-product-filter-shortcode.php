@@ -59,7 +59,7 @@ function ft_pf_product_image($post_id) {
     return $thumb ?: '';
 }
 
-function ft_pf_build_data($atts) {
+function ft_pf_build_data($atts, $fixed_category = '') {
     $fields = ft_pf_fields();
     $meta_fields = ['color' => 'Color'] + $fields;
     $terms = get_terms([
@@ -90,6 +90,22 @@ function ft_pf_build_data($atts) {
         'order' => 'ASC',
         'no_found_rows' => true,
     ];
+
+    // Only scoped when the category is locked (hide_category=yes, e.g. category
+    // archive pages) - the field/option lists below are built purely from
+    // whichever products this query returns, so locking it to one category here
+    // is what keeps irrelevant fields (e.g. Species on a Carpet page) from
+    // showing at all. Never applied when the category picker itself is visible
+    // and changeable - that needs every category's products loaded at once.
+    if ($fixed_category !== '') {
+        $args['tax_query'] = [
+            [
+                'taxonomy' => 'categories',
+                'field' => 'slug',
+                'terms' => $fixed_category,
+            ],
+        ];
+    }
 
     $query = new WP_Query($args);
     $products = [];
@@ -178,7 +194,7 @@ function ft_pf_shortcode($atts) {
     $per_page = max(1, (int) $atts['per_page']);
     $hide_category = in_array(strtolower((string) $atts['hide_category']), ['1', 'yes', 'true'], true);
     $fixed_category = $hide_category ? sanitize_title($atts['category']) : '';
-    $data = ft_pf_build_data($atts);
+    $data = ft_pf_build_data($atts, $fixed_category);
     $instance_id = wp_unique_id('ft-product-filter-');
 
     ob_start();
