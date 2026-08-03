@@ -378,6 +378,7 @@ function ft_pf_shortcode($atts) {
                 display: flex;
                 align-items: center;
                 width: 100%;
+                min-width: 0;
                 min-height: 42px;
                 border: 0 !important;
                 border-radius: 0 !important;
@@ -400,6 +401,7 @@ function ft_pf_shortcode($atts) {
                 box-shadow: none !important;
             }
             .ft-pf__select-current {
+                min-width: 0;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -649,6 +651,10 @@ function ft_pf_shortcode($atts) {
                 padding: 76px 16px 14px;
             }
             .ft-pf__card-title {
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
                 margin: 0;
                 font-family: "Montserrat", sans-serif;
                 font-size: 16px;
