@@ -581,7 +581,39 @@ function ft_next_homepage_attribution_script() {
         . 'function socialSource(refHost){if(!refHost)return "";if(socialHosts[refHost])return socialHosts[refHost];var keys=Object.keys(socialHosts);for(var i=0;i<keys.length;i++){if(refHost.endsWith("."+keys[i]))return socialHosts[keys[i]];}return "";}'
         . 'function current(){var pageUrl=new URL(window.location.href);var params=pageUrl.searchParams;var ref=document.referrer||"";var refHost=host(ref);var ownHost=host(window.location.href);if(refHost===ownHost)refHost="";var utmSource=params.get("hello_social")||params.get("utm_source")||"";var data={createdAt:Date.now(),pageUrl:window.location.href,landingPage:window.location.href,referrerUrl:ref,referrerHost:refHost,utmSource:utmSource,utmMedium:params.get("utm_medium")||"",utmCampaign:params.get("utm_campaign")||"",utmContent:params.get("utm_content")||"",utmTerm:params.get("utm_term")||"",trafficSource:utmSource||socialSource(refHost)||refHost||"Direct"};return data;}'
         . 'function capture(){var existing=read();var data=current();var hasCampaign=data.utmSource||data.utmMedium||data.utmCampaign||data.utmContent||data.utmTerm||data.referrerHost;if(!existing&&hasCampaign){try{localStorage.setItem(key,JSON.stringify(data));}catch(e){}return data;}return existing||data;}'
-        . 'function decorateLinks(){}'
+        // Propagates the captured attribution onto every internal link's
+        // querystring, so document.referrer still carries it no matter how
+        // many pages deep a visitor is when they finally reach a form -
+        // including CRM iframe embeds (app.floorstoday.ca), which parse
+        // utm_source/hello_social straight out of the referrer URL since
+        // they can't read this site's localStorage across origins. External
+        // links, mailto/tel, and fragment-only hrefs are left untouched.
+        . 'function decorateLinks(){'
+        . 'var data=capture();'
+        . 'var params={};'
+        . 'if(data.utmSource)params.utm_source=data.utmSource;'
+        . 'if(data.utmMedium)params.utm_medium=data.utmMedium;'
+        . 'if(data.utmCampaign)params.utm_campaign=data.utmCampaign;'
+        . 'if(data.utmTerm)params.utm_term=data.utmTerm;'
+        . 'if(data.utmContent)params.utm_content=data.utmContent;'
+        . 'var keys=Object.keys(params);'
+        . 'if(!keys.length)return;'
+        . 'var ownHost=host(window.location.href);'
+        . 'document.querySelectorAll("a[href]").forEach(function(a){'
+        . 'if(a.dataset.ftDecorated==="1")return;'
+        . 'var href=a.getAttribute("href")||"";'
+        . 'if(!href||href.charAt(0)==="#")return;'
+        . 'if(/^(mailto:|tel:|javascript:)/i.test(href))return;'
+        . 'var url;'
+        . 'try{url=new URL(href,window.location.href);}catch(e){return;}'
+        . 'if(url.protocol!=="http:"&&url.protocol!=="https:")return;'
+        . 'if(host(url.href)!==ownHost)return;'
+        . 'var changed=false;'
+        . 'keys.forEach(function(k){if(!url.searchParams.has(k)){url.searchParams.set(k,params[k]);changed=true;}});'
+        . 'if(changed)a.setAttribute("href",url.toString());'
+        . 'a.dataset.ftDecorated="1";'
+        . '});'
+        . '}'
         . 'window.ftGetAttribution=function(){return capture();};'
         . 'capture();'
         . 'if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",decorateLinks);}else{decorateLinks();}'
