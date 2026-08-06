@@ -463,3 +463,161 @@ add_action('wp_head', function () {
     </style>
     <?php
 }, 9999);
+
+/**
+ * Remove empty, N/A, and "-" values from an ACF Group.
+ */
+function itech_clean_acf_group($group_name)
+{
+    $group = get_field($group_name);
+
+    if (!$group || !is_array($group)) {
+        return [];
+    }
+
+    foreach ($group as $key => $value) {
+
+        // Handle arrays (checkboxes, repeaters, etc.)
+        if (is_array($value)) {
+            if (empty($value)) {
+                unset($group[$key]);
+            }
+            continue;
+        }
+
+        $value = trim((string)$value);
+
+        if (
+            $value === '' ||
+            strtoupper($value) === 'N/A' ||
+            $value === '-'
+        ) {
+            unset($group[$key]);
+        }
+    }
+
+    return $group;
+}
+
+/**
+ * Display product specifications for a single Our Products entry.
+ *
+ * Pulls from the "Product Information" ACF field group, but only the fields
+ * below - that group also has FAQs/Key Features/FAQs Tabs fields, which
+ * belong to other sections of the product page, not this spec list.
+ *
+ * Usage:
+ * [product_specifications]
+ * [product_specifications title="Specifications"]
+ */
+function itech_product_specifications_shortcode($atts)
+{
+    $atts = shortcode_atts(
+        [
+            'title' => 'Specifications',
+        ],
+        $atts,
+        'product_specifications'
+    );
+
+    // Only display on the Our Products post type.
+    if (get_post_type() !== 'our-products') {
+        return '';
+    }
+
+    if (!function_exists('get_field_object')) {
+        return '';
+    }
+
+    // Field names, in display order. Labels are pulled live from ACF below,
+    // not hardcoded here, so renaming a field's label in ACF updates the
+    // output automatically.
+    $spec_fields = [
+        'dimensions',
+        'color',
+        'color_shade',
+        'flooring_look',
+        'flooring_types',
+        'gloss_level',
+        'species',
+        'surface_texture',
+        'sku',
+        'seo_title_products',
+    ];
+
+    $invalid_values = [
+        '',
+        'n/a',
+        'na',
+        'not applicable',
+        '-',
+    ];
+
+    $rows = [];
+
+    foreach ($spec_fields as $field_name) {
+        $field_object = get_field_object($field_name);
+
+        if (empty($field_object)) {
+            continue;
+        }
+
+        $value = $field_object['value'];
+
+        // Support arrays such as checkbox or multi-select fields.
+        if (is_array($value)) {
+            $value = array_filter(
+                array_map('trim', array_map('strval', $value)),
+                static function ($item) {
+                    return $item !== '';
+                }
+            );
+
+            $value = implode(', ', $value);
+        }
+
+        $value = trim((string) $value);
+
+        if (in_array(strtolower($value), $invalid_values, true)) {
+            continue;
+        }
+
+        $rows[] = [
+            'label' => $field_object['label'] ?? $field_name,
+            'value' => $value,
+        ];
+    }
+
+    // Hide the entire specification section when no valid rows exist.
+    if (empty($rows)) {
+        return '';
+    }
+
+    ob_start();
+    ?>
+    <div class="itech-product-specifications">
+        <?php if ($atts['title'] !== '') : ?>
+            <div class="itech-specifications-title">
+                <?php echo esc_html($atts['title']); ?>
+            </div>
+        <?php endif; ?>
+
+        <div class="itech-specifications-list">
+            <?php foreach ($rows as $row) : ?>
+                <div class="itech-specification-row">
+                    <strong class="itech-specification-label">
+                        <?php echo esc_html($row['label']); ?>:
+                    </strong>
+
+                    <span class="itech-specification-value">
+                        <?php echo esc_html($row['value']); ?>
+                    </span>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php
+
+    return ob_get_clean();
+}
+add_shortcode('product_specifications', 'itech_product_specifications_shortcode');
