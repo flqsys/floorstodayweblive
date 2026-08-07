@@ -278,6 +278,7 @@ add_action('admin_post_ft_xd_crm_save_settings', function () {
 
     $cf_fields = [
         'flooring_type', 'property_type', 'start_time', 'preferred_visit_time',
+        'traffic_source', 'utm_source',
         'utm_campaign', 'utm_medium', 'utm_content', 'utm_term',
         'page_url', 'device_platform',
     ];
@@ -350,6 +351,8 @@ function ft_xd_crm_render_settings_page(): void {
         'property_type'   => 'Property Type',
         'start_time'      => 'Start Time',
         'preferred_visit_time' => 'Preferred Visit Time',
+        'traffic_source'  => 'Traffic Source (resolved channel, e.g. Facebook/Google/Direct)',
+        'utm_source'      => 'UTM Source (raw value)',
         'utm_campaign'    => 'UTM Campaign',
         'utm_medium'      => 'UTM Medium',
         'utm_content'     => 'UTM Content',

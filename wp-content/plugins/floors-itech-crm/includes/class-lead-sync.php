@@ -156,6 +156,13 @@ class FT_XD_Lead_Sync {
             'property_type'   => $data['property_type']   ?? '',
             'start_time'      => $data['start_time']       ?? '',
             'preferred_visit_time' => $data['preferred_visit_time'] ?? '',
+            // Resolved channel name (e.g. "Facebook", "Google", "Direct") -
+            // distinct from the raw utm_source keyword and from the CRM's own
+            // built-in Source dropdown, which stays whatever default_source
+            // is configured regardless of traffic origin. This is what feeds
+            // the CRM's "Campaign Source" custom field.
+            'traffic_source'  => $data['traffic_source']   ?? '',
+            'utm_source'      => $data['utm_source']       ?? '',
             'utm_campaign'    => $data['utm_campaign']     ?? '',
             'utm_medium'      => $data['utm_medium']       ?? '',
             'utm_content'     => $data['utm_content']      ?? '',
