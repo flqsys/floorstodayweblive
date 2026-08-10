@@ -542,7 +542,6 @@ function itech_product_specifications_shortcode($atts)
         'species',
         'surface_texture',
         'sku',
-        'seo_title_products',
     ];
 
     $invalid_values = [
