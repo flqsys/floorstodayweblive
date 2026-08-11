@@ -58,8 +58,24 @@ function ft_pf_split_values($value) {
 function ft_pf_product_image($post_id) {
     $catalog_image = get_post_meta($post_id, 'catalog_image', true);
 
+    // Some products have this stored as a serialized array of one ID
+    // (e.g. from an ACF/import path) rather than a bare scalar -
+    // get_post_meta() auto-unserializes it, so $catalog_image comes back
+    // as an array here. is_numeric()/is_string() both silently return
+    // false for an array, so this field was never actually reaching
+    // either branch below - every card fell through to the featured
+    // image regardless of what catalog_image pointed to.
+    if (is_array($catalog_image)) {
+        $catalog_image = reset($catalog_image);
+    }
+
     if (is_numeric($catalog_image)) {
-        $url = wp_get_attachment_image_url((int) $catalog_image, 'full');
+        // 'large' (WP core default, max 1024px) instead of 'full' - if a
+        // smaller registered size doesn't exist yet for a given image, WP
+        // just falls back to full size on its own, so this is free to
+        // request even before thumbnails are regenerated, and starts
+        // paying off automatically the moment they are.
+        $url = wp_get_attachment_image_url((int) $catalog_image, 'large');
         if ($url) {
             return $url;
         }
@@ -69,7 +85,7 @@ function ft_pf_product_image($post_id) {
         return esc_url_raw($catalog_image);
     }
 
-    $thumb = get_the_post_thumbnail_url($post_id, 'full');
+    $thumb = get_the_post_thumbnail_url($post_id, 'large');
     return $thumb ?: '';
 }
 
@@ -610,6 +626,12 @@ function ft_pf_shortcode($atts) {
                 grid-template-columns: repeat(var(--ft-pf-columns), minmax(0, 1fr));
                 column-gap: 40px !important;
                 row-gap: 40px !important;
+                transition: height .26s ease, opacity .16s ease;
+            }
+            @media (prefers-reduced-motion: reduce) {
+                .ft-pf__grid {
+                    transition: none;
+                }
             }
             .ft-pf__card {
                 position: relative;
@@ -936,9 +958,17 @@ function ft_pf_shortcode($atts) {
                     wrap.style.setProperty('--ft-pf-menu-max', Math.max(140, Math.min(250, available)) + 'px');
                 }
 
+                // Cards store their image URL in data-bg instead of an
+                // inline background-image, so nothing downloads until
+                // observeCardImages() below actually applies it once the
+                // card scrolls near the viewport. These product images
+                // aren't resized on the server (some are 200-450KB each),
+                // so loading all 15 of a page at once was the actual cause
+                // of the slow/half-rendered look on first load - this
+                // spreads that network cost out over scrolling instead.
                 function renderCard(product) {
                     var image = product.image
-                        ? '<span class="ft-pf__image" role="img" aria-label="' + escapeHtml(product.title) + '" style="background-image:url(&quot;' + escapeHtml(product.image) + '&quot;)"></span>'
+                        ? '<span class="ft-pf__image" role="img" aria-label="' + escapeHtml(product.title) + '" data-bg="' + escapeHtml(product.image) + '"></span>'
                         : '<span class="ft-pf__image-placeholder"></span>';
 
                     return '<a class="ft-pf__card" href="' + escapeHtml(product.url) + '">' + image + '<div class="ft-pf__card-content"><h3 class="ft-pf__card-title">' + escapeHtml(product.title) + '</h3></div></a>';
@@ -964,6 +994,39 @@ function ft_pf_shortcode($atts) {
                     var initialCategory = root.dataset.initialCategory || '';
                     var fixedCategory = root.dataset.fixedCategory || '';
                     var searchInput = root.querySelector('.ft-pf__search-input');
+
+                    // Loads a card's background-image only once it scrolls
+                    // near the viewport (200px early, so it's ready by the
+                    // time it's actually visible) instead of every card on
+                    // the page requesting its image immediately. Falls back
+                    // to loading everything immediately on very old browsers
+                    // without IntersectionObserver, rather than never
+                    // loading images at all.
+                    var imageObserver = ('IntersectionObserver' in window)
+                        ? new IntersectionObserver(function (entries) {
+                            entries.forEach(function (entry) {
+                                if (!entry.isIntersecting) return;
+                                loadCardImage(entry.target);
+                                imageObserver.unobserve(entry.target);
+                            });
+                        }, { rootMargin: '200px 0px' })
+                        : null;
+
+                    function loadCardImage(el) {
+                        var src = el.dataset.bg;
+                        if (!src) return;
+                        el.style.backgroundImage = 'url("' + src + '")';
+                        el.removeAttribute('data-bg');
+                    }
+
+                    function observeCardImages() {
+                        var targets = grid.querySelectorAll('.ft-pf__image[data-bg]');
+                        if (imageObserver) {
+                            targets.forEach(function (el) { imageObserver.observe(el); });
+                        } else {
+                            targets.forEach(loadCardImage);
+                        }
+                    }
 
                     if (initialCategory) {
                         var categoryInput = root.querySelector('.ft-pf__select-value[data-filter="categories"]');
@@ -995,9 +1058,78 @@ function ft_pf_shortcode($atts) {
                         if (filterToggle) filterToggle.setAttribute('aria-expanded', 'true');
                     }
 
-                    function apply() {
+                    function apply(scrollToTop) {
                         visibleLimit = perPage;
                         render();
+                        if (scrollToTop) {
+                            anchorToFilterTop();
+                        }
+                    }
+
+                    // Brings the filter panel back into view (below the
+                    // sticky site header) after a selection changes the
+                    // results - otherwise, if the visitor had scrolled down
+                    // (e.g. via Load More) and a filter narrows the results
+                    // way down, they'd be stranded looking at empty space
+                    // with no results in sight. Only moves the page when the
+                    // panel's actually been scrolled past; does nothing if
+                    // it's already in view, so it never fights a visitor who
+                    // hasn't scrolled anywhere.
+                    function anchorToFilterTop() {
+                        var headerOffset = 128;
+                        var rect = root.getBoundingClientRect();
+                        if (rect.top >= headerOffset) return;
+                        window.scrollTo({
+                            top: window.pageYOffset + rect.top - headerOffset,
+                            behavior: 'smooth'
+                        });
+                    }
+
+                    // Swaps the grid's content without an instant snap: holds
+                    // the current height, fades out, mutates the DOM, then
+                    // animates to the new natural height while fading back
+                    // in. Without this, a filter that changes the result
+                    // count changes the grid's height instantly, reflowing
+                    // everything below it in one frame - the "page jumps"
+                    // feeling. Height is cleared back to auto once settled
+                    // so later reflows (window resize, etc.) aren't pinned
+                    // to a stale pixel value.
+                    //
+                    // Checkboxes fire both "input" and "change" for a single
+                    // click, and both are listened for (search needs "input",
+                    // the custom selects call apply() directly) - so two
+                    // overlapping calls for the same interaction are routine,
+                    // not an edge case. Without cancelling the first call's
+                    // pending steps, its later timeout can stomp the second
+                    // call's in-progress height, leaving the grid pinned to a
+                    // stale pixel height from before the filter - exactly the
+                    // large blank gap seen with a single result. Every call
+                    // cancels whatever's still in flight before starting.
+                    var gridAnimTimeouts = [];
+                    function animateGridUpdate(mutate) {
+                        gridAnimTimeouts.forEach(function (id) { clearTimeout(id); });
+                        gridAnimTimeouts = [];
+
+                        var startHeight = grid.offsetHeight;
+                        grid.style.height = startHeight + 'px';
+                        grid.style.overflow = 'hidden';
+                        grid.style.opacity = '1';
+
+                        requestAnimationFrame(function () {
+                            grid.style.opacity = '0';
+                            gridAnimTimeouts.push(setTimeout(function () {
+                                mutate();
+                                var endHeight = grid.scrollHeight;
+                                grid.style.height = endHeight + 'px';
+                                requestAnimationFrame(function () {
+                                    grid.style.opacity = '1';
+                                });
+                                gridAnimTimeouts.push(setTimeout(function () {
+                                    grid.style.height = '';
+                                    grid.style.overflow = '';
+                                }, 260));
+                            }, 160));
+                        });
                     }
 
                     function render() {
@@ -1022,14 +1154,29 @@ function ft_pf_shortcode($atts) {
                             });
                         });
 
-                        grid.innerHTML = lastFiltered.slice(0, visibleLimit).map(renderCard).join('');
-                        count.innerHTML = '<i class="fa-solid fa-box-archive" aria-hidden="true"></i><span>' + lastFiltered.length + ' product' + (lastFiltered.length === 1 ? '' : 's') + '</span>';
-                        root.classList.toggle('is-empty', lastFiltered.length === 0);
-                        if (loadMore) loadMore.hidden = visibleLimit >= lastFiltered.length;
+                        animateGridUpdate(function () {
+                            grid.innerHTML = lastFiltered.slice(0, visibleLimit).map(renderCard).join('');
+                            observeCardImages();
+                            count.innerHTML = '<i class="fa-solid fa-box-archive" aria-hidden="true"></i><span>' + lastFiltered.length + ' product' + (lastFiltered.length === 1 ? '' : 's') + '</span>';
+                            root.classList.toggle('is-empty', lastFiltered.length === 0);
+                            if (loadMore) loadMore.hidden = visibleLimit >= lastFiltered.length;
+                        });
                     }
 
-                    root.addEventListener('input', apply);
-                    root.addEventListener('change', apply);
+                    // Search-as-you-type is the one exception that shouldn't
+                    // anchor-scroll - the visitor's still typing, mid-input,
+                    // and yanking the page around under their cursor would
+                    // be disruptive. Every other input on this panel
+                    // (checkboxes) is a discrete, one-shot selection.
+                    function isSearchInput(target) {
+                        return !!target.closest('.ft-pf__search-input');
+                    }
+                    root.addEventListener('input', function (event) {
+                        apply(!isSearchInput(event.target));
+                    });
+                    root.addEventListener('change', function (event) {
+                        apply(!isSearchInput(event.target));
+                    });
                     root.addEventListener('click', function (event) {
                         var trigger = event.target.closest('.ft-pf__select-trigger');
                         var option = event.target.closest('.ft-pf__select-option');
@@ -1083,7 +1230,7 @@ function ft_pf_shortcode($atts) {
                             optionMenu.hidden = true;
                             optionWrap.classList.remove('is-open', 'is-drop-up');
                             optionTrigger.setAttribute('aria-expanded', 'false');
-                            apply();
+                            apply(true);
                         }
                     });
                     document.addEventListener('click', function (event) {
@@ -1115,12 +1262,13 @@ function ft_pf_shortcode($atts) {
                             wrap.querySelector('.ft-pf__select-menu').hidden = true;
                             wrap.querySelector('.ft-pf__select-trigger').setAttribute('aria-expanded', 'false');
                         });
-                        apply();
+                        apply(true);
                     });
                     if (loadMore) {
                         loadMore.addEventListener('click', function () {
                             visibleLimit += perPage;
                             grid.innerHTML = lastFiltered.slice(0, visibleLimit).map(renderCard).join('');
+                            observeCardImages();
                             loadMore.hidden = visibleLimit >= lastFiltered.length;
                         });
                     }
