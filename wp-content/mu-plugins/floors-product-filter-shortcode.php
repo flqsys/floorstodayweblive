@@ -878,7 +878,7 @@ function ft_pf_shortcode($atts) {
                     padding: 56px 10px 10px;
                 }
                 .ft-pf__card-title {
-                    font-size: 12px;
+                    font-size: 18px;
                     line-height: 1.25;
                 }
             .ft-pf__card-title,
@@ -971,7 +971,14 @@ function ft_pf_shortcode($atts) {
                         ? '<span class="ft-pf__image" role="img" aria-label="' + escapeHtml(product.title) + '" data-bg="' + escapeHtml(product.image) + '"></span>'
                         : '<span class="ft-pf__image-placeholder"></span>';
 
-                    return '<a class="ft-pf__card" href="' + escapeHtml(product.url) + '">' + image + '<div class="ft-pf__card-content"><h3 class="ft-pf__card-title">' + escapeHtml(product.title) + '</h3></div></a>';
+                    // A plain div, not h2/h3 - a heading tag here means the
+                    // theme's global heading styles (font-size, font-family,
+                    // etc.) apply on top of this file's own styling, and can
+                    // win depending on specificity - exactly what inflated
+                    // this to ~30px instead of the intended 16px. It's also
+                    // not really a real heading anyway: it's one of many
+                    // repeated card labels in a grid, not document structure.
+                    return '<a class="ft-pf__card" href="' + escapeHtml(product.url) + '">' + image + '<div class="ft-pf__card-content"><div class="ft-pf__card-title">' + escapeHtml(product.title) + '</div></div></a>';
                 }
 
                 function init(root) {
