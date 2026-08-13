@@ -293,11 +293,22 @@ function ft_pf_shortcode($atts) {
                (embedded in their normal page layout) are unaffected. */
             .ft-pf[data-progressive="1"] {
                 width: 100vw;
+                max-width: 100vw;
                 margin-left: calc(50% - 50vw);
                 margin-right: calc(50% - 50vw);
                 padding-left: max(24px, calc((100vw - 1340px) / 2));
                 padding-right: max(24px, calc((100vw - 1340px) / 2));
                 box-sizing: border-box;
+            }
+            /* 100vw includes the vertical scrollbar's own width, which the
+               visible page area doesn't - that mismatch (not any layout
+               width) is what causes the horizontal scrollbar. This only
+               suppresses an accidental horizontal scrollbar from appearing;
+               it doesn't touch any element's width/layout, so it can't
+               cause the kind of breakage the width change did. Only prints
+               on pages using this shortcode, not site-wide. */
+            body {
+                overflow-x: hidden;
             }
             .ft-pf[data-layout="vertical"] {
                 grid-template-columns: minmax(230px, 300px) minmax(0, 1fr);
@@ -1375,7 +1386,20 @@ function ft_pf_shortcode($atts) {
                     // large blank gap seen with a single result. Every call
                     // cancels whatever's still in flight before starting.
                     var gridAnimTimeouts = [];
+                    var isFirstRender = true;
                     function animateGridUpdate(mutate) {
+                        // The very first render (page load, before any
+                        // filter interaction) should just show content
+                        // immediately - animating a fade/height-grow from
+                        // an empty grid on load looked like the page itself
+                        // was jumping as it loaded. Only real filter
+                        // changes afterward get the animated transition.
+                        if (isFirstRender) {
+                            isFirstRender = false;
+                            mutate();
+                            return;
+                        }
+
                         gridAnimTimeouts.forEach(function (id) { clearTimeout(id); });
                         gridAnimTimeouts = [];
 
