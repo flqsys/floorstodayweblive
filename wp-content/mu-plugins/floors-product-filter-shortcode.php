@@ -207,6 +207,18 @@ function ft_pf_build_data($atts, $fixed_category = '') {
         );
     }
 
+    // Attaches each category's real product count as its own data field
+    // (not baked into the label text as "Carpet (188)") so it renders as
+    // a separate styled badge next to the name. $categories (not $options)
+    // is the count source since it comes straight from get_terms(), not
+    // from how many products this particular query happened to return.
+    $category_counts = array_column($categories, 'count', 'slug');
+    foreach ($options['categories'] as $i => $option) {
+        if (isset($category_counts[$option['slug']])) {
+            $options['categories'][$i]['count'] = $category_counts[$option['slug']];
+        }
+    }
+
     return [
         'fields' => $fields,
         'categories' => $categories,
@@ -226,15 +238,26 @@ function ft_pf_shortcode($atts) {
         'columns' => 3,
         'gap' => 0,
         'per_page' => 15,
+        // "Shop all" mode: only the Category filter shows at first: every
+        // other field, and the results grid, stay hidden until a category
+        // is picked, then only the fields relevant to that category appear
+        // (client-side, same allowlist the fixed-category pages already
+        // use server-side - no page reload switching categories after).
+        'progressive' => 'no',
     ], $atts, 'floors_product_filter');
 
     $layout = strtolower((string) $atts['layout']) === 'horizontal' ? 'horizontal' : 'vertical';
     $columns = max(1, min(4, (int) $atts['columns']));
     $gap = max(0, (int) $atts['gap']);
     $per_page = max(1, (int) $atts['per_page']);
-    $hide_category = in_array(strtolower((string) $atts['hide_category']), ['1', 'yes', 'true'], true);
+    $is_progressive = in_array(strtolower((string) $atts['progressive']), ['1', 'yes', 'true'], true);
+    $hide_category = !$is_progressive && in_array(strtolower((string) $atts['hide_category']), ['1', 'yes', 'true'], true);
+    // Progressive mode is inherently "browse everything, pick a category
+    // as you go" - a locked-in fixed category would contradict that, so
+    // it always wins over hide_category/category if both are somehow set.
     $fixed_category = $hide_category ? sanitize_title($atts['category']) : '';
     $data = ft_pf_build_data($atts, $fixed_category);
+    $data['categoryFieldAllowlist'] = (object) ft_pf_category_field_allowlist();
     $instance_id = wp_unique_id('ft-product-filter-');
 
     ob_start();
@@ -260,6 +283,21 @@ function ft_pf_shortcode($atts) {
                 padding: 0;
                 color: var(--ft-pf-text);
                 font-family: Arial, Helvetica, sans-serif;
+            }
+            /* Shop page only (data-progressive) - breaks out of the
+               theme's centered content container (width:100% above only
+               fills whatever the parent allows, and that parent is a
+               constrained ~1180px column) and re-centers a wider 1340px
+               content area within the full viewport. Scoped to progressive
+               mode specifically so the existing category-page filters
+               (embedded in their normal page layout) are unaffected. */
+            .ft-pf[data-progressive="1"] {
+                width: 100vw;
+                margin-left: calc(50% - 50vw);
+                margin-right: calc(50% - 50vw);
+                padding-left: max(24px, calc((100vw - 1340px) / 2));
+                padding-right: max(24px, calc((100vw - 1340px) / 2));
+                box-sizing: border-box;
             }
             .ft-pf[data-layout="vertical"] {
                 grid-template-columns: minmax(230px, 300px) minmax(0, 1fr);
@@ -517,6 +555,14 @@ function ft_pf_shortcode($atts) {
                 overflow: auto;
                 padding-right: 4px;
             }
+            /* Categories only ever has 5 options - the 190px scroll limit
+               above exists for fields with many values (Dimensions has 24),
+               not this one. Applies everywhere the category checklist
+               shows, not just the shop page. */
+            .ft-pf__field[data-field="categories"] .ft-pf__checks {
+                max-height: none;
+                overflow: visible;
+            }
             .ft-pf__check {
                 display: flex;
                 align-items: center;
@@ -525,6 +571,20 @@ function ft_pf_shortcode($atts) {
                 cursor: pointer;
                 font-size: 14px;
                 line-height: 1.3;
+            }
+            .ft-pf__check-count {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 24px;
+                height: 20px;
+                margin-left: auto;
+                padding: 0 7px;
+                border-radius: 999px;
+                background: rgba(35, 91, 184, .08);
+                color: var(--ft-pf-primary);
+                font-size: 11px;
+                font-weight: 700;
             }
             .ft-pf__checkbox-anim {
                 position: relative;
@@ -758,6 +818,46 @@ function ft_pf_shortcode($atts) {
             .ft-pf.is-empty .ft-pf__empty { display: block; }
             .ft-pf.is-empty .ft-pf__grid,
             .ft-pf.is-empty .ft-pf__load-wrap { display: none; }
+            /* "Shop all" progressive mode: only Category shows at first -
+               every other field is hidden until a category is picked. JS
+               (updateProgressiveVisibility) then reveals only the fields
+               relevant to whichever category(ies) got selected, via inline
+               styles that override this rule. The grid itself stays
+               visible throughout - it shows a fixed preview (3 per
+               category, via buildCategoryPreview()) before any category is
+               picked, then switches to the real filtered results after. */
+            .ft-pf[data-progressive="1"] .ft-pf__field:not([data-field="categories"]) {
+                display: none;
+            }
+            /* Load More/pagination only makes sense once real filtering
+               starts - the preview is a fixed, non-paginated sample. */
+            .ft-pf[data-progressive="1"] .ft-pf__load-wrap {
+                display: none;
+            }
+            .ft-pf[data-progressive="1"].has-category-selected .ft-pf__load-wrap {
+                display: flex;
+            }
+            .ft-pf__progressive-prompt {
+                display: none;
+                margin: 0 0 20px;
+                padding: 10px 20px;
+                background: rgba(35, 91, 184, .06);
+                border-radius: 999px;
+                color: var(--ft-pf-primary);
+                text-align: center;
+                font-size: 14px;
+                font-weight: 600;
+            }
+            .ft-pf[data-progressive="1"]:not(.has-category-selected) .ft-pf__progressive-prompt {
+                display: block;
+            }
+            /* Product count badge only - scoped to the shop page. */
+            .ft-pf[data-progressive="1"] .ft-pf__count {
+                background: rgba(35, 91, 184, .08);
+                border-color: transparent;
+                color: var(--ft-pf-primary);
+                font-weight: 700;
+            }
             @media (max-width: 1024px) {
                 .ft-pf[data-layout="vertical"],
                 .ft-pf[data-layout="horizontal"] {
@@ -1000,7 +1100,169 @@ function ft_pf_shortcode($atts) {
                     var lastFiltered = [];
                     var initialCategory = root.dataset.initialCategory || '';
                     var fixedCategory = root.dataset.fixedCategory || '';
+                    var progressive = root.dataset.progressive === '1';
                     var searchInput = root.querySelector('.ft-pf__search-input');
+
+                    // "Shop all" mode: reveals only the fields relevant to
+                    // whichever category(ies) are currently checked (union,
+                    // so picking both Carpet and Vinyl shows what applies to
+                    // either), same allowlist data the fixed-category pages
+                    // already use server-side - just applied live here since
+                    // this page has no single fixed category to scope by.
+                    // A fixed sample (first N products, in their existing
+                    // title-sorted order) from each known category,
+                    // concatenated in category order - shown in the grid
+                    // before any Floor Type is picked, so the shop page
+                    // isn't just an empty panel on load.
+                    function buildCategoryPreview(perCategory) {
+                        var preview = [];
+                        data.categories.forEach(function (category) {
+                            var count = 0;
+                            for (var i = 0; i < data.products.length && count < perCategory; i++) {
+                                if (data.products[i].categorySlugs.indexOf(category.slug) !== -1) {
+                                    preview.push(data.products[i]);
+                                    count++;
+                                }
+                            }
+                        });
+                        return preview;
+                    }
+
+                    // Rebuilds a field's option list to only the values that
+                    // actually exist on products in the given category
+                    // selection (union across multiple selected categories).
+                    // The field-visibility allowlist above only decides
+                    // *which fields* to show - without this, a Carpet-scoped
+                    // Flooring Types list still included Click/Tongue and
+                    // Groove/etc. pulled in from every other category too,
+                    // since data.options was built from all 424 products.
+                    function buildCategoryFieldOptions(selectedSlugs) {
+                        var matches = data.products.filter(function (product) {
+                            return selectedSlugs.some(function (slug) {
+                                return product.categorySlugs.indexOf(slug) !== -1;
+                            });
+                        });
+                        var result = {};
+                        Object.keys(data.fields).forEach(function (key) {
+                            var seen = {};
+                            var order = [];
+                            matches.forEach(function (product) {
+                                var meta = product.meta[key];
+                                if (!meta) return;
+                                meta.slugs.forEach(function (slug, i) {
+                                    if (!seen[slug]) {
+                                        seen[slug] = meta.values[i];
+                                        order.push(slug);
+                                    }
+                                });
+                            });
+                            order.sort(function (a, b) {
+                                return seen[a].localeCompare(seen[b], undefined, { numeric: true, sensitivity: 'base' });
+                            });
+                            result[key] = order.map(function (slug) { return { slug: slug, label: seen[slug] }; });
+                        });
+                        return result;
+                    }
+
+                    function renderCheckOptionsHtml(key, options) {
+                        return options.map(function (option) {
+                            return '<label class="ft-pf__check">' +
+                                '<span class="ft-pf__checkbox-anim">' +
+                                '<input type="checkbox" data-filter="' + escapeHtml(key) + '" value="' + escapeHtml(option.slug) + '">' +
+                                '<svg viewBox="0 0 35.6 35.6" aria-hidden="true" focusable="false">' +
+                                '<circle class="background" cx="17.8" cy="17.8" r="17.8"></circle>' +
+                                '<circle class="stroke" cx="17.8" cy="17.8" r="14.37"></circle>' +
+                                '<polyline class="check" points="11.78 18.12 15.55 22.23 25.17 12.87"></polyline>' +
+                                '</svg></span>' +
+                                '<span>' + escapeHtml(option.label) + '</span>' +
+                                '</label>';
+                        }).join('');
+                    }
+
+                    function renderSelectOptionsHtml(label, options) {
+                        var html = '<button class="ft-pf__select-option is-selected" type="button" data-value="">' + escapeHtml('All ' + label.toLowerCase()) + '</button>';
+                        options.forEach(function (option) {
+                            html += '<button class="ft-pf__select-option" type="button" data-value="' + escapeHtml(option.slug) + '">' + escapeHtml(option.label) + '</button>';
+                        });
+                        return html;
+                    }
+
+                    var lastProgressiveCategoryKey = null;
+
+                    // Only rebuilds when the category selection actually
+                    // changes (not on every keystroke/filter tweak within
+                    // the same category). Rebuilding also resets that
+                    // field's own current selection - a value picked under
+                    // one category may not even exist in the next.
+                    function refreshCategoryScopedOptions(selected) {
+                        var key = selected.slice().sort().join(',');
+                        if (key === lastProgressiveCategoryKey) return;
+                        lastProgressiveCategoryKey = key;
+                        if (!selected.length) return;
+
+                        var scoped = buildCategoryFieldOptions(selected);
+                        Object.keys(data.fields).forEach(function (fieldKey) {
+                            var field = root.querySelector('.ft-pf__field[data-field="' + fieldKey + '"]');
+                            if (!field) return;
+                            var options = scoped[fieldKey] || [];
+
+                            var checks = field.querySelector('.ft-pf__checks');
+                            if (checks) checks.innerHTML = renderCheckOptionsHtml(fieldKey, options);
+
+                            var menu = field.querySelector('.ft-pf__select-menu');
+                            if (menu) {
+                                menu.innerHTML = renderSelectOptionsHtml(data.fields[fieldKey], options);
+                                var current = field.querySelector('.ft-pf__select-current');
+                                var valueInput = field.querySelector('.ft-pf__select-value');
+                                if (current) current.textContent = 'All ' + data.fields[fieldKey].toLowerCase();
+                                if (valueInput) valueInput.value = '';
+                            }
+                        });
+                    }
+
+                    function updateProgressiveVisibility() {
+                        if (!progressive) return;
+
+                        var selected = fixedCategory
+                            ? [fixedCategory]
+                            : (selectedSelect(root, 'categories') ? [selectedSelect(root, 'categories')] : selectedValues(root, 'categories'));
+
+                        refreshCategoryScopedOptions(selected);
+
+                        root.classList.toggle('has-category-selected', selected.length > 0);
+
+                        var searchField = root.querySelector('.ft-pf__field--search');
+                        if (searchField) searchField.style.display = selected.length ? 'block' : 'none';
+
+                        var allowed = null;
+                        if (selected.length) {
+                            allowed = {};
+                            selected.forEach(function (slug) {
+                                var fields = data.categoryFieldAllowlist[slug];
+                                if (!fields) return;
+                                fields.forEach(function (key) { allowed[key] = true; });
+                            });
+                        }
+
+                        root.querySelectorAll('.ft-pf__field[data-field]').forEach(function (el) {
+                            var key = el.dataset.field;
+                            if (key === 'categories') return;
+                            if (!selected.length) {
+                                el.style.display = '';
+                                return;
+                            }
+                            // A category with no allowlist entry at all (not
+                            // one of the 5 known ones) falls back to showing
+                            // every field, rather than silently showing none.
+                            // Explicit 'block' (not '') matters here - '' just
+                            // clears the inline override and falls back to
+                            // the stylesheet's own unconditional display:none
+                            // for this element, which is exactly the bug that
+                            // kept fields hidden even once selected.
+                            var show = !Object.keys(data.categoryFieldAllowlist).length || allowed[key];
+                            el.style.display = show ? 'block' : 'none';
+                        });
+                    }
 
                     // Loads a card's background-image only once it scrolls
                     // near the viewport (200px early, so it's ready by the
@@ -1140,6 +1402,8 @@ function ft_pf_shortcode($atts) {
                     }
 
                     function render() {
+                        updateProgressiveVisibility();
+
                         var categoryChecks = selectedValues(root, 'categories');
                         var categorySelect = selectedSelect(root, 'categories');
                         var categorySelected = fixedCategory
@@ -1148,18 +1412,26 @@ function ft_pf_shortcode($atts) {
 
                         var searchTerm = normalize(searchInput ? searchInput.value : '').trim();
 
-                        lastFiltered = data.products.filter(function (product) {
-                            if (!matchesSearch(product, searchTerm)) return false;
-                            if (!matchesMulti(product.categorySlugs, categorySelected)) return false;
+                        if (progressive && !categorySelected.length) {
+                            // Nothing picked yet on the shop page - show the
+                            // fixed per-category preview instead of running
+                            // it through the normal filters (search/other
+                            // fields are hidden in this state anyway).
+                            lastFiltered = buildCategoryPreview(3);
+                        } else {
+                            lastFiltered = data.products.filter(function (product) {
+                                if (!matchesSearch(product, searchTerm)) return false;
+                                if (!matchesMulti(product.categorySlugs, categorySelected)) return false;
 
-                            return Object.keys(data.fields).every(function (key) {
-                                var checked = selectedValues(root, key);
-                                var selected = selectedSelect(root, key);
-                                var values = selected ? [selected] : checked;
-                                var productValues = product.meta[key] ? product.meta[key].slugs : [];
-                                return matchesMulti(productValues, values);
+                                return Object.keys(data.fields).every(function (key) {
+                                    var checked = selectedValues(root, key);
+                                    var selected = selectedSelect(root, key);
+                                    var values = selected ? [selected] : checked;
+                                    var productValues = product.meta[key] ? product.meta[key].slugs : [];
+                                    return matchesMulti(productValues, values);
+                                });
                             });
-                        });
+                        }
 
                         animateGridUpdate(function () {
                             grid.innerHTML = lastFiltered.slice(0, visibleLimit).map(renderCard).join('');
@@ -1178,10 +1450,28 @@ function ft_pf_shortcode($atts) {
                     function isSearchInput(target) {
                         return !!target.closest('.ft-pf__search-input');
                     }
+
+                    // Shop page only: picking a category deselects any
+                    // other checked one, so it behaves like a single choice
+                    // (radio-style) rather than letting multiple categories'
+                    // fields mix together. Runs on both input and change
+                    // since checkboxes fire both for one click - harmless
+                    // either way, unchecking an already-unchecked box is a
+                    // no-op.
+                    function enforceSingleCategorySelection(target) {
+                        if (!progressive) return;
+                        if (!target || target.dataset.filter !== 'categories' || target.type !== 'checkbox' || !target.checked) return;
+                        root.querySelectorAll('input[type="checkbox"][data-filter="categories"]').forEach(function (input) {
+                            if (input !== target) input.checked = false;
+                        });
+                    }
+
                     root.addEventListener('input', function (event) {
+                        enforceSingleCategorySelection(event.target);
                         apply(!isSearchInput(event.target));
                     });
                     root.addEventListener('change', function (event) {
+                        enforceSingleCategorySelection(event.target);
                         apply(!isSearchInput(event.target));
                     });
                     root.addEventListener('click', function (event) {
@@ -1301,7 +1591,7 @@ function ft_pf_shortcode($atts) {
     }
 
     ?>
-    <div id="<?php echo esc_attr($instance_id); ?>" class="ft-pf" data-layout="<?php echo esc_attr($layout); ?>" data-per-page="<?php echo esc_attr($per_page); ?>" data-initial-category="<?php echo esc_attr(sanitize_title($atts['category'])); ?>" data-fixed-category="<?php echo esc_attr($fixed_category); ?>" style="<?php echo esc_attr('--ft-pf-columns:' . $columns . ';--ft-pf-gap:' . $gap . 'px;'); ?>">
+    <div id="<?php echo esc_attr($instance_id); ?>" class="ft-pf" data-layout="<?php echo esc_attr($layout); ?>" data-per-page="<?php echo esc_attr($per_page); ?>" data-initial-category="<?php echo esc_attr(sanitize_title($atts['category'])); ?>" data-fixed-category="<?php echo esc_attr($fixed_category); ?>" data-progressive="<?php echo $is_progressive ? '1' : '0'; ?>" style="<?php echo esc_attr('--ft-pf-columns:' . $columns . ';--ft-pf-gap:' . $gap . 'px;'); ?>">
         <script type="application/json"><?php echo wp_json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT); ?></script>
         <button class="ft-pf__filter-toggle" type="button" aria-expanded="false" aria-controls="<?php echo esc_attr($instance_id . '-panel'); ?>">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18"></path><path d="M6 12h12"></path><path d="M10 19h4"></path></svg>
@@ -1337,6 +1627,9 @@ function ft_pf_shortcode($atts) {
             </div>
         </aside>
         <section class="ft-pf__results">
+            <?php if ($is_progressive) : ?>
+                <div class="ft-pf__progressive-prompt"><?php esc_html_e('A preview from each category - select a Floor Type to see the full selection.', 'floors-today'); ?></div>
+            <?php endif; ?>
             <div class="ft-pf__grid"></div>
             <div class="ft-pf__load-wrap">
                 <button class="ft-pf__load-more" type="button"><?php esc_html_e('Load More', 'floors-today'); ?></button>
@@ -1368,7 +1661,7 @@ function ft_pf_render_checks($key, $label, $options) {
         return;
     }
     ?>
-    <div class="ft-pf__field">
+    <div class="ft-pf__field" data-field="<?php echo esc_attr($key); ?>">
         <span class="ft-pf__label"><?php echo esc_html($label); ?></span>
         <div class="ft-pf__checks">
             <?php foreach ($options as $option) : ?>
@@ -1382,6 +1675,9 @@ function ft_pf_render_checks($key, $label, $options) {
                         </svg>
                     </span>
                     <span><?php echo esc_html($option['label']); ?></span>
+                    <?php if (isset($option['count'])) : ?>
+                        <span class="ft-pf__check-count"><?php echo esc_html((string) $option['count']); ?></span>
+                    <?php endif; ?>
                 </label>
             <?php endforeach; ?>
         </div>
@@ -1394,7 +1690,7 @@ function ft_pf_render_select($instance_id, $key, $label, $options) {
         return;
     }
     ?>
-    <div class="ft-pf__field">
+    <div class="ft-pf__field" data-field="<?php echo esc_attr($key); ?>">
         <label class="ft-pf__label" for="<?php echo esc_attr($instance_id . '-' . $key); ?>"><?php echo esc_html($label); ?></label>
         <div class="ft-pf__select-wrap">
             <button
@@ -1442,6 +1738,25 @@ add_shortcode('floors_category_product_filter', function ($atts) {
 
     $atts['hide_category'] = 'yes';
     $atts['layout'] = $atts['layout'] ?? 'horizontal';
+
+    return ft_pf_shortcode($atts);
+});
+
+// "Shop all" page: every product, every category, but only the Category
+// filter shows at first - the rest of the filters (and the results grid)
+// stay hidden until a Floor Type is picked, then only the fields that
+// actually apply to it appear. See ft_pf_category_field_allowlist() and
+// updateProgressiveVisibility() in the shared JS for how that's decided.
+add_shortcode('floors_product_filter_shop', function ($atts) {
+    $atts = is_array($atts) ? $atts : [];
+    $atts['progressive'] = 'yes';
+    $atts['hide_category'] = 'no';
+    $atts['layout'] = $atts['layout'] ?? 'vertical';
+    // ft_pf_shortcode()'s own default is 0 (shared by every other
+    // shortcode variant, left untouched) - this one just sets its own
+    // default so the filter panel isn't flush against the results grid,
+    // while still respecting an explicit gap="..." if one's passed.
+    $atts['gap'] = $atts['gap'] ?? 32;
 
     return ft_pf_shortcode($atts);
 });
