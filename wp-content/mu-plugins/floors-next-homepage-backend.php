@@ -728,6 +728,7 @@ function ft_next_homepage_runtime_bridge($settings) {
                 $nav_items[] = [
                     'name' => $name,
                     'href' => $href,
+                    'badge' => (string) ($item['badge'] ?? ''),
                 ];
             }
         }
@@ -2318,11 +2319,13 @@ add_action('admin_post_ft_next_homepage_save', function () {
     $data['nav_items'] = [];
     $nav_names = $_POST['nav_name'] ?? [];
     $nav_hrefs = $_POST['nav_href'] ?? [];
-    for ($i = 0; $i < 5; $i++) {
+    // Slot 6 (index 5) is reserved for the upcoming Blog link - it always
+    // gets a glowing red "New" badge, and only appears once a title is typed.
+    for ($i = 0; $i < 6; $i++) {
         $name = isset($nav_names[$i]) ? ft_next_clean_text($nav_names[$i]) : '';
         $href = isset($nav_hrefs[$i]) ? ft_next_clean_menu_url($nav_hrefs[$i]) : '';
         if ($name !== '') {
-            $data['nav_items'][] = ['name' => $name, 'href' => $href ?: '#'];
+            $data['nav_items'][] = ['name' => $name, 'href' => $href ?: '#', 'badge' => $i === 5 ? 'new' : ''];
         }
     }
 
@@ -2686,12 +2689,13 @@ function ft_next_homepage_render_admin() {
 
                         <h3>Main menu</h3>
                         <table class="widefat striped ft-next-table">
-                            <thead><tr><th>Name</th><th>Link</th></tr></thead>
+                            <thead><tr><th>Name</th><th>Link</th><th>Badge</th></tr></thead>
                             <tbody>
-                            <?php for ($i = 0; $i < 5; $i++) : $item = $settings['nav_items'][$i] ?? ['name' => '', 'href' => '']; ?>
+                            <?php for ($i = 0; $i < 6; $i++) : $item = $settings['nav_items'][$i] ?? ['name' => '', 'href' => '']; ?>
                                 <tr>
                                     <td><input name="nav_name[]" type="text" value="<?php echo esc_attr($item['name']); ?>"></td>
                                     <td><input name="nav_href[]" type="text" value="<?php echo esc_attr($item['href']); ?>"></td>
+                                    <td><?php echo $i === 5 ? '<span class="description">Glowing red &quot;New&quot; badge (auto) &mdash; reserved for the Blog link</span>' : ''; ?></td>
                                 </tr>
                             <?php endfor; ?>
                             </tbody>
@@ -3715,11 +3719,31 @@ function ft_next_header_shortcode() {
             }
             .ft-sh-nav { gap: 24px; }
             .ft-sh-nav a {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
                 color: var(--ft-sh-foreground);
                 font-size: 16px;
                 font-weight: 600;
                 white-space: nowrap;
                 transition: color .18s ease;
+            }
+            .ft-sh-badge-new {
+                display: inline-block;
+                padding: 1px 7px;
+                border-radius: 999px;
+                background: #dc2626;
+                color: #fff !important;
+                font-size: 10px;
+                font-weight: 800;
+                letter-spacing: .04em;
+                text-transform: uppercase;
+                line-height: 1.5;
+                animation: ft-sh-badge-glow 1.8s ease-in-out infinite;
+            }
+            @keyframes ft-sh-badge-glow {
+                0%, 100% { box-shadow: 0 0 0 rgba(220, 38, 38, 0); }
+                50% { box-shadow: 0 0 10px rgba(220, 38, 38, .7); }
             }
             .ft-sh-nav a:hover,
             .ft-sh-nav a:focus-visible,
@@ -3886,7 +3910,12 @@ function ft_next_header_shortcode() {
                         continue;
                     }
                     ?>
-                    <a href="<?php echo esc_url(ft_next_header_shortcode_url($item['href'] ?? '#')); ?>"><?php echo esc_html($name); ?></a>
+                    <a href="<?php echo esc_url(ft_next_header_shortcode_url($item['href'] ?? '#')); ?>">
+                        <?php echo esc_html($name); ?>
+                        <?php if (($item['badge'] ?? '') === 'new') : ?>
+                            <span class="ft-sh-badge-new">New</span>
+                        <?php endif; ?>
+                    </a>
                 <?php endforeach; ?>
             </nav>
             <div class="ft-sh-actions">
@@ -3909,7 +3938,12 @@ function ft_next_header_shortcode() {
                     continue;
                 }
                 ?>
-                <a href="<?php echo esc_url(ft_next_header_shortcode_url($item['href'] ?? '#')); ?>"><?php echo esc_html($name); ?></a>
+                <a href="<?php echo esc_url(ft_next_header_shortcode_url($item['href'] ?? '#')); ?>">
+                    <?php echo esc_html($name); ?>
+                    <?php if (($item['badge'] ?? '') === 'new') : ?>
+                        <span class="ft-sh-badge-new">New</span>
+                    <?php endif; ?>
+                </a>
             <?php endforeach; ?>
             <?php foreach ($utility_links as $item) : ?>
                 <a href="<?php echo esc_url($item['href']); ?>"><?php echo esc_html($item['name']); ?></a>
@@ -4571,19 +4605,21 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
             }
             .ft-ncta-input-wrap input::placeholder { color: #94a3b8 !important; }
             .ft-ncta-buttons {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
                 gap: 10px;
                 margin-top: 4px;
             }
-            .ft-ncta-claim,
-            .ft-ncta-details {
+            .ft-ncta-claim {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
+                width: 100% !important;
                 height: 46px !important;
                 border: none !important;
                 border-radius: 999px !important;
+                background: var(--ft-ncta-secondary) !important;
                 color: #fff !important;
                 font-family: inherit;
                 font-size: 15px !important;
@@ -4596,10 +4632,25 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                 transition: opacity .18s ease;
                 padding: 0 12px !important;
             }
-            .ft-ncta-claim  { background: var(--ft-ncta-secondary) !important; }
-            .ft-ncta-details { background: var(--ft-ncta-primary) !important; }
-            .ft-ncta-claim:hover,
-            .ft-ncta-details:hover { opacity: .88; color: #fff !important; text-decoration: none !important; }
+            .ft-ncta-claim:hover { opacity: .88; color: #fff !important; text-decoration: none !important; }
+            .ft-ncta-details {
+                all: unset;
+                display: inline-block !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                color: var(--ft-ncta-primary) !important;
+                font-family: inherit;
+                font-size: 14px !important;
+                font-weight: 600 !important;
+                text-align: center;
+                text-decoration: underline !important;
+                text-underline-offset: 3px;
+                cursor: pointer;
+                transition: opacity .18s ease;
+            }
+            .ft-ncta-details:hover { opacity: .75; }
             .ft-ncta-success-card {
                 background: #fff;
                 border-radius: 16px;

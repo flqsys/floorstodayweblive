@@ -59,9 +59,14 @@ export function Header() {
               <a
                 key={item.name}
                 href={item.href}
-                className="text-base font-medium text-foreground hover:text-primary transition-colors"
+                className="flex items-center gap-1.5 text-base font-medium text-foreground hover:text-primary transition-colors"
               >
                 {item.name}
+                {item.badge === "new" && (
+                  <span className="ft-nav-badge-new rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-extrabold uppercase leading-none tracking-wide text-white">
+                    New
+                  </span>
+                )}
               </a>
             ))}
           </div>
@@ -99,16 +104,21 @@ export function Header() {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="text-base font-medium text-foreground hover:text-primary"
+                  className="flex items-center gap-1.5 text-base font-medium text-foreground hover:text-primary"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.name}
+                  {item.badge === "new" && (
+                    <span className="ft-nav-badge-new rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-extrabold uppercase leading-none tracking-wide text-white">
+                      New
+                    </span>
+                  )}
                 </a>
               ))}
               <div className="pt-4 border-t border-border flex flex-col gap-3">
                 <a href={phoneHref} className="flex items-center gap-2.5 text-lg font-bold">
-                  <span className="ft-phone-icon flex h-8 w-8 flex-none items-center justify-center rounded-full text-white">
-                    <Phone className="h-4 w-4" />
+                  <span className="ft-phone-icon flex h-[28px] w-[28px] flex-none items-center justify-center rounded-full text-white">
+                    <Phone className="h-3 w-3" />
                   </span>
                   {settings.phone}
                 </a>

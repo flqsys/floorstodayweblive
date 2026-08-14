@@ -1,6 +1,7 @@
 export type NavItem = {
   name: string
   href: string
+  badge?: string
 }
 
 export type ProcessStep = {
