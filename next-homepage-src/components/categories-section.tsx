@@ -1,5 +1,6 @@
 "use client"
 
+import { ArrowRight } from "lucide-react"
 import { useHomepageSettings } from "@/components/homepage-settings-provider"
 
 function getCategorySlugId(value: string) {
@@ -93,6 +94,16 @@ export function CategoriesSection() {
               </a>
             )
           })}
+        </div>
+
+        <div className="mt-8 text-center sm:mt-12">
+          <a
+            href="/shop/"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-primary px-6 py-2.5 font-bold text-primary-foreground shadow-md transition-colors hover:bg-primary/90"
+          >
+            Floors Today Products
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </a>
         </div>
       </div>
     </section>

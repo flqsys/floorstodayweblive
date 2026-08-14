@@ -1,6 +1,6 @@
 "use client"
 
-import { Check, HelpCircle } from "lucide-react"
+import { ArrowRight, Check, HelpCircle } from "lucide-react"
 import Link from "next/link"
 import { useHomepageSettings } from "@/components/homepage-settings-provider"
 
@@ -31,7 +31,8 @@ export function ComparisonSection() {
             </p>
             {settings.comparison_disclaimer && (
               <div
-                className="mt-4 rounded-md bg-secondary px-4 py-3 text-sm leading-relaxed text-secondary-foreground sm:text-base [&_span]:!text-secondary-foreground"
+                className="mt-4 rounded-xl px-4 py-3 text-sm leading-relaxed text-white sm:text-base [&_span]:!text-white"
+                style={{ backgroundColor: "#14469773" }}
                 dangerouslySetInnerHTML={{ __html: settings.comparison_disclaimer }}
               />
             )}
@@ -68,9 +69,10 @@ export function ComparisonSection() {
               <Link
                 href="#estimate"
                 onClick={scrollToEstimate}
-                className="inline-flex min-h-11 w-full items-center justify-center rounded-md bg-secondary px-5 py-2.5 font-bold text-secondary-foreground transition-colors hover:bg-secondary/90 sm:w-auto"
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-secondary px-5 py-2.5 font-bold text-secondary-foreground transition-colors hover:bg-secondary/90 sm:w-auto"
               >
                 {settings.comparison_button}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
           </div>

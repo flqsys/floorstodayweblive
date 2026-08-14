@@ -64,7 +64,7 @@ function ft_next_homepage_defaults() {
         'hero_badge_font_size' => '16px',
         'hero_badge_mobile_font_size' => '14px',
         'hero_badge_padding_x' => '16px',
-        'hero_badge_padding_y' => '8px',
+        'hero_badge_padding_y' => '5px',
         'hero_title' => 'Transform Your Home with',
         'hero_highlight' => 'Premium Flooring',
         'hero_badge_animation_color_1' => 'lab(76 3.16 65.32)',
@@ -696,7 +696,7 @@ function ft_next_homepage_runtime_bridge($settings) {
     $hero_badge_font_size = ft_next_homepage_css_length($settings['hero_badge_font_size'] ?? '', '16px');
     $hero_badge_mobile_font_size = ft_next_homepage_css_length($settings['hero_badge_mobile_font_size'] ?? '', '14px');
     $hero_badge_padding_x = ft_next_homepage_css_length($settings['hero_badge_padding_x'] ?? '', '16px');
-    $hero_badge_padding_y = ft_next_homepage_css_length($settings['hero_badge_padding_y'] ?? '', '8px');
+    $hero_badge_padding_y = ft_next_homepage_css_length($settings['hero_badge_padding_y'] ?? '', '5px');
     $hero_badge_bg = (string) ($settings['hero_badge_bg_color'] ?? '#cc9c2e');
     $hero_badge_text = (string) ($settings['hero_badge_text_color'] ?? '#ffffff');
     $hero_title_font_size = ft_next_homepage_css_length($settings['hero_title_font_size'] ?? '', '60px');
@@ -4581,12 +4581,12 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                height: 56px !important;
+                height: 46px !important;
                 border: none !important;
-                border-radius: 8px !important;
+                border-radius: 999px !important;
                 color: #fff !important;
                 font-family: inherit;
-                font-size: 17px !important;
+                font-size: 15px !important;
                 font-weight: 700 !important;
                 cursor: pointer;
                 box-shadow: none !important;
@@ -4710,7 +4710,7 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                 padding: 9px 22px;
                 background: var(--ft-ncta-primary, #1d4ed8);
                 color: #fff !important;
-                border-radius: 6px;
+                border-radius: 999px;
                 font-size: 14px;
                 font-weight: 600;
                 text-decoration: none !important;

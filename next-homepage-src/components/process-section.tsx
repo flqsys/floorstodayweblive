@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Calendar, FileText, Wrench } from "lucide-react"
+import { ArrowRight, Calendar, FileText, Wrench } from "lucide-react"
 import { useHomepageSettings } from "@/components/homepage-settings-provider"
 
 export function ProcessSection() {
@@ -66,9 +66,10 @@ export function ProcessSection() {
                   <Link
                     href="#estimate"
                     onClick={scrollToEstimate}
-                    className="mt-4 inline-flex min-h-10 w-full items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 sm:w-auto"
+                    className="mt-4 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 sm:w-auto"
                   >
                     {step.button}
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
                 )}
               </div>

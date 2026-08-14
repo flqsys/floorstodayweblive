@@ -803,22 +803,25 @@ function ft_pf_shortcode($atts) {
                 margin-top: 30px;
             }
             .ft-pf__load-more {
-                min-height: 44px;
-                border: 0;
-                border-radius: 8px;
-                background: #171717;
-                color: #fff;
+                min-height: 46px;
+                border: 0 !important;
+                border-radius: 999px !important;
+                background: var(--ft-pf-primary) !important;
+                box-shadow: 0 4px 14px rgba(35, 91, 184, .3) !important;
+                color: #fff !important;
                 cursor: pointer;
                 font: inherit;
                 font-size: 16px;
-                font-weight: 400;
-                padding: 0 28px;
-                transition: background .18s ease, transform .12s ease;
+                font-weight: 700 !important;
+                padding: 0 32px !important;
+                transition: background .18s ease, box-shadow .18s ease, transform .12s ease;
             }
             .ft-pf__load-more:hover,
             .ft-pf__load-more:focus-visible {
-                background: var(--ft-pf-accent);
+                background: var(--ft-pf-accent) !important;
+                box-shadow: 0 6px 18px rgba(204, 156, 46, .35) !important;
                 outline: none;
+                transform: translateY(-1px);
             }
             .ft-pf__load-more:active {
                 transform: translateY(1px);

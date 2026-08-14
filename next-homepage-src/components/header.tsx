@@ -69,9 +69,11 @@ export function Header() {
           <div className="flex flex-none items-center justify-end gap-3 sm:gap-4">
             <a
               href={phoneHref}
-              className="hidden sm:flex items-center gap-2 text-base font-semibold text-foreground whitespace-nowrap"
+              className="hidden sm:flex items-center gap-2.5 text-lg font-bold text-foreground whitespace-nowrap"
             >
-              <Phone className="h-4 w-4 text-primary" />
+              <span className="ft-phone-icon flex h-[28px] w-[28px] flex-none items-center justify-center rounded-full text-white">
+                <Phone className="h-3 w-3" />
+              </span>
               {settings.phone}
             </a>
 
@@ -104,8 +106,10 @@ export function Header() {
                 </a>
               ))}
               <div className="pt-4 border-t border-border flex flex-col gap-3">
-                <a href={phoneHref} className="flex items-center gap-2 text-base font-semibold">
-                  <Phone className="h-4 w-4 text-primary" />
+                <a href={phoneHref} className="flex items-center gap-2.5 text-lg font-bold">
+                  <span className="ft-phone-icon flex h-8 w-8 flex-none items-center justify-center rounded-full text-white">
+                    <Phone className="h-4 w-4" />
+                  </span>
                   {settings.phone}
                 </a>
               </div>
