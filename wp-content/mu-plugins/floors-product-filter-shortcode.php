@@ -13,8 +13,8 @@ function ft_pf_fields() {
     return [
         'dimensions' => 'Dimensions',
         'color_shade' => 'Color Shade',
-        'flooring_look' => 'Flooring Look',
         'flooring_types' => 'Flooring Types',
+        'flooring_look' => 'Flooring Look',
         'gloss_level' => 'Gloss Level',
         'species' => 'Species',
         'surface_texture' => 'Surface Texture',
@@ -22,12 +22,12 @@ function ft_pf_fields() {
 }
 
 // Which fields apply per category - not derived from product data, because
-// some fields (e.g. Flooring Look) are fully populated across every product
-// in a category yet still aren't meaningful filters there (per the agreed
-// spec). Explicit allowlist, not auto-detection.
+// some fields are fully populated across every product in a category yet
+// still aren't meaningful filters there (per the agreed spec). Explicit
+// allowlist, not auto-detection.
 function ft_pf_category_field_allowlist() {
     return [
-        'carpet' => ['dimensions', 'color_shade', 'flooring_types', 'surface_texture'],
+        'carpet' => ['dimensions', 'color_shade', 'flooring_types', 'flooring_look', 'surface_texture'],
         'engineered-hardwood' => ['dimensions', 'color_shade', 'flooring_types', 'surface_texture', 'gloss_level', 'species'],
         'laminate' => ['dimensions', 'color_shade', 'flooring_look', 'gloss_level'],
         'solid-hardwood' => ['dimensions', 'color_shade', 'flooring_types', 'surface_texture', 'gloss_level', 'species'],
