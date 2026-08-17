@@ -3762,13 +3762,18 @@ function ft_next_header_shortcode() {
                 font-weight: 700;
                 white-space: nowrap;
             }
+            .ft-sh-phone,
+            .ft-sh-phone-mobile,
+            .ft-sh-menu-toggle {
+                -webkit-tap-highlight-color: transparent;
+            }
             .ft-sh-phone .ft-sh-icon {
                 box-sizing: border-box;
                 width: 30px;
                 height: 30px;
                 padding: 7px;
                 border-radius: 999px;
-                color: #fff;
+                color: #fff !important;
                 animation: ft-sh-phone-flash 1.6s ease-in-out infinite;
             }
             .ft-sh-phone-mobile {
@@ -3779,10 +3784,10 @@ function ft_next_header_shortcode() {
                 align-items: center;
                 justify-content: center;
                 border-radius: 999px;
-                color: #fff;
+                color: #fff !important;
                 animation: ft-sh-phone-flash 1.6s ease-in-out infinite;
             }
-            .ft-sh-phone-mobile .ft-sh-icon { width: 18px; height: 18px; }
+            .ft-sh-phone-mobile .ft-sh-icon { width: 18px; height: 18px; color: #fff !important; }
             @keyframes ft-sh-phone-flash {
                 0%, 100% { background-color: #16a34a; box-shadow: 0 0 0 0 rgba(22, 163, 74, .45); }
                 50% { background-color: #235bb8; box-shadow: 0 0 0 5px rgba(35, 91, 184, 0); }
@@ -3794,9 +3799,11 @@ function ft_next_header_shortcode() {
                 padding: 0;
                 align-items: center;
                 justify-content: center;
-                border: 0;
+                border: 0 !important;
                 border-radius: 6px;
-                background: transparent;
+                background: transparent !important;
+                box-shadow: none !important;
+                outline: none !important;
                 color: var(--ft-sh-foreground);
                 cursor: pointer;
             }
@@ -3864,7 +3871,9 @@ function ft_next_header_shortcode() {
                     width: 44px;
                     height: 44px;
                     border-radius: 6px;
-                    background: transparent;
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    outline: none !important;
                     color: #111827;
                 }
                 .ft-sh-menu-toggle .ft-sh-icon {
