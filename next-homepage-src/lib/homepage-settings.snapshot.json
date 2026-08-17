@@ -46,8 +46,8 @@
   "hero_badge_text_color": "#ff0000",
   "hero_badge_font_size": "60px",
   "hero_badge_mobile_font_size": "30px",
-  "hero_badge_padding_x": "15px",
-  "hero_badge_padding_y": "15px",
+  "hero_badge_padding_x": "8px",
+  "hero_badge_padding_y": "8px",
   "hero_title": "Transform Your Home with",
   "hero_highlight": "Premium Flooring",
   "hero_badge_animation_color_1": "lab(76 3.16 65.32)",
@@ -218,23 +218,28 @@
   "nav_items": [
     {
       "name": "Solid Hardwood",
-      "href": "/categories/solid-hardwood/"
+      "href": "/categories/solid-hardwood/",
+      "badge": ""
     },
     {
       "name": "Engineered Hardwood",
-      "href": "/categories/engineered-hardwood/"
+      "href": "/categories/engineered-hardwood/",
+      "badge": ""
     },
     {
       "name": "Laminate",
-      "href": "/categories/laminate/"
+      "href": "/categories/laminate/",
+      "badge": ""
     },
     {
       "name": "Vinyl",
-      "href": "/categories/vinyl/"
+      "href": "/categories/vinyl/",
+      "badge": ""
     },
     {
       "name": "Carpet",
-      "href": "/categories/carpet/"
+      "href": "/categories/carpet/",
+      "badge": ""
     }
   ],
   "utility_links": [

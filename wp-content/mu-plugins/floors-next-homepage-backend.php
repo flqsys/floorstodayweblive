@@ -3762,7 +3762,31 @@ function ft_next_header_shortcode() {
                 font-weight: 700;
                 white-space: nowrap;
             }
-            .ft-sh-phone .ft-sh-icon { color: var(--ft-sh-primary); }
+            .ft-sh-phone .ft-sh-icon {
+                box-sizing: border-box;
+                width: 30px;
+                height: 30px;
+                padding: 7px;
+                border-radius: 999px;
+                color: #fff;
+                animation: ft-sh-phone-flash 1.6s ease-in-out infinite;
+            }
+            .ft-sh-phone-mobile {
+                display: none;
+                flex: none;
+                width: 36px;
+                height: 36px;
+                align-items: center;
+                justify-content: center;
+                border-radius: 999px;
+                color: #fff;
+                animation: ft-sh-phone-flash 1.6s ease-in-out infinite;
+            }
+            .ft-sh-phone-mobile .ft-sh-icon { width: 18px; height: 18px; }
+            @keyframes ft-sh-phone-flash {
+                0%, 100% { background-color: #16a34a; box-shadow: 0 0 0 0 rgba(22, 163, 74, .45); }
+                50% { background-color: #235bb8; box-shadow: 0 0 0 5px rgba(35, 91, 184, 0); }
+            }
             .ft-sh-menu-toggle {
                 display: none;
                 width: 44px;
@@ -3816,6 +3840,7 @@ function ft_next_header_shortcode() {
                 .ft-sh-inner { width: 100%; padding-inline: 16px; }
                 .ft-sh-utility,
                 .ft-sh-actions > .ft-sh-phone { display: none; }
+                .ft-sh-actions > .ft-sh-phone-mobile { display: inline-flex; }
                 .ft-sh-topbar { font-size: 12px; }
                 .ft-sh-topbar-inner {
                     min-height: 37px;
@@ -3923,6 +3948,11 @@ function ft_next_header_shortcode() {
                     <a class="ft-sh-phone" href="<?php echo esc_url('tel:' . $phone_href); ?>">
                         <svg class="ft-sh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13.8 16.6a1 1 0 0 0 1.2-.3l.4-.5A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.5.4a1 1 0 0 0-.3 1.2 14 14 0 0 0 6.4 6.4Z"/></svg>
                         <?php echo esc_html($phone); ?>
+                    </a>
+                <?php endif; ?>
+                <?php if ($phone !== '' && $phone_href !== '') : ?>
+                    <a class="ft-sh-phone-mobile" href="<?php echo esc_url('tel:' . $phone_href); ?>" aria-label="<?php echo esc_attr('Call ' . $phone); ?>">
+                        <svg class="ft-sh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13.8 16.6a1 1 0 0 0 1.2-.3l.4-.5A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.5.4a1 1 0 0 0-.3 1.2 14 14 0 0 0 6.4 6.4Z"/></svg>
                     </a>
                 <?php endif; ?>
                 <button class="ft-sh-menu-toggle" type="button" aria-expanded="false" aria-controls="<?php echo esc_attr($instance_id); ?>">
