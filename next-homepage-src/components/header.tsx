@@ -76,7 +76,10 @@ export function Header() {
               href={phoneHref}
               className="hidden sm:flex items-center gap-2.5 text-lg font-bold text-foreground whitespace-nowrap"
             >
-              <span className="ft-phone-icon flex h-[28px] w-[28px] flex-none items-center justify-center rounded-full text-white">
+              <span
+                className="ft-phone-icon flex h-[28px] w-[28px] flex-none items-center justify-center rounded-full text-white"
+                style={{ WebkitTapHighlightColor: "transparent" }}
+              >
                 <Phone className="h-3 w-3" />
               </span>
               {settings.phone}
@@ -86,6 +89,7 @@ export function Header() {
               href={phoneHref}
               aria-label={`Call ${settings.phone}`}
               className="ft-phone-icon flex h-[34px] w-[34px] flex-none items-center justify-center rounded-full text-white sm:hidden"
+              style={{ WebkitTapHighlightColor: "transparent" }}
             >
               <Phone className="h-4 w-4" />
             </a>
@@ -93,6 +97,7 @@ export function Header() {
             <button
               type="button"
               className="flex h-11 w-11 items-center justify-center rounded-md p-0 text-foreground lg:hidden"
+              style={{ WebkitTapHighlightColor: "transparent" }}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               <span className="sr-only">Open menu</span>
@@ -125,7 +130,10 @@ export function Header() {
               ))}
               <div className="pt-4 border-t border-border flex flex-col gap-3">
                 <a href={phoneHref} className="flex items-center gap-2.5 text-lg font-bold">
-                  <span className="ft-phone-icon flex h-[28px] w-[28px] flex-none items-center justify-center rounded-full text-white">
+                  <span
+                className="ft-phone-icon flex h-[28px] w-[28px] flex-none items-center justify-center rounded-full text-white"
+                style={{ WebkitTapHighlightColor: "transparent" }}
+              >
                     <Phone className="h-3 w-3" />
                   </span>
                   {settings.phone}
