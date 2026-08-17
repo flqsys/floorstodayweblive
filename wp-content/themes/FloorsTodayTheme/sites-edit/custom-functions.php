@@ -512,6 +512,8 @@ function itech_clean_acf_group($group_name)
  */
 function itech_product_specifications_shortcode($atts)
 {
+    static $tooltip_assets_printed = false;
+
     $atts = shortcode_atts(
         [
             'title' => 'Specifications',
@@ -552,6 +554,16 @@ function itech_product_specifications_shortcode($atts)
         '-',
     ];
 
+    // Same field/condition the Elementor "Natural Colour Variation" alert
+    // uses (#natural, see floors-natural-colour-variation.php) - the "!"
+    // icon next to Species is the same notice surfaced inline here, so it
+    // should only appear under the same condition. Matched by first letter
+    // so it works with the "YSE" typo currently saved in ACF as well as a
+    // corrected "YES".
+    $ncv_value = strtolower(trim((string) get_post_meta(get_the_ID(), 'natural_colour_variation', true)));
+    $show_species_tooltip = $ncv_value !== '' && $ncv_value[0] === 'y';
+    $species_tooltip_text = 'This species is photosensitive and may naturally darken or change color when exposed to sunlight over time.';
+
     $rows = [];
 
     foreach ($spec_fields as $field_name) {
@@ -584,12 +596,95 @@ function itech_product_specifications_shortcode($atts)
         $rows[] = [
             'label' => $field_object['label'] ?? $field_name,
             'value' => $value,
+            'tooltip' => ($field_name === 'species' && $show_species_tooltip) ? $species_tooltip_text : '',
         ];
     }
 
     // Hide the entire specification section when no valid rows exist.
     if (empty($rows)) {
         return '';
+    }
+
+    if (!$tooltip_assets_printed) {
+        $tooltip_assets_printed = true;
+        ?>
+        <style id="itech-specification-tooltip-styles">
+            .itech-specification-tooltip {
+                position: relative;
+                z-index: 0;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 16px;
+                height: 16px;
+                margin-left: 6px;
+                border-radius: 50%;
+                background: #CC9C2E;
+                color: #000;
+                font-size: 11px;
+                font-weight: 700;
+                line-height: 1;
+                cursor: help;
+                vertical-align: middle;
+            }
+            .itech-specification-tooltip::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                z-index: -1;
+                border-radius: 50%;
+                background: #CC9C2E;
+                animation: itech-spec-wave 1.8s ease-out infinite;
+            }
+            @keyframes itech-spec-wave {
+                0% { transform: scale(1); opacity: .55; }
+                100% { transform: scale(2.4); opacity: 0; }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                .itech-specification-tooltip::before {
+                    animation: none;
+                    display: none;
+                }
+            }
+            .itech-specification-tooltip__bubble {
+                position: absolute;
+                bottom: calc(100% + 8px);
+                left: 50%;
+                z-index: 20;
+                width: 220px;
+                transform: translateX(-50%) translateY(4px);
+                background: #1f2937;
+                color: #fff;
+                font-size: 12px;
+                font-weight: 400;
+                line-height: 1.45;
+                text-align: left;
+                border-radius: 6px;
+                padding: 10px 12px;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transition: opacity .15s ease, transform .15s ease;
+            }
+            .itech-specification-tooltip__bubble::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                border: 6px solid transparent;
+                border-top-color: #1f2937;
+            }
+            .itech-specification-tooltip:hover .itech-specification-tooltip__bubble,
+            .itech-specification-tooltip:focus .itech-specification-tooltip__bubble,
+            .itech-specification-tooltip:focus-visible .itech-specification-tooltip__bubble {
+                opacity: 1;
+                visibility: visible;
+                transform: translateX(-50%) translateY(0);
+            }
+        </style>
+        <?php
     }
 
     ob_start();
@@ -610,6 +705,12 @@ function itech_product_specifications_shortcode($atts)
 
                     <span class="itech-specification-value">
                         <?php echo esc_html($row['value']); ?>
+                        <?php if ($row['tooltip'] !== '') : ?>
+                            <span class="itech-specification-tooltip" tabindex="0" aria-label="<?php echo esc_attr($row['tooltip']); ?>">
+                                !
+                                <span class="itech-specification-tooltip__bubble"><?php echo esc_html($row['tooltip']); ?></span>
+                            </span>
+                        <?php endif; ?>
                     </span>
                 </div>
             <?php endforeach; ?>
