@@ -3804,9 +3804,10 @@ function ft_next_header_shortcode() {
                 background: transparent !important;
                 box-shadow: none !important;
                 outline: none !important;
-                color: var(--ft-sh-foreground);
+                color: #111827 !important;
                 cursor: pointer;
             }
+            .ft-sh-menu-toggle .ft-sh-icon { color: #111827 !important; }
             .ft-sh-menu-toggle:hover,
             .ft-sh-menu-toggle:focus-visible { background: #f3f5f7; }
             .ft-sh-mobile-menu {
