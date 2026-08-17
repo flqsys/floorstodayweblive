@@ -82,6 +82,14 @@ export function Header() {
               {settings.phone}
             </a>
 
+            <a
+              href={phoneHref}
+              aria-label={`Call ${settings.phone}`}
+              className="ft-phone-icon flex h-[34px] w-[34px] flex-none items-center justify-center rounded-full text-white sm:hidden"
+            >
+              <Phone className="h-4 w-4" />
+            </a>
+
             <button
               type="button"
               className="flex h-11 w-11 items-center justify-center rounded-md p-0 text-foreground lg:hidden"
