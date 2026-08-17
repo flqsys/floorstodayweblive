@@ -210,7 +210,7 @@
       "url": "https://floorstoday.ca/terms-of-use/"
     }
   ],
-  "footer_copyright": "Floors Today Copyright {year} All Rights Reserved",
+  "footer_copyright": "© 2026 Floors Today™ {year}. All Rights Reserved.",
   "google_places_api_key": "",
   "footer_bg_color_1": "#523900",
   "footer_bg_color_2": "#000000",
@@ -240,6 +240,11 @@
       "name": "Carpet",
       "href": "/categories/carpet/",
       "badge": ""
+    },
+    {
+      "name": "All Products",
+      "href": "/shop",
+      "badge": "new"
     }
   ],
   "utility_links": [

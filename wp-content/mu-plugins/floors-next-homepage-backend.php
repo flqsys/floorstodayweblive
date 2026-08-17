@@ -572,7 +572,7 @@ function ft_next_homepage_attribution_script() {
     return '<script id="ft-attribution-tracker">(function(){'
         . 'if(window.ftGetAttribution)return;'
         . 'var key="ft_attribution_v1";'
-        . 'var maxAge=90*24*60*60*1000;'
+        . 'var maxAge=24*60*60*1000;'
         . 'var socialHosts={'
         . '"facebook.com":"facebook","m.facebook.com":"facebook","l.facebook.com":"facebook","lm.facebook.com":"facebook","instagram.com":"instagram","l.instagram.com":"instagram","tiktok.com":"tiktok","vm.tiktok.com":"tiktok","linkedin.com":"linkedin","lnkd.in":"linkedin","youtube.com":"youtube","youtu.be":"youtube","pinterest.com":"pinterest","x.com":"x","twitter.com":"x"'
         . '};'
@@ -3517,7 +3517,7 @@ function ft_next_homepage_render_utm_admin() {
                 <strong>Tracking domain</strong>
                 <code>https://floorstoday.ca/</code>
                 <strong style="display:block;margin-top:12px;">Lead attribution</strong>
-                <code>hello_social saved for 90 days</code>
+                <code>hello_social saved for 24 hours</code>
             </div>
         </div>
 
