@@ -189,39 +189,33 @@ class FT_XD_Newsletter_Integration {
         ]);
     }
 
+    /**
+     * Sends to the CRM's dedicated newsletter-subscribers endpoint, not
+     * /xd/leads - a promo-form signup isn't a sales Lead (see
+     * xd_coupons's xd_newsletter_subscribers table on the CRM side). Staff
+     * can manually convert a subscriber to a real Lead from the CRM's
+     * Newsletter Subscribers page if one's worth pursuing. The itech_crm_source
+     * /itech_crm_status/itech_crm_tags settings don't apply to a subscriber
+     * record, so they're no longer sent here - the CRM assigns the
+     * currently-active promotion automatically.
+     */
     private function send_to_itech_crm(array $data, array $settings): true|WP_Error {
         $crm = get_option(FT_XD_CRM_SETTINGS_KEY, []);
         if (empty($crm['base_url']) || empty($crm['api_token'])) {
             return new WP_Error('xd_newsletter_itech_crm_missing', 'iTech CRM settings are incomplete.');
         }
 
-        $tags = array_filter(array_map('trim', explode(',', (string) ($settings['itech_crm_tags'] ?? 'newsletter'))));
-        $description = implode("\n", array_filter([
-            'Newsletter signup',
-            'Name: ' . $data['name'],
-            'Email: ' . $data['email'],
-            'Phone: ' . $data['phone'],
-            'City: ' . $data['city'],
-            'Page: ' . $data['page_url'],
-            'Referrer: ' . $data['referrer_url'],
-        ]));
-
         $payload = [
-            'name' => $data['name'] !== '' ? $data['name'] : $data['email'],
+            'name' => $data['name'],
             'email' => $data['email'],
-            'phonenumber' => $data['phone'],
+            'phone' => $data['phone'],
             'city' => $data['city'],
-            'source' => sanitize_text_field($settings['itech_crm_source'] ?? 'Website Newsletter'),
-            'status' => sanitize_text_field($settings['itech_crm_status'] ?? '1'),
-            'description' => $description,
+            'page_url' => $data['page_url'],
+            'referrer_url' => $data['referrer_url'],
         ];
 
-        if (!empty($tags)) {
-            $payload['tags'] = implode(',', $tags);
-        }
-
         $api = new FT_XD_CRM_API($crm['base_url'], $crm['api_token']);
-        $result = $api->create_lead($payload);
+        $result = $api->create_subscriber($payload);
 
         if (is_wp_error($result)) {
             return $result;

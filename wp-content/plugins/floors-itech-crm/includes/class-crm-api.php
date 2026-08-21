@@ -25,6 +25,15 @@ class FT_XD_CRM_API {
         return $this->post('/xd/leads', $fields);
     }
 
+    /**
+     * Newsletter/promo-form signups are not sales leads - they land in the
+     * CRM's own lighter-weight subscribers table (xd_coupons module) and
+     * only become a real Lead if a staff member manually converts one.
+     */
+    public function create_subscriber(array $fields): array|WP_Error {
+        return $this->post('/xd/newsletter-subscribers', $fields);
+    }
+
     public function create_appointment(array $fields): array|WP_Error {
         return $this->post('/xd/appointments', $fields);
     }
