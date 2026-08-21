@@ -451,7 +451,7 @@ function ft_xd_crm_render_settings_page(): void {
 
             <div class="ft-xd-card">
                 <h2>Newsletter Integrations</h2>
-                <p class="description">Newsletter signups collect name, email, phone, and city. WordPress keeps delivery status only; Sendy and/or iTech CRM store the subscriber/lead.</p>
+                <p class="description">Newsletter signups collect name, email, phone, and city. WordPress keeps delivery status only; Sendy and/or iTech CRM store the subscriber. This never creates an iTech CRM Lead - only a lightweight Subscriber record.</p>
                 <table class="form-table">
                     <tr>
                         <th><label for="newsletter_destination">Destination</label></th>
@@ -502,11 +502,14 @@ function ft_xd_crm_render_settings_page(): void {
                 <table class="form-table">
                     <tr>
                         <th><label for="newsletter_itech_crm_enabled">Also Send to iTech CRM</label></th>
-                        <td><label><input type="checkbox" name="newsletter_itech_crm_enabled" id="newsletter_itech_crm_enabled" value="1" <?php checked($newsletter['itech_crm_enabled'] ?? '', '1'); ?>> Create an iTech CRM lead for newsletter signups</label></td>
+                        <td><label><input type="checkbox" name="newsletter_itech_crm_enabled" id="newsletter_itech_crm_enabled" value="1" <?php checked($newsletter['itech_crm_enabled'] ?? '', '1'); ?>> Create an iTech CRM <strong>subscriber</strong> for newsletter signups (not a Lead)</label></td>
                     </tr>
                     <tr>
                         <th><label for="newsletter_itech_crm_source">iTech CRM Newsletter Source</label></th>
-                        <td><input type="text" name="newsletter_itech_crm_source" id="newsletter_itech_crm_source" value="<?php echo esc_attr($newsletter['itech_crm_source'] ?? 'Website Newsletter'); ?>" class="regular-text"></td>
+                        <td>
+                            <input type="text" name="newsletter_itech_crm_source" id="newsletter_itech_crm_source" value="<?php echo esc_attr($newsletter['itech_crm_source'] ?? 'Website Newsletter'); ?>" class="regular-text">
+                            <p class="description">Not currently used - subscriber records don't carry a source/status/tags field on the CRM side. Kept here in case a future CRM change needs it.</p>
+                        </td>
                     </tr>
                     <tr>
                         <th><label for="newsletter_itech_crm_status">iTech CRM Status ID</label></th>

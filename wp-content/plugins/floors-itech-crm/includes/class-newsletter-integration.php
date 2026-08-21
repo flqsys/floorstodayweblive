@@ -145,18 +145,17 @@ class FT_XD_Newsletter_Integration {
 
         $log_id = $this->create_log($data);
         $settings = self::get_settings();
-        $destination = $settings['destination'] ?: 'sendy';
         $results = [];
 
-        if (in_array($destination, ['sendy', 'both'], true)) {
-            $results['sendy'] = $this->send_to_sendy($data, $settings);
-            $this->record_result($log_id, 'sendy', $results['sendy']);
-        }
+        // Always send to both - the "Destination" setting proved unreliable
+        // to keep saved correctly from the WP admin screen, and every
+        // newsletter signup should reach Sendy and the CRM's subscriber
+        // list regardless of that toggle's state.
+        $results['sendy'] = $this->send_to_sendy($data, $settings);
+        $this->record_result($log_id, 'sendy', $results['sendy']);
 
-        if (in_array($destination, ['itech_crm', 'both'], true) || !empty($settings['itech_crm_enabled'])) {
-            $results['itech_crm'] = $this->send_to_itech_crm($data, $settings);
-            $this->record_result($log_id, 'itech_crm', $results['itech_crm']);
-        }
+        $results['itech_crm'] = $this->send_to_itech_crm($data, $settings);
+        $this->record_result($log_id, 'itech_crm', $results['itech_crm']);
 
         $errors = array_filter($results, 'is_wp_error');
         if (!empty($errors)) {
