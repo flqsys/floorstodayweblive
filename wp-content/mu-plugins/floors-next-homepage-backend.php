@@ -1160,6 +1160,30 @@ add_action('template_redirect', function () {
     // Settings and static markup can contain URLs saved before the site moved.
     $html = ft_next_homepage_normalize_static_html($html);
 
+    // Google Tag Manager - this page is served as a raw static export (this
+    // handler exits before wp_head/wp_footer ever fire), so it needs its
+    // own direct head/body injection rather than the wp_head/wp_footer
+    // hooks used for every other WordPress page. Head script goes right
+    // after the opening <head> tag (as high as possible, per Google's own
+    // placement guidance) and the noscript fallback right after <body>.
+    $gtm_id = sanitize_text_field($settings['gtm_container_id'] ?? '');
+    if ($gtm_id !== '') {
+        $gtm_head = "\n" . '<!-- Google Tag Manager -->' . "\n"
+            . '<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({\'gtm.start\':'
+            . 'new Date().getTime(),event:\'gtm.js\'});var f=d.getElementsByTagName(s)[0],'
+            . 'j=d.createElement(s),dl=l!=\'dataLayer\'?\'&l=\'+l:\'\';j.async=true;j.src='
+            . '\'https://www.googletagmanager.com/gtm.js?id=\'+i+dl;f.parentNode.insertBefore(j,f);'
+            . '})(window,document,\'script\',\'dataLayer\',\'' . esc_js($gtm_id) . '\');</script>' . "\n"
+            . '<!-- End Google Tag Manager -->' . "\n";
+        $gtm_noscript = "\n" . '<!-- Google Tag Manager (noscript) -->' . "\n"
+            . '<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=' . esc_attr($gtm_id) . '" '
+            . 'height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>' . "\n"
+            . '<!-- End Google Tag Manager (noscript) -->' . "\n";
+
+        $html = preg_replace('/<head(\s[^>]*)?>/i', '$0' . str_replace('$', '\\$', $gtm_head), $html, 1);
+        $html = preg_replace('/<body(\s[^>]*)?>/i', '$0' . str_replace('$', '\\$', $gtm_noscript), $html, 1);
+    }
+
     status_header(200);
     nocache_headers();
     header('Content-Type: text/html; charset=' . get_bloginfo('charset'));
@@ -2266,7 +2290,7 @@ add_action('admin_post_ft_next_homepage_save', function () {
         'warranty_popup_title', 'warranty_see_more_text', 'warranty_see_more_url',
         'footer_about_title', 'footer_categories_title', 'footer_help_title',
         'footer_policies_title', 'footer_copyright', 'google_places_api_key',
-        'fb_pixel_id', 'recaptcha_site_key',
+        'fb_pixel_id', 'gtm_container_id', 'recaptcha_site_key',
     ];
     $textarea_fields = [
         'hero_text', 'process_text', 'comparison_text', 'comparison_disclaimer', 'cta_text', 'footer_about',
@@ -3472,6 +3496,11 @@ function ft_next_homepage_render_admin() {
                             Facebook Pixel ID
                             <input name="fb_pixel_id" type="text" value="<?php echo esc_attr($settings['fb_pixel_id'] ?? ''); ?>" placeholder="1234567890123456" style="font-family:monospace">
                             <span class="description">Your numeric Pixel ID — fires a PageView event on every page automatically. No need to paste the full script. <a href="https://www.facebook.com/events_manager2/list/pixel/" target="_blank" rel="noopener">Get Pixel ID →</a></span>
+                        </label>
+                        <label>
+                            Google Tag Manager Container ID
+                            <input name="gtm_container_id" type="text" value="<?php echo esc_attr($settings['gtm_container_id'] ?? ''); ?>" placeholder="GTM-XXXXXXX" style="font-family:monospace">
+                            <span class="description">Just the container ID — the head script and body noscript tag are added automatically on every page. <a href="https://tagmanager.google.com/" target="_blank" rel="noopener">Find your container ID →</a></span>
                         </label>
                         <label>
                             reCAPTCHA v3 Site Key
@@ -5737,6 +5766,43 @@ add_action('wp_footer', function () {
     if ($chat_src === '') return;
     $id_attr = $chat_id ? ' id="' . esc_attr($chat_id) . '"' : '';
     echo '<script' . $id_attr . ' src="' . esc_url($chat_src) . '" defer></script>' . "\n";
+});
+
+// Inject Google Tag Manager on every standard WordPress page. The homepage
+// is served as a raw static export via template_redirect (exits before
+// wp_head/wp_footer ever fire there), so it gets its own direct string
+// injection into head/body instead - see the template_redirect handler
+// above. Priority 1 so this runs as early as possible in <head>, per
+// Google's own placement guidance.
+add_action('wp_head', function () {
+    $settings = ft_next_homepage_settings();
+    $gtm_id = sanitize_text_field($settings['gtm_container_id'] ?? '');
+    if ($gtm_id === '') return;
+    ?>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','<?php echo esc_js($gtm_id); ?>');</script>
+<!-- End Google Tag Manager -->
+    <?php
+}, 1);
+
+// GTM's noscript fallback belongs immediately after <body>, but this theme
+// doesn't call wp_body_open() anywhere - wp_footer is the closest hook
+// available without editing header.php. Functionally equivalent for GTM
+// (only affects visitors with JavaScript disabled).
+add_action('wp_footer', function () {
+    $settings = ft_next_homepage_settings();
+    $gtm_id = sanitize_text_field($settings['gtm_container_id'] ?? '');
+    if ($gtm_id === '') return;
+    ?>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=<?php echo esc_attr($gtm_id); ?>"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <?php
 });
 
 add_action('rest_api_init', function () {
