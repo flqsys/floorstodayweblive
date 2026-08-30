@@ -12,6 +12,19 @@ if (!defined('ABSPATH')) {
 const FT_NEXT_HOME_OPTION = 'ft_next_homepage_settings';
 const FT_NEXT_SENDY_OPTION = 'ft_next_sendy_settings';
 
+// Admins pasting a raw ad-pixel snippet into a settings textarea sometimes
+// paste just the bare JS (e.g. a lone oaiq("measure", ...) call) instead of
+// a full <script>...</script> block - echoed as-is, that renders as literal
+// visible text on the page instead of running. Wrap it defensively so
+// either form always works correctly.
+function ft_next_ensure_script_wrapped($code) {
+    $code = trim((string) $code);
+    if ($code === '' || stripos($code, '<script') !== false) {
+        return $code;
+    }
+    return '<script>' . $code . '</script>';
+}
+
 function ft_next_homepage_defaults() {
     $public_url = untrailingslashit(ft_next_homepage_asset_url());
 
@@ -1186,9 +1199,8 @@ add_action('template_redirect', function () {
     }
 
     // OpenAI Ads pixel - same reasoning as GTM above, needs direct <head>
-    // injection since this page never fires wp_head. Echoed as-is; already
-    // wraps its own <script> tag.
-    $openai_ads_code = trim($settings['openai_ads_embed_code'] ?? '');
+    // injection since this page never fires wp_head.
+    $openai_ads_code = ft_next_ensure_script_wrapped($settings['openai_ads_embed_code'] ?? '');
     if ($openai_ads_code !== '') {
         $openai_ads_head = "\n" . $openai_ads_code . "\n";
         $html = preg_replace('/<head(\s[^>]*)?>/i', '$0' . str_replace('$', '\\$', $openai_ads_head), $html, 1);
@@ -2560,6 +2572,7 @@ function ft_next_homepage_utm_links() {
         'Newsletter' => 'newsletter',
         'Google Ads' => 'google-ads',
         'Meta Ads' => 'meta-ads',
+        'OpenAI Ad' => 'openaiad',
     ];
     $links = [];
 
@@ -5780,7 +5793,7 @@ fbq('init','<?php echo esc_js($pixel_id); ?>');fbq('track','PageView');
 // below (it exits before wp_head ever fires there).
 add_action('wp_head', function () {
     $settings = ft_next_homepage_settings();
-    $code = trim($settings['openai_ads_embed_code'] ?? '');
+    $code = ft_next_ensure_script_wrapped($settings['openai_ads_embed_code'] ?? '');
     if ($code === '') return;
     echo "\n" . $code . "\n";
 });
