@@ -28,6 +28,8 @@ declare global {
     dataLayer?: any[]
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     XDTrack?: { lead: (data: Record<string, string>) => void }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    oaiq?: (...args: any[]) => void
   }
 }
 
@@ -134,6 +136,17 @@ export function HeroSection() {
       // XDTrack global (injected by XD CRM plugin on WordPress pages)
       if (window.XDTrack) {
         window.XDTrack.lead(trackingData)
+      }
+
+      // OpenAI Ads — conversion event. "lead_submitted" is a placeholder
+      // event name matching the fbq/gtag calls above - rename it to
+      // whatever OpenAI Ads' own event taxonomy expects if different.
+      if (window.oaiq) {
+        window.oaiq("measure", "lead_submitted", {
+          type: "customer_action",
+          amount: 0,
+          currency: "CAD",
+        })
       }
     }
 

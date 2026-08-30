@@ -142,6 +142,7 @@ function ft_next_homepage_defaults() {
         'testimonials_bg_color_1' => 'oklch(0.985 0.002 90)',
         'chat_embed_code' => '',
         'estimate_form_embed_code' => '',
+        'openai_ads_embed_code' => '',
         'fb_pixel_id' => '',
         'ga4_measurement_id' => '',
         'gtm_container_id' => '',
@@ -1182,6 +1183,15 @@ add_action('template_redirect', function () {
 
         $html = preg_replace('/<head(\s[^>]*)?>/i', '$0' . str_replace('$', '\\$', $gtm_head), $html, 1);
         $html = preg_replace('/<body(\s[^>]*)?>/i', '$0' . str_replace('$', '\\$', $gtm_noscript), $html, 1);
+    }
+
+    // OpenAI Ads pixel - same reasoning as GTM above, needs direct <head>
+    // injection since this page never fires wp_head. Echoed as-is; already
+    // wraps its own <script> tag.
+    $openai_ads_code = trim($settings['openai_ads_embed_code'] ?? '');
+    if ($openai_ads_code !== '') {
+        $openai_ads_head = "\n" . $openai_ads_code . "\n";
+        $html = preg_replace('/<head(\s[^>]*)?>/i', '$0' . str_replace('$', '\\$', $openai_ads_head), $html, 1);
     }
 
     status_header(200);
@@ -2333,6 +2343,7 @@ add_action('admin_post_ft_next_homepage_save', function () {
     $data['testimonials_embed_code'] = isset($_POST['testimonials_embed_code']) ? wp_unslash($_POST['testimonials_embed_code']) : ($current['testimonials_embed_code'] ?? '');
     $data['chat_embed_code'] = isset($_POST['chat_embed_code']) ? wp_unslash($_POST['chat_embed_code']) : ($current['chat_embed_code'] ?? '');
     $data['estimate_form_embed_code'] = isset($_POST['estimate_form_embed_code']) ? wp_unslash($_POST['estimate_form_embed_code']) : ($current['estimate_form_embed_code'] ?? '');
+    $data['openai_ads_embed_code'] = isset($_POST['openai_ads_embed_code']) ? wp_unslash($_POST['openai_ads_embed_code']) : ($current['openai_ads_embed_code'] ?? '');
     $data['hero_show_background'] = isset($_POST['hero_show_background']) ? '1' : '0';
     $data['hero_show_overlay'] = isset($_POST['hero_show_overlay']) ? '1' : '0';
 
@@ -3513,6 +3524,11 @@ function ft_next_homepage_render_admin() {
                             Chat Widget Embed Code
                             <textarea name="chat_embed_code" rows="4" placeholder="&lt;script id=&quot;...&quot; src=&quot;https://...&quot; defer&gt;&lt;/script&gt;" style="font-family:monospace"><?php echo esc_textarea($settings['chat_embed_code'] ?? ''); ?></textarea>
                             <span class="description">Paste the <code>&lt;script&gt;</code> tag from your chat provider. Loads on every page — homepage and all other pages. Works with Tidio, LiveChat, Intercom, and others.</span>
+                        </label>
+                        <label>
+                            OpenAI Ads Pixel Setup Code
+                            <textarea name="openai_ads_embed_code" rows="4" placeholder="&lt;script&gt;...&lt;/script&gt;" style="font-family:monospace"><?php echo esc_textarea($settings['openai_ads_embed_code'] ?? ''); ?></textarea>
+                            <span class="description">Paste the full setup <code>&lt;script&gt;</code> tag from OpenAI Ads' "Set up your data source" screen. Loads in <code>&lt;head&gt;</code> on every page — homepage and all other pages.</span>
                         </label>
                         <label>
                             Estimate Form Embed Code
@@ -5754,6 +5770,19 @@ fbq('init','<?php echo esc_js($pixel_id); ?>');fbq('track','PageView');
 <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=<?php echo esc_attr($pixel_id); ?>&ev=PageView&noscript=1"/></noscript>
 <!-- End Facebook Pixel Code -->
     <?php
+});
+
+// Inject the OpenAI Ads pixel setup code in <head> of every standard
+// WordPress page. Echoed as-is (not parsed/rebuilt) since it's an inline
+// script, not a single external src - only admins (manage_options) can
+// save it, same trust boundary as chat_embed_code/estimate_form_embed_code.
+// The homepage gets its own copy injected directly in template_redirect
+// below (it exits before wp_head ever fires there).
+add_action('wp_head', function () {
+    $settings = ft_next_homepage_settings();
+    $code = trim($settings['openai_ads_embed_code'] ?? '');
+    if ($code === '') return;
+    echo "\n" . $code . "\n";
 });
 
 // Inject chat widget script in the footer of every standard WordPress page.
