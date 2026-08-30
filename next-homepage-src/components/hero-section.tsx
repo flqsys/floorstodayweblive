@@ -138,15 +138,16 @@ export function HeroSection() {
         window.XDTrack.lead(trackingData)
       }
 
-      // OpenAI Ads — conversion event. "lead_submitted" is a placeholder
-      // event name matching the fbq/gtag calls above - rename it to
-      // whatever OpenAI Ads' own event taxonomy expects if different.
+      // OpenAI Ads — conversion event. Per developers.openai.com/ads/measurement-pixel,
+      // "quote_requested" isn't a standard event name, so it goes through
+      // the custom-event path (measure "custom" + custom_event_name).
       if (window.oaiq) {
-        window.oaiq("measure", "lead_submitted", {
-          type: "customer_action",
-          amount: 0,
-          currency: "CAD",
-        })
+        window.oaiq(
+          "measure",
+          "custom",
+          { type: "custom" },
+          { custom_event_name: "quote_requested" }
+        )
       }
     }
 
