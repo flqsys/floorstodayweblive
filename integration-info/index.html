@@ -547,27 +547,6 @@
 
       <div class="spec">
         <div class="spec-head">
-          <span class="spec-title">Social UTM links</span>
-          <span class="spec-note">id: ft-utm-embed &middot; admin login required</span>
-        </div>
-        <div class="codebar">
-          <pre><code data-copy-source="5"><span class="tok-tag">&lt;iframe</span> <span class="tok-attr">id=</span><span class="tok-str">"ft-utm-embed"</span> <span class="tok-attr">src=</span><span class="tok-str">"https://floorstoday.ca/ft-embed/utm"</span> <span class="tok-attr">style=</span><span class="tok-str">"width:100%; border:0; overflow:hidden;"</span> <span class="tok-attr">scrolling=</span><span class="tok-str">"no"</span><span class="tok-tag">&gt;&lt;/iframe&gt;</span></code></pre>
-          <button class="copy-btn" data-copy-target="5" type="button">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
-            Copy
-          </button>
-        </div>
-        <details class="preview">
-          <summary>Live preview</summary>
-          <p class="preview-hint">Requires an active floorstoday.ca admin session in this browser &mdash; otherwise shows a login prompt instead of the links.</p>
-          <div class="preview-frame">
-            <iframe id="ft-utm-embed" src="https://floorstoday.ca/ft-embed/utm" scrolling="no" title="UTM links preview"></iframe>
-          </div>
-        </details>
-      </div>
-
-      <div class="spec">
-        <div class="spec-head">
           <span class="spec-title">Auto-resize listener</span>
           <span class="spec-note">add once per page &middot; sizes all three embeds above</span>
         </div>
@@ -576,7 +555,7 @@
 <span class="tok-com">// Resizes the iframe to match the form's real height, no scrollbar</span>
 window.addEventListener(<span class="tok-str">'message'</span>, <span class="tok-attr">function</span> (e) {
   if (!e.data || !e.data.ftEmbedHeight) return;
-  <span class="tok-attr">var</span> idMap = { booking: <span class="tok-str">'ft-booking-embed'</span>, contact: <span class="tok-str">'ft-contact-embed'</span>, utm: <span class="tok-str">'ft-utm-embed'</span> };
+  <span class="tok-attr">var</span> idMap = { booking: <span class="tok-str">'ft-booking-embed'</span>, contact: <span class="tok-str">'ft-contact-embed'</span> };
   <span class="tok-attr">var</span> iframe = document.getElementById(idMap[e.data.ftEmbedType]);
   if (iframe) iframe.style.height = e.data.ftEmbedHeight + <span class="tok-str">'px'</span>;
 });
@@ -703,7 +682,7 @@ window.addEventListener(<span class="tok-str">'message'</span>, <span class="tok
     </div>
     <div class="note">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7.5"/><path d="M10 9v4.5M10 6.5v.01"/></svg>
-      <span>These same links, always kept in sync, are also available live (while logged in as an admin) via the Social UTM Links embed above, or in wp-admin under <strong>Next Homepage &rarr; Social UTM Links</strong>.</span>
+      <span>These links are always kept in sync with wp-admin under <strong>Next Homepage &rarr; Social UTM Links</strong> &mdash; internal reference only, not meant to be embedded or shared outside the team.</span>
     </div>
   </section>
 
@@ -773,7 +752,7 @@ window.addEventListener(<span class="tok-str">'message'</span>, <span class="tok
   // Sizes the live-preview iframes to the embedded form's real height,
   // same mechanism given to viewers as the copy-paste "Auto-resize
   // listener" snippet above.
-  var previewIdMap = { booking: 'ft-booking-embed', contact: 'ft-contact-embed', utm: 'ft-utm-embed' };
+  var previewIdMap = { booking: 'ft-booking-embed', contact: 'ft-contact-embed' };
   window.addEventListener('message', function (e) {
     if (!e.data || !e.data.ftEmbedHeight) return;
     var iframe = document.getElementById(previewIdMap[e.data.ftEmbedType]);
