@@ -707,27 +707,19 @@ window.addEventListener(<span class="tok-str">'message'</span>, <span class="tok
     </div>
   </section>
 
-  <section class="block" id="allowed">
-    <div class="block-head">
-      <h2>Allowed origins</h2>
-      <span class="count">frame-ancestors</span>
-    </div>
-    <div class="pill-row">
-      <span class="pill"><span class="dot"></span>*.floorstoday.ca</span>
-      <span class="pill"><span class="dot"></span>floorstoday.ca</span>
-    </div>
-  </section>
-
   <section class="block" id="howto">
     <div class="block-head">
-      <h2>Adding an embed in Elementor</h2>
+      <h2>Adding an embed</h2>
+      <span class="count">any of the methods below</span>
     </div>
+    <p class="block-intro">Works the same way regardless of where the page lives &mdash; a floorstoday.ca subdomain, a plain static site, or any landing-page tool. Just get the two snippets above into the page's actual HTML.</p>
     <div class="howto">
       <ol>
-        <li>Drag an <strong>HTML widget</strong> onto the page &mdash; not the Text Editor widget, it strips <code>&lt;iframe&gt;</code> and <code>&lt;script&gt;</code> tags.</li>
-        <li>Paste one embed snippet per widget.</li>
-        <li>Add the auto-resize script in one more HTML widget anywhere on the page &mdash; only needed once, even with multiple embeds.</li>
-        <li>Click <strong>Update</strong>, then check the result on the <strong>published page</strong>, not the editor canvas &mdash; Elementor's own preview frame can render iframes oddly even when the live page is correct.</li>
+        <li><strong>Elementor:</strong> drag an <strong>HTML widget</strong> onto the page (not the Text Editor widget &mdash; it strips <code>&lt;iframe&gt;</code> and <code>&lt;script&gt;</code> tags), paste one embed snippet per widget.</li>
+        <li><strong>Static HTML page:</strong> paste the embed snippet directly into the page's HTML wherever the form should appear.</li>
+        <li><strong>Other landing-page builders</strong> (Unbounce, Webflow, ClickFunnels, Instapage, etc.): use its embed / custom code / HTML block &mdash; every builder has one, usually under a name like "Embed," "Custom HTML," or "Code."</li>
+        <li>Add the auto-resize script once anywhere on the page &mdash; it works for every embed on that page, no matter how many.</li>
+        <li>Check the result on the <strong>published page</strong>, not an editor's live-preview canvas &mdash; some builders render nested iframes oddly in edit mode even when the live page is correct.</li>
       </ol>
     </div>
   </section>
