@@ -3542,7 +3542,7 @@ function ft_next_homepage_render_admin() {
                     }
                 }
                 ?>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+                <div class="ft-next-field-stack" style="grid-template-columns:1fr 1fr;gap:24px;">
                     <label>
                         <?php echo ft_next_field_icon('google'); ?>Google Places API Key
                         <input name="google_places_api_key" type="text" value="<?php echo esc_attr($settings['google_places_api_key'] ?? ''); ?>" placeholder="AIza..." style="font-family:monospace">
@@ -3564,7 +3564,7 @@ function ft_next_homepage_render_admin() {
                         <span class="description">Adds invisible bot protection to the homepage booking form — visitors never see a challenge. <a href="https://www.google.com/recaptcha/admin/create" target="_blank" rel="noopener">Create reCAPTCHA v3 key →</a></span>
                     </label>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:28px;">
+                <div class="ft-next-field-stack" style="grid-template-columns:1fr 1fr;gap:24px;margin-top:28px;">
                     <label>
                         <?php echo ft_next_field_icon('chat'); ?>Chat Widget Embed Code
                         <textarea name="chat_embed_code" rows="4" placeholder="&lt;script id=&quot;...&quot; src=&quot;https://...&quot; defer&gt;&lt;/script&gt;" style="font-family:monospace"><?php echo esc_textarea($settings['chat_embed_code'] ?? ''); ?></textarea>
