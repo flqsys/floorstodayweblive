@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Floors Today Embed Kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html { color-scheme: light dark; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+
+  :root {
+    --bg: #f6f2ec;
+    --surface: #ffffff;
+    --surface-2: #efe8db;
+    --ink: #2b2620;
+    --ink-soft: #55493c;
+    --muted: #8a7d6c;
+    --accent: #235bb8;
+    --accent-soft: #e8eefb;
+    --accent-ink: #ffffff;
+    --success: #15803d;
+    --success-soft: #e5f3ea;
+    --border: #e3dac9;
+    --code-bg: #241f19;
+    --code-ink: #f3ede3;
+    --code-muted: #a79a87;
+    --shadow: 0 1px 2px rgba(43, 38, 32, 0.04), 0 8px 24px -12px rgba(43, 38, 32, 0.14);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1b1712;
+      --surface: #241f19;
+      --surface-2: #2e2820;
+      --ink: #f3ede3;
+      --ink-soft: #d9cfc0;
+      --muted: #a79a87;
+      --accent: #7fabec;
+      --accent-soft: #2a3a54;
+      --accent-ink: #12233f;
+      --success: #6fce93;
+      --success-soft: #1c3527;
+      --border: #3a3227;
+      --code-bg: #14110d;
+      --code-ink: #f3ede3;
+      --code-muted: #948572;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #1b1712;
+    --surface: #241f19;
+    --surface-2: #2e2820;
+    --ink: #f3ede3;
+    --ink-soft: #d9cfc0;
+    --muted: #a79a87;
+    --accent: #7fabec;
+    --accent-soft: #2a3a54;
+    --accent-ink: #12233f;
+    --success: #6fce93;
+    --success-soft: #1c3527;
+    --border: #3a3227;
+    --code-bg: #14110d;
+    --code-ink: #f3ede3;
+    --code-muted: #948572;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Inter", system-ui, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  header.masthead {
+    margin-bottom: 48px;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: clamp(32px, 5vw, 42px);
+    font-weight: 600;
+    line-height: 1.12;
+    margin: 0 0 12px;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+
+  .masthead p {
+    font-size: 16px;
+    color: var(--ink-soft);
+    max-width: 60ch;
+    margin: 0;
+  }
+
+  .masthead p code {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 14px;
+    background: var(--surface-2);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  section.block {
+    margin-bottom: 44px;
+  }
+
+  .block-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  h2 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .block-head .count {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .block-intro {
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    margin: 0 0 20px;
+    max-width: 62ch;
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .spec {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .spec-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .spec-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+  }
+
+  .spec-note {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+
+  .codebar {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    background: var(--code-bg);
+    border-radius: 7px;
+    overflow: hidden;
+  }
+
+  .codebar pre {
+    margin: 0;
+    padding: 11px 14px;
+    overflow-x: auto;
+    flex: 1;
+    scrollbar-width: thin;
+  }
+
+  .codebar code {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    color: var(--code-ink);
+    white-space: pre;
+  }
+
+  .codebar .tok-tag { color: #7fabec; }
+  .codebar .tok-attr { color: #d9c47f; }
+  .codebar .tok-str { color: #9bd88a; }
+  .codebar .tok-com { color: var(--code-muted); font-style: italic; }
+
+  .copy-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: center;
+    margin-right: 10px;
+    padding: 7px 12px;
+    border: 1px solid #45392a;
+    border-radius: 6px;
+    background: #322a20;
+    color: var(--code-ink);
+    font-family: "Inter", sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .copy-btn:hover { background: #3d3225; }
+  .copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .copy-btn.is-copied { background: var(--success); border-color: var(--success); color: #0d2415; }
+  .copy-btn svg { width: 13px; height: 13px; }
+
+  .pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: var(--success-soft);
+    color: var(--success);
+    border: 1px solid var(--success);
+    font-weight: 500;
+  }
+
+  .pill .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+    flex-shrink: 0;
+  }
+
+  .howto {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+    box-shadow: var(--shadow);
+  }
+
+  .howto ol {
+    margin: 0;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .howto li {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+  }
+
+  .howto li strong { color: var(--ink); }
+
+  .howto li code {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    background: var(--surface-2);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--ink);
+  }
+
+  .note {
+    display: flex;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-top: 16px;
+  }
+
+  .note svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    color: var(--accent);
+  }
+
+  .note a { color: var(--accent); font-weight: 600; }
+
+  footer.foot {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 12.5px;
+    color: var(--muted);
+    font-family: "JetBrains Mono", monospace;
+  }
+
+  @media (max-width: 560px) {
+    .page { padding: 40px 16px 72px; }
+    .spec-head { flex-direction: column; align-items: flex-start; }
+  }
+
+  .preview {
+    margin-top: 12px;
+    border-top: 1px dashed var(--border);
+    padding-top: 12px;
+  }
+
+  .preview summary {
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--accent);
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .preview summary::-webkit-details-marker { display: none; }
+  .preview summary::before {
+    content: "\25B8";
+    display: inline-block;
+    transition: transform 0.15s ease;
+    font-size: 10px;
+  }
+  .preview[open] summary::before { transform: rotate(90deg); }
+
+  .preview-frame {
+    margin-top: 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    background: var(--surface-2);
+  }
+
+  .preview-frame iframe {
+    display: block;
+    width: 100%;
+    border: 0;
+  }
+
+  .preview-hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 0 10px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="masthead">
+    <span class="eyebrow">Floors Today &middot; Forms Reference</span>
+    <h1>Embed Kit</h1>
+    <p>Every way the booking and contact forms can be placed on a page &mdash; the plain WordPress shortcode for pages on <code>floorstoday.ca</code>, and the cross-domain <code>&lt;iframe&gt;</code> embeds for anywhere else.</p>
+  </header>
+
+  <section class="block" id="shortcodes">
+    <div class="block-head">
+      <h2>Shortcodes</h2>
+      <span class="count">floorstoday.ca only</span>
+    </div>
+    <p class="block-intro">Paste directly into any WordPress page, post, or Elementor Shortcode/HTML widget on floorstoday.ca. Not usable on another domain &mdash; for that, use the iframe embeds below.</p>
+    <div class="stack">
+
+      <div class="spec">
+        <div class="spec-head">
+          <span class="spec-title">Booking form</span>
+          <span class="spec-note">3-step estimate wizard</span>
+        </div>
+        <div class="codebar">
+          <pre><code data-copy-source="1">[floors_booking_form]</code></pre>
+          <button class="copy-btn" data-copy-target="1" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+            Copy
+          </button>
+        </div>
+      </div>
+
+      <div class="spec">
+        <div class="spec-head">
+          <span class="spec-title">Contact form</span>
+          <span class="spec-note">Name, email, phone, message</span>
+        </div>
+        <div class="codebar">
+          <pre><code data-copy-source="2">[floors_booking_form_contact]</code></pre>
+          <button class="copy-btn" data-copy-target="2" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+            Copy
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="block" id="embeds">
+    <div class="block-head">
+      <h2>Cross-domain embeds</h2>
+      <span class="count">any allowed subdomain</span>
+    </div>
+    <p class="block-intro">Bare, background-free versions of the same forms for dropping into a page on another (sub)domain via <code>&lt;iframe&gt;</code>. No card, border, or shadow &mdash; the form blends straight into the page it's placed on.</p>
+    <div class="stack">
+
+      <div class="spec">
+        <div class="spec-head">
+          <span class="spec-title">Booking form</span>
+          <span class="spec-note">id: ft-booking-embed</span>
+        </div>
+        <div class="codebar">
+          <pre><code data-copy-source="3"><span class="tok-tag">&lt;iframe</span> <span class="tok-attr">id=</span><span class="tok-str">"ft-booking-embed"</span> <span class="tok-attr">src=</span><span class="tok-str">"https://floorstoday.ca/ft-embed/booking"</span> <span class="tok-attr">style=</span><span class="tok-str">"width:100%; border:0; overflow:hidden;"</span> <span class="tok-attr">scrolling=</span><span class="tok-str">"no"</span><span class="tok-tag">&gt;&lt;/iframe&gt;</span></code></pre>
+          <button class="copy-btn" data-copy-target="3" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+            Copy
+          </button>
+        </div>
+        <details class="preview" open>
+          <summary>Live preview</summary>
+          <div class="preview-frame">
+            <iframe id="ft-booking-embed" src="https://floorstoday.ca/ft-embed/booking" scrolling="no" title="Booking form preview"></iframe>
+          </div>
+        </details>
+      </div>
+
+      <div class="spec">
+        <div class="spec-head">
+          <span class="spec-title">Contact form</span>
+          <span class="spec-note">id: ft-contact-embed</span>
+        </div>
+        <div class="codebar">
+          <pre><code data-copy-source="4"><span class="tok-tag">&lt;iframe</span> <span class="tok-attr">id=</span><span class="tok-str">"ft-contact-embed"</span> <span class="tok-attr">src=</span><span class="tok-str">"https://floorstoday.ca/ft-embed/contact"</span> <span class="tok-attr">style=</span><span class="tok-str">"width:100%; border:0; overflow:hidden;"</span> <span class="tok-attr">scrolling=</span><span class="tok-str">"no"</span><span class="tok-tag">&gt;&lt;/iframe&gt;</span></code></pre>
+          <button class="copy-btn" data-copy-target="4" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+            Copy
+          </button>
+        </div>
+        <details class="preview" open>
+          <summary>Live preview</summary>
+          <div class="preview-frame">
+            <iframe id="ft-contact-embed" src="https://floorstoday.ca/ft-embed/contact" scrolling="no" title="Contact form preview"></iframe>
+          </div>
+        </details>
+      </div>
+
+      <div class="spec">
+        <div class="spec-head">
+          <span class="spec-title">Social UTM links</span>
+          <span class="spec-note">id: ft-utm-embed &middot; admin login required</span>
+        </div>
+        <div class="codebar">
+          <pre><code data-copy-source="5"><span class="tok-tag">&lt;iframe</span> <span class="tok-attr">id=</span><span class="tok-str">"ft-utm-embed"</span> <span class="tok-attr">src=</span><span class="tok-str">"https://floorstoday.ca/ft-embed/utm"</span> <span class="tok-attr">style=</span><span class="tok-str">"width:100%; border:0; overflow:hidden;"</span> <span class="tok-attr">scrolling=</span><span class="tok-str">"no"</span><span class="tok-tag">&gt;&lt;/iframe&gt;</span></code></pre>
+          <button class="copy-btn" data-copy-target="5" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+            Copy
+          </button>
+        </div>
+        <details class="preview">
+          <summary>Live preview</summary>
+          <p class="preview-hint">Requires an active floorstoday.ca admin session in this browser &mdash; otherwise shows a login prompt instead of the links.</p>
+          <div class="preview-frame">
+            <iframe id="ft-utm-embed" src="https://floorstoday.ca/ft-embed/utm" scrolling="no" title="UTM links preview"></iframe>
+          </div>
+        </details>
+      </div>
+
+      <div class="spec">
+        <div class="spec-head">
+          <span class="spec-title">Auto-resize listener</span>
+          <span class="spec-note">add once per page &middot; sizes all three embeds above</span>
+        </div>
+        <div class="codebar">
+          <pre><code data-copy-source="6"><span class="tok-tag">&lt;script&gt;</span>
+<span class="tok-com">// Resizes the iframe to match the form's real height, no scrollbar</span>
+window.addEventListener(<span class="tok-str">'message'</span>, <span class="tok-attr">function</span> (e) {
+  if (!e.data || !e.data.ftEmbedHeight) return;
+  <span class="tok-attr">var</span> idMap = { booking: <span class="tok-str">'ft-booking-embed'</span>, contact: <span class="tok-str">'ft-contact-embed'</span>, utm: <span class="tok-str">'ft-utm-embed'</span> };
+  <span class="tok-attr">var</span> iframe = document.getElementById(idMap[e.data.ftEmbedType]);
+  if (iframe) iframe.style.height = e.data.ftEmbedHeight + <span class="tok-str">'px'</span>;
+});
+<span class="tok-tag">&lt;/script&gt;</span></code></pre>
+          <button class="copy-btn" data-copy-target="6" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+            Copy
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="note">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7.5"/><path d="M10 9v4.5M10 6.5v.01"/></svg>
+      <span>Embeds render on floorstoday.ca and any of its subdomains. A domain outside that family won't be able to load them &mdash; ask for it to be added first.</span>
+    </div>
+  </section>
+
+  <section class="block" id="allowed">
+    <div class="block-head">
+      <h2>Allowed origins</h2>
+      <span class="count">frame-ancestors</span>
+    </div>
+    <div class="pill-row">
+      <span class="pill"><span class="dot"></span>*.floorstoday.ca</span>
+      <span class="pill"><span class="dot"></span>floorstoday.ca</span>
+    </div>
+  </section>
+
+  <section class="block" id="howto">
+    <div class="block-head">
+      <h2>Adding an embed in Elementor</h2>
+    </div>
+    <div class="howto">
+      <ol>
+        <li>Drag an <strong>HTML widget</strong> onto the page &mdash; not the Text Editor widget, it strips <code>&lt;iframe&gt;</code> and <code>&lt;script&gt;</code> tags.</li>
+        <li>Paste one embed snippet per widget.</li>
+        <li>Add the auto-resize script in one more HTML widget anywhere on the page &mdash; only needed once, even with multiple embeds.</li>
+        <li>Click <strong>Update</strong>, then check the result on the <strong>published page</strong>, not the editor canvas &mdash; Elementor's own preview frame can render iframes oddly even when the live page is correct.</li>
+      </ol>
+    </div>
+  </section>
+
+  <footer class="foot">wp-content/mu-plugins/floors-embed-forms.php</footer>
+
+</div>
+
+<script>
+(function () {
+  var checkIcon = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10.5l3.5 3.5L16 6"/></svg>';
+
+  document.querySelectorAll('.copy-btn').forEach(function (btn) {
+    var originalHTML = btn.innerHTML;
+    btn.addEventListener('click', function () {
+      var sourceEl = document.querySelector('[data-copy-source="' + btn.getAttribute('data-copy-target') + '"]');
+      var text = sourceEl ? sourceEl.textContent : '';
+
+      function done() {
+        btn.classList.add('is-copied');
+        btn.innerHTML = checkIcon + 'Copied';
+        setTimeout(function () {
+          btn.classList.remove('is-copied');
+          btn.innerHTML = originalHTML;
+        }, 1500);
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () {
+          fallbackCopy(text);
+          done();
+        });
+      } else {
+        fallbackCopy(text);
+        done();
+      }
+    });
+  });
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+})();
+</script>
+</body>
+</html>
