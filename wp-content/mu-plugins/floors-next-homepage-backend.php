@@ -5593,6 +5593,15 @@ function ft_next_booking_form_shortcode() {
                 error.hidden = !message;
             }
 
+            var CANADIAN_AREA_CODES = ['204','226','236','249','250','263','289','306','343','354','365','367','368','382','403','416','418','428','431','437','438','450','468','474','506','514','519','548','579','581','584','587','604','613','639','647','672','683','705','709','742','753','778','780','782','807','819','825','867','873','902','905'];
+            function isValidCanadianPhone(value) {
+                var digits = String(value || '').replace(/\D/g, '');
+                if (digits.length === 11 && digits.charAt(0) === '1') digits = digits.slice(1);
+                if (digits.length !== 10) return false;
+                if (digits.charAt(3) === '0' || digits.charAt(3) === '1') return false;
+                return CANADIAN_AREA_CODES.indexOf(digits.slice(0, 3)) !== -1;
+            }
+
             function setCselectValue(name, value) {
                 var wrap = root.querySelector('.ft-bf__cselect[data-name="' + name + '"]');
                 if (!wrap) return;
@@ -5685,7 +5694,7 @@ function ft_next_booking_form_shortcode() {
                         if (fullName.split(/\s+/).filter(Boolean).length < 2) return showError('Please enter your first and last name.');
                         if (!email) return showError('Please enter your email address.');
                         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError('Please enter a valid email address.');
-                        if (!phoneLocal) return showError('Please enter your phone number.');
+                        if (!isValidCanadianPhone(phoneLocal)) return showError('Please enter a valid Canadian phone number.');
                     }
                     showStep(Math.min(state.totalSteps, state.step + 1));
                 }
