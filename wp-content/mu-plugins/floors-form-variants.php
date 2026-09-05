@@ -701,6 +701,7 @@ function ft_next_booking_form_contact_shortcode($atts) {
 
         var form  = root.querySelector('.ft-cf__form');
         var error = root.querySelector('.ft-cf__error');
+        var FT_REDIRECT_URL = <?php echo wp_json_encode((string) ($settings['form_redirect_url'] ?? '')); ?>;
 
         function showError(msg) {
             error.textContent = msg || '';
@@ -777,6 +778,12 @@ function ft_next_booking_form_contact_shortcode($atts) {
                         leadSource: attribution.trafficSource || utmSource || 'Direct',
                         utmSource:  utmSource,
                     });
+                }
+
+                // Give the tracking call above a moment to actually fire
+                // before navigating away.
+                if (FT_REDIRECT_URL) {
+                    setTimeout(function () { window.location.href = FT_REDIRECT_URL; }, 600);
                 }
             } catch (err) {
                 showError(err.message || 'We could not send your message. Please try again.');
