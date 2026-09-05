@@ -431,6 +431,10 @@
 .ft-inbox-data-grid div[data-key="referrer_url"],
 .ft-inbox-data-grid div[data-key="page_url"] { grid-column: span 6; }
 
+/* Email Delivery: Internal Notification | Customer Confirmation (2 × 50%) */
+.ft-inbox-data-grid div[data-key="admin_email_status"],
+.ft-inbox-data-grid div[data-key="client_email_status"] { grid-column: span 6; }
+
 /* Message & headings span full row */
 .ft-inbox-data-grid div[data-key="message"] { grid-column: 1 / -1; }
 

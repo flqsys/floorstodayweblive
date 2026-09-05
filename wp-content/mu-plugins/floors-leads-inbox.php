@@ -864,23 +864,6 @@ function ft_inbox_render_detail($lead_id) {
     echo '</form>';
     echo '</div>';
 
-    echo '<section class="ft-inbox-email-delivery"><h2 class="ft-inbox-data-grid__heading">Email Delivery</h2><div class="ft-inbox-data-grid">';
-    foreach (['admin' => 'Internal notification', 'client' => 'Customer confirmation'] as $type => $label) {
-        $status = $lead[$type . '_email_status'] ?? '';
-        if ($status === '') {
-            $display = 'Not sent (disabled in settings, or invalid email)';
-            $class   = 'is-missing';
-        } elseif ($status === 'accepted') {
-            $display = 'Accepted by mail server at ' . $lead[$type . '_email_checked_at'];
-            $class   = 'is-accepted';
-        } else {
-            $display = 'Failed at ' . $lead[$type . '_email_checked_at'] . ($lead[$type . '_email_error'] ? ' — ' . $lead[$type . '_email_error'] : '');
-            $class   = 'is-missing';
-        }
-        echo '<div data-key="' . esc_attr($type) . '_email_status"><span>' . esc_html($label) . '</span><strong class="' . esc_attr($class) . '">' . esc_html($display) . '</strong></div>';
-    }
-    echo '</div></section>';
-
     $tracking_fields = [
         'traffic_source',
         'utm_source',
@@ -940,6 +923,24 @@ function ft_inbox_render_detail($lead_id) {
         echo '</div>';
     }
     echo '</section>';
+
+    echo '<section class="ft-inbox-email-delivery"><h2 class="ft-inbox-data-grid__heading">Email Delivery</h2><div class="ft-inbox-data-grid">';
+    foreach (['admin' => 'Internal notification', 'client' => 'Customer confirmation'] as $type => $label) {
+        $status = $lead[$type . '_email_status'] ?? '';
+        if ($status === '') {
+            $display = 'Not sent (disabled in settings, or invalid email)';
+            $class   = 'is-missing';
+        } elseif ($status === 'accepted') {
+            $display = 'Accepted by mail server at ' . $lead[$type . '_email_checked_at'];
+            $class   = 'is-accepted';
+        } else {
+            $display = 'Failed at ' . $lead[$type . '_email_checked_at'] . ($lead[$type . '_email_error'] ? ' — ' . $lead[$type . '_email_error'] : '');
+            $class   = 'is-missing';
+        }
+        echo '<div data-key="' . esc_attr($type) . '_email_status"><span>' . esc_html($label) . '</span><strong class="' . esc_attr($class) . '">' . esc_html($display) . '</strong></div>';
+    }
+    echo '</div></section>';
+
     echo '</section>';
 
     echo '<aside class="ft-inbox-panel">';
