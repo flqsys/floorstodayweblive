@@ -389,12 +389,62 @@
     display: block;
     width: 100%;
     border: 0;
+    height: 640px;
+    transition: height 0.2s ease;
   }
 
   .preview-hint {
     font-size: 12px;
     color: var(--muted);
     margin: 0 0 10px;
+  }
+
+  .link-table {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .link-row {
+    display: grid;
+    grid-template-columns: 110px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .link-row:last-child { border-bottom: none; }
+  .link-row:nth-child(even) { background: var(--surface-2); }
+
+  .link-row .platform {
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+
+  .link-row .url {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .link-row .copy-btn {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+  }
+
+  .link-row .copy-btn:hover { background: var(--accent-soft); }
+  .link-row .copy-btn.is-copied { background: var(--success-soft); border-color: var(--success); color: var(--success); }
+
+  @media (max-width: 560px) {
+    .link-row { grid-template-columns: 1fr; gap: 6px; }
+    .link-row .copy-btn { justify-self: start; }
   }
 </style>
 </head>
@@ -546,6 +596,117 @@ window.addEventListener(<span class="tok-str">'message'</span>, <span class="tok
     </div>
   </section>
 
+  <section class="block" id="tracking-links">
+    <div class="block-head">
+      <h2>Social tracking links</h2>
+      <span class="count">12 channels</span>
+    </div>
+    <p class="block-intro">Each link points at the same homepage but tags itself with a source. Post the <strong>Facebook</strong> link in Facebook, the <strong>Instagram</strong> link in your Instagram bio, and so on &mdash; when someone clicks through and submits a form, that lead shows up in the inbox already labeled with the real channel it came from, instead of every visit landing as generic &ldquo;Direct&rdquo; traffic. That's the difference between guessing which channel brings in leads and actually knowing it.</p>
+    <p class="block-intro">The tag is remembered for 24 hours after the click, so it still gets credited even if someone browses a few pages before filling out a form. <strong>Always copy the link from here rather than the plain homepage URL</strong> &mdash; the tracking only works because of the <code>?hello_social=</code> part at the end.</p>
+    <div class="link-table">
+      <div class="link-row">
+        <span class="platform">Facebook</span>
+        <span class="url" data-copy-source="7">https://floorstoday.ca/?hello_social=facebook</span>
+        <button class="copy-btn" data-copy-target="7" type="button">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="link-row">
+        <span class="platform">Instagram</span>
+        <span class="url" data-copy-source="8">https://floorstoday.ca/?hello_social=instagram</span>
+        <button class="copy-btn" data-copy-target="8" type="button">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="link-row">
+        <span class="platform">TikTok</span>
+        <span class="url" data-copy-source="9">https://floorstoday.ca/?hello_social=tiktok</span>
+        <button class="copy-btn" data-copy-target="9" type="button">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="link-row">
+        <span class="platform">LinkedIn</span>
+        <span class="url" data-copy-source="10">https://floorstoday.ca/?hello_social=linkedin</span>
+        <button class="copy-btn" data-copy-target="10" type="button">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="link-row">
+        <span class="platform">YouTube</span>
+        <span class="url" data-copy-source="11">https://floorstoday.ca/?hello_social=youtube</span>
+        <button class="copy-btn" data-copy-target="11" type="button">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="link-row">
+        <span class="platform">Pinterest</span>
+        <span class="url" data-copy-source="12">https://floorstoday.ca/?hello_social=pinterest</span>
+        <button class="copy-btn" data-copy-target="12" type="button">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="link-row">
+        <span class="platform">X / Twitter</span>
+        <span class="url" data-copy-source="13">https://floorstoday.ca/?hello_social=x</span>
+        <button class="copy-btn" data-copy-target="13" type="button">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="link-row">
+        <span class="platform">SMS</span>
+        <span class="url" data-copy-source="14">https://floorstoday.ca/?hello_social=sms</span>
+        <button class="copy-btn" data-copy-target="14" type="button">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="link-row">
+        <span class="platform">Newsletter</span>
+        <span class="url" data-copy-source="15">https://floorstoday.ca/?hello_social=newsletter</span>
+        <button class="copy-btn" data-copy-target="15" type="button">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="link-row">
+        <span class="platform">Google Ads</span>
+        <span class="url" data-copy-source="16">https://floorstoday.ca/?hello_social=google-ads</span>
+        <button class="copy-btn" data-copy-target="16" type="button">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="link-row">
+        <span class="platform">Meta Ads</span>
+        <span class="url" data-copy-source="17">https://floorstoday.ca/?hello_social=meta-ads</span>
+        <button class="copy-btn" data-copy-target="17" type="button">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="link-row">
+        <span class="platform">OpenAI Ad</span>
+        <span class="url" data-copy-source="18">https://floorstoday.ca/?hello_social=openaiad</span>
+        <button class="copy-btn" data-copy-target="18" type="button">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M4 13.5H3.5A1.5 1.5 0 0 1 2 12V4.5A1.5 1.5 0 0 1 3.5 3H12a1.5 1.5 0 0 1 1.5 1.5V5"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+    <div class="note">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7.5"/><path d="M10 9v4.5M10 6.5v.01"/></svg>
+      <span>These same links, always kept in sync, are also available live (while logged in as an admin) via the Social UTM Links embed above, or in wp-admin under <strong>Next Homepage &rarr; Social UTM Links</strong>.</span>
+    </div>
+  </section>
+
   <section class="block" id="allowed">
     <div class="block-head">
       <h2>Allowed origins</h2>
@@ -616,6 +777,16 @@ window.addEventListener(<span class="tok-str">'message'</span>, <span class="tok
     try { document.execCommand('copy'); } catch (e) {}
     document.body.removeChild(ta);
   }
+
+  // Sizes the live-preview iframes to the embedded form's real height,
+  // same mechanism given to viewers as the copy-paste "Auto-resize
+  // listener" snippet above.
+  var previewIdMap = { booking: 'ft-booking-embed', contact: 'ft-contact-embed', utm: 'ft-utm-embed' };
+  window.addEventListener('message', function (e) {
+    if (!e.data || !e.data.ftEmbedHeight) return;
+    var iframe = document.getElementById(previewIdMap[e.data.ftEmbedType]);
+    if (iframe) iframe.style.height = e.data.ftEmbedHeight + 'px';
+  });
 })();
 </script>
 </body>
