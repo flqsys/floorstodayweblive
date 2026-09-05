@@ -22,6 +22,7 @@ add_action('template_redirect', function () {
         return;
     }
 
+    status_header(200);
     nocache_headers();
     header_remove('X-Frame-Options');
     header('Content-Type: text/html; charset=UTF-8');
@@ -74,4 +75,4 @@ add_action('template_redirect', function () {
 </html>
     <?php
     exit;
-});
+}, 1);
