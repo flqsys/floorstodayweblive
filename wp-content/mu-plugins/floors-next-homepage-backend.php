@@ -3521,24 +3521,26 @@ function ft_next_homepage_render_admin() {
             <div style="margin-top:32px;">
             <?php ft_next_homepage_card_open('Integrations'); ?>
                 <?php
-                // Small monochrome "platform" marks shown before each field's
-                // label - not exact trademarked logo files, just enough of a
-                // recognizable mark to tell fields apart at a glance (fill
-                // uses currentColor so they follow each label's text color).
-                $ft_next_platform_icons = [
-                    'google'   => '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M21.6 12.23c0-.68-.06-1.34-.17-1.98H12v3.74h5.4a4.62 4.62 0 0 1-2 3.03v2.5h3.24c1.9-1.75 3-4.32 3-7.3Z"/><path d="M12 22c2.7 0 4.97-.9 6.63-2.44l-3.24-2.5c-.9.6-2.05.96-3.39.96-2.6 0-4.8-1.76-5.59-4.12H3.06v2.58A10 10 0 0 0 12 22Z"/><path d="M6.41 13.9a6 6 0 0 1 0-3.8V7.52H3.06a10 10 0 0 0 0 8.96l3.35-2.58Z"/><path d="M12 5.98c1.47 0 2.79.5 3.83 1.5l2.87-2.87A9.6 9.6 0 0 0 12 2a10 10 0 0 0-8.94 5.52l3.35 2.58c.79-2.36 2.99-4.12 5.59-4.12Z"/></svg>',
-                    'facebook' => '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-9h3l.5-3.5h-3.5V7.3c0-1 .3-1.8 1.8-1.8H17V2.4c-.3 0-1.4-.1-2.7-.1-2.7 0-4.6 1.7-4.6 4.8v2.4H7V13h2.7v9h3.8Z"/></svg>',
-                    'shield'   => '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>',
-                    'tag'      => '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12.6 2H4a2 2 0 0 0-2 2v8.6c0 .5.2 1 .6 1.4l8.4 8.4c.8.8 2 .8 2.8 0l7-7c.8-.8.8-2 0-2.8L12.4 2.6a2 2 0 0 0-1.4-.6Z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>',
-                    'chat'     => '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H6l-3 2 .5-3.4A8.5 8.5 0 1 1 21 11.5Z"/></svg>',
-                    'spark'    => '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2c.6 3.6 2.4 6.4 5 8-2.6 1.6-4.4 4.4-5 8-.6-3.6-2.4-6.4-5-8 2.6-1.6 4.4-4.4 5-8Z"/><path d="M19 2c.2 1.4.9 2.4 1.8 3-.9.6-1.6 1.6-1.8 3-.2-1.4-.9-2.4-1.8-3 .9-.6 1.6-1.6 1.8-3Z"/></svg>',
-                    'bullhorn' => '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10v4a1 1 0 0 0 1 1h2l4 5v-6M3 10l14-6v18L3 15M3 10v5"/><path d="M21 9a5 5 0 0 1 0 6"/></svg>',
-                    'clipboard'=> '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M8 10h8M8 14h8M8 18h5"/></svg>',
-                ];
                 if (!function_exists('ft_next_field_icon')) {
+                    // Small monochrome "platform" marks shown before each field's
+                    // label - not exact trademarked logo files, just enough of a
+                    // recognizable mark to tell fields apart at a glance (fill
+                    // uses currentColor so they follow each label's text color).
+                    // Kept local to this function (not a `global`, which pulled
+                    // from PHP's real global scope and returned nothing, since
+                    // the array only ever existed as a local variable here).
                     function ft_next_field_icon($key) {
-                        global $ft_next_platform_icons;
-                        return '<span style="display:inline-flex;flex:none;margin-right:6px;vertical-align:-3px;color:#6b7280;">' . ($ft_next_platform_icons[$key] ?? '') . '</span>';
+                        $icons = [
+                            'google'   => '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M21.6 12.23c0-.68-.06-1.34-.17-1.98H12v3.74h5.4a4.62 4.62 0 0 1-2 3.03v2.5h3.24c1.9-1.75 3-4.32 3-7.3Z"/><path d="M12 22c2.7 0 4.97-.9 6.63-2.44l-3.24-2.5c-.9.6-2.05.96-3.39.96-2.6 0-4.8-1.76-5.59-4.12H3.06v2.58A10 10 0 0 0 12 22Z"/><path d="M6.41 13.9a6 6 0 0 1 0-3.8V7.52H3.06a10 10 0 0 0 0 8.96l3.35-2.58Z"/><path d="M12 5.98c1.47 0 2.79.5 3.83 1.5l2.87-2.87A9.6 9.6 0 0 0 12 2a10 10 0 0 0-8.94 5.52l3.35 2.58c.79-2.36 2.99-4.12 5.59-4.12Z"/></svg>',
+                            'facebook' => '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-9h3l.5-3.5h-3.5V7.3c0-1 .3-1.8 1.8-1.8H17V2.4c-.3 0-1.4-.1-2.7-.1-2.7 0-4.6 1.7-4.6 4.8v2.4H7V13h2.7v9h3.8Z"/></svg>',
+                            'shield'   => '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>',
+                            'tag'      => '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12.6 2H4a2 2 0 0 0-2 2v8.6c0 .5.2 1 .6 1.4l8.4 8.4c.8.8 2 .8 2.8 0l7-7c.8-.8.8-2 0-2.8L12.4 2.6a2 2 0 0 0-1.4-.6Z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>',
+                            'chat'     => '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H6l-3 2 .5-3.4A8.5 8.5 0 1 1 21 11.5Z"/></svg>',
+                            'spark'    => '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2c.6 3.6 2.4 6.4 5 8-2.6 1.6-4.4 4.4-5 8-.6-3.6-2.4-6.4-5-8 2.6-1.6 4.4-4.4 5-8Z"/><path d="M19 2c.2 1.4.9 2.4 1.8 3-.9.6-1.6 1.6-1.8 3-.2-1.4-.9-2.4-1.8-3 .9-.6 1.6-1.6 1.8-3Z"/></svg>',
+                            'bullhorn' => '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10v4a1 1 0 0 0 1 1h2l4 5v-6M3 10l14-6v18L3 15M3 10v5"/><path d="M21 9a5 5 0 0 1 0 6"/></svg>',
+                            'clipboard'=> '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M8 10h8M8 14h8M8 18h5"/></svg>',
+                        ];
+                        return '<span style="display:inline-flex;flex:none;margin-right:6px;vertical-align:-3px;color:#6b7280;">' . ($icons[$key] ?? '') . '</span>';
                     }
                 }
                 ?>
