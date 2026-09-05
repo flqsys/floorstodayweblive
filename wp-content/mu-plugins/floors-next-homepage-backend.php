@@ -5146,7 +5146,7 @@ function ft_next_booking_form_shortcode() {
     $primary_color = sanitize_hex_color($settings['primary_color'] ?? '') ?: '#155f99';
     $secondary_color = sanitize_hex_color($settings['secondary_color'] ?? '') ?: '#cc9c2e';
     $title = (string) ($settings['form_title'] ?? 'Get Your FREE In-Home Estimate');
-    $subtitle = (string) ($settings['form_subtitle'] ?? 'No obligation. Takes just 2 minutes.');
+    $subtitle = (string) ($settings['form_subtitle'] ?? 'No obligation. Take 30 seconds.');
     $flooring_types = ['Solid Hardwood', 'Engineered Hardwood', 'Laminate', 'Vinyl', 'Carpet', 'Not sure yet'];
     $property_types = ['Residential', 'Office Space', 'Business'];
     $property_icons = [
@@ -5227,9 +5227,13 @@ function ft_next_booking_form_shortcode() {
             .ft-bf__line.is-complete { background: #059669; }
             .ft-bf__step[hidden] { display: none !important; }
             .ft-bf__step { animation: ft-bf-fade .22s ease both; }
+            /* No opacity dip - a busy page loading many scripts at once can
+               stall mid-animation, and an opacity-based fade risks getting
+               stuck looking washed-out/invisible longer than the page
+               takes to settle. Slide only, always opaque. */
             @keyframes ft-bf-fade {
-                from { opacity: 0; transform: translateY(4px); }
-                to { opacity: 1; transform: translateY(0); }
+                from { transform: translateY(4px); }
+                to { transform: translateY(0); }
             }
             .ft-bf__question { margin: 0 0 16px; color: #0f172a; font-size: 16px; font-weight: 700; }
             .ft-bf__choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
@@ -5441,15 +5445,20 @@ function ft_next_booking_form_shortcode() {
         <div class="ft-bf__progress" aria-label="<?php esc_attr_e('Booking form progress', 'floors-today'); ?>">
             <span class="ft-bf__dot is-active" data-dot="1">1</span><span class="ft-bf__line" data-line="1"></span>
             <span class="ft-bf__dot" data-dot="2">2</span><span class="ft-bf__line" data-line="2"></span>
-            <span class="ft-bf__dot" data-dot="3">3</span><span class="ft-bf__line" data-line="3"></span>
-            <span class="ft-bf__dot" data-dot="4">4</span>
+            <span class="ft-bf__dot" data-dot="3">3</span>
         </div>
         <form class="ft-bf__form">
             <div class="ft-bf__trap" aria-hidden="true">
                 <label>Leave this field empty<input name="ftInboxTrap" type="text" tabindex="-1" autocomplete="new-password"></label>
             </div>
             <section class="ft-bf__step" data-step="1">
-                <h3 class="ft-bf__question">What floors interest you?</h3>
+                <h3 class="ft-bf__question">Property type</h3>
+                <div class="ft-bf__choices ft-bf__choices--property">
+                    <?php foreach ($property_types as $property_type) : ?>
+                        <button class="ft-bf__choice ft-bf__property" type="button" data-field="propertyType" data-value="<?php echo esc_attr($property_type); ?>"><span class="ft-bf__property-icon"><?php echo $property_icons[$property_type] ?? ''; ?></span><span><?php echo esc_html($property_type); ?></span></button>
+                    <?php endforeach; ?>
+                </div>
+                <h3 class="ft-bf__question" style="margin-top:24px">What floors interest you?</h3>
                 <div class="ft-bf__choices ft-bf__choices--flooring">
                     <?php foreach ($flooring_types as $flooring_type) : ?>
                         <button class="ft-bf__choice" type="button" data-field="flooringType" data-value="<?php echo esc_attr($flooring_type); ?>"><?php echo esc_html($flooring_type); ?></button>
@@ -5458,60 +5467,6 @@ function ft_next_booking_form_shortcode() {
                 <div class="ft-bf__actions"><span></span><button class="ft-bf__next" type="button">Continue <span class="ft-bf__arrow" aria-hidden="true">&rarr;</span></button></div>
             </section>
             <section class="ft-bf__step" data-step="2" hidden>
-                <h3 class="ft-bf__question">Property type</h3>
-                <div class="ft-bf__choices ft-bf__choices--property">
-                    <?php foreach ($property_types as $property_type) : ?>
-                        <button class="ft-bf__choice ft-bf__property" type="button" data-field="propertyType" data-value="<?php echo esc_attr($property_type); ?>"><span class="ft-bf__property-icon"><?php echo $property_icons[$property_type] ?? ''; ?></span><span><?php echo esc_html($property_type); ?></span></button>
-                    <?php endforeach; ?>
-                </div>
-                <div class="ft-bf__columns" style="margin-top:20px">
-                    <label class="ft-bf__field">
-                        <span>When are you looking to start?</span>
-                        <div class="ft-bf__cselect" data-name="startTime">
-                            <input type="hidden" name="startTime" value="<?php echo esc_attr($start_times[0]); ?>">
-                            <button type="button" class="ft-bf__cselect-trigger" aria-haspopup="listbox" aria-expanded="false">
-                                <span class="ft-bf__cselect-current"><?php echo esc_html($start_times[0]); ?></span>
-                            </button>
-                            <span class="ft-bf__cselect-arrow" aria-hidden="true"></span>
-                            <div class="ft-bf__cselect-menu" hidden role="listbox">
-                                <?php foreach ($start_times as $i => $start_time) : ?>
-                                    <button type="button" class="ft-bf__cselect-option<?php echo $i === 0 ? ' is-selected' : ''; ?>" data-value="<?php echo esc_attr($start_time); ?>" role="option"><?php echo esc_html($start_time); ?></button>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    </label>
-                    <label class="ft-bf__field">
-                        <span>Preferred visit time</span>
-                        <div class="ft-bf__cselect" data-name="preferredVisitTime">
-                            <input type="hidden" name="preferredVisitTime" value="<?php echo esc_attr($visit_times[0]); ?>">
-                            <button type="button" class="ft-bf__cselect-trigger" aria-haspopup="listbox" aria-expanded="false">
-                                <span class="ft-bf__cselect-current"><?php echo esc_html($visit_times[0]); ?></span>
-                            </button>
-                            <span class="ft-bf__cselect-arrow" aria-hidden="true"></span>
-                            <div class="ft-bf__cselect-menu" hidden role="listbox">
-                                <?php foreach ($visit_times as $i => $visit_time) : ?>
-                                    <button type="button" class="ft-bf__cselect-option<?php echo $i === 0 ? ' is-selected' : ''; ?>" data-value="<?php echo esc_attr($visit_time); ?>" role="option"><?php echo esc_html($visit_time); ?></button>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    </label>
-                </div>
-                <div class="ft-bf__actions"><button class="ft-bf__back" type="button">&larr; Back</button><button class="ft-bf__next" type="button">Continue <span class="ft-bf__arrow" aria-hidden="true">&rarr;</span></button></div>
-            </section>
-            <section class="ft-bf__step" data-step="3" hidden>
-                <h3 class="ft-bf__question">Your contact details</h3>
-                <label class="ft-bf__field"><span>Full name</span><input class="ft-bf__input" name="fullName" type="text" autocomplete="name" placeholder="Jane Doe" required></label>
-                <label class="ft-bf__field"><span>Email</span><input class="ft-bf__input" name="email" type="email" autocomplete="email" placeholder="jane@email.com" required></label>
-                <label class="ft-bf__field">
-                    <span>Phone</span>
-                    <div class="ft-bf__phone-wrap">
-                        <span class="ft-bf__phone-pfx" aria-hidden="true">+1</span>
-                        <input class="ft-bf__input" name="phoneLocal" type="tel" autocomplete="tel" placeholder="(416) 555-0199" required>
-                    </div>
-                </label>
-                <div class="ft-bf__actions"><button class="ft-bf__back" type="button">&larr; Back</button><button class="ft-bf__next" type="button">Continue <span class="ft-bf__arrow" aria-hidden="true">&rarr;</span></button></div>
-            </section>
-            <section class="ft-bf__step" data-step="4" hidden>
                 <h3 class="ft-bf__question">Where should we visit?</h3>
                 <div class="ft-bf__addr-row">
                     <label class="ft-bf__field">
@@ -5562,7 +5517,56 @@ function ft_next_booking_form_shortcode() {
                         <input class="ft-bf__input" name="country" type="text" value="Canada" readonly>
                     </label>
                 </div>
-                <div class="ft-bf__actions"><button class="ft-bf__back" type="button">&larr; Back</button><button class="ft-bf__submit" type="submit">Get My Free Estimate <span class="ft-bf__arrow" aria-hidden="true">&rarr;</span></button></div>
+                <div class="ft-bf__actions"><button class="ft-bf__back" type="button">&larr; Back</button><button class="ft-bf__next" type="button">Continue <span class="ft-bf__arrow" aria-hidden="true">&rarr;</span></button></div>
+            </section>
+            <section class="ft-bf__step" data-step="3" hidden>
+                <h3 class="ft-bf__question">Your contact details</h3>
+                <div class="ft-bf__columns">
+                    <label class="ft-bf__field"><span>Full name</span><input class="ft-bf__input" name="fullName" type="text" autocomplete="name" placeholder="Jane Doe" required></label>
+                    <label class="ft-bf__field"><span>Email</span><input class="ft-bf__input" name="email" type="email" autocomplete="email" placeholder="jane@email.com" required></label>
+                    <label class="ft-bf__field">
+                        <span>Phone</span>
+                        <div class="ft-bf__phone-wrap">
+                            <span class="ft-bf__phone-pfx" aria-hidden="true">+1</span>
+                            <input class="ft-bf__input" name="phoneLocal" type="tel" autocomplete="tel" placeholder="(416) 555-0199" required>
+                        </div>
+                    </label>
+                    <label class="ft-bf__field">
+                        <span>Number of rooms</span>
+                        <input class="ft-bf__input" name="numberOfRooms" type="number" inputmode="numeric" min="1" max="99" step="1" placeholder="Enter number of rooms">
+                    </label>
+                    <label class="ft-bf__field">
+                        <span>When are you looking to start?</span>
+                        <div class="ft-bf__cselect" data-name="startTime">
+                            <input type="hidden" name="startTime" value="<?php echo esc_attr($start_times[0]); ?>">
+                            <button type="button" class="ft-bf__cselect-trigger" aria-haspopup="listbox" aria-expanded="false">
+                                <span class="ft-bf__cselect-current"><?php echo esc_html($start_times[0]); ?></span>
+                            </button>
+                            <span class="ft-bf__cselect-arrow" aria-hidden="true"></span>
+                            <div class="ft-bf__cselect-menu" hidden role="listbox">
+                                <?php foreach ($start_times as $i => $start_time) : ?>
+                                    <button type="button" class="ft-bf__cselect-option<?php echo $i === 0 ? ' is-selected' : ''; ?>" data-value="<?php echo esc_attr($start_time); ?>" role="option"><?php echo esc_html($start_time); ?></button>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="ft-bf__field">
+                        <span>Preferred visit time</span>
+                        <div class="ft-bf__cselect" data-name="preferredVisitTime">
+                            <input type="hidden" name="preferredVisitTime" value="<?php echo esc_attr($visit_times[0]); ?>">
+                            <button type="button" class="ft-bf__cselect-trigger" aria-haspopup="listbox" aria-expanded="false">
+                                <span class="ft-bf__cselect-current"><?php echo esc_html($visit_times[0]); ?></span>
+                            </button>
+                            <span class="ft-bf__cselect-arrow" aria-hidden="true"></span>
+                            <div class="ft-bf__cselect-menu" hidden role="listbox">
+                                <?php foreach ($visit_times as $i => $visit_time) : ?>
+                                    <button type="button" class="ft-bf__cselect-option<?php echo $i === 0 ? ' is-selected' : ''; ?>" data-value="<?php echo esc_attr($visit_time); ?>" role="option"><?php echo esc_html($visit_time); ?></button>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                <div class="ft-bf__actions"><button class="ft-bf__back" type="button">&larr; Back</button><button class="ft-bf__submit" type="submit">Book Your Appointment <span class="ft-bf__arrow" aria-hidden="true">&rarr;</span></button></div>
             </section>
             <p class="ft-bf__error" role="alert" hidden></p>
         </form>
@@ -5580,7 +5584,7 @@ function ft_next_booking_form_shortcode() {
 
             var form = root.querySelector('.ft-bf__form');
             var error = root.querySelector('.ft-bf__error');
-            var state = { step: 1, flooringType: '', propertyType: '', totalSteps: 4 };
+            var state = { step: 1, flooringType: '', propertyType: '', totalSteps: 3 };
 
             function showError(message) {
                 error.textContent = message || '';
@@ -5656,8 +5660,21 @@ function ft_next_booking_form_shortcode() {
                 }
 
                 if (next) {
+                    if (state.step === 1 && !state.propertyType) return showError('Please choose a property type.');
                     if (state.step === 1 && !state.flooringType) return showError('Please choose a flooring option.');
-                    if (state.step === 2 && !state.propertyType) return showError('Please choose a property type.');
+                    // Address is no longer the last step, so form.reportValidity()
+                    // at final submit won't see it anymore (hidden sections are
+                    // excluded from HTML5 constraint validation) - check its
+                    // required fields directly here instead, same fix as the
+                    // CRM estimate form needed for the same reason.
+                    if (state.step === 2) {
+                        var street = (root.querySelector('[name="street"]').value || '').trim();
+                        var city = (root.querySelector('[name="city"]').value || '').trim();
+                        var postalCode = (root.querySelector('[name="postalCode"]').value || '').trim();
+                        if (!street) return showError('Please enter your street address.');
+                        if (!city) return showError('Please enter your city.');
+                        if (!postalCode) return showError('Please enter your postal code.');
+                    }
                     if (state.step === 3) {
                         var fullName = (root.querySelector('[name="fullName"]').value || '').trim();
                         var email = (root.querySelector('[name="email"]').value || '').trim();
@@ -5724,6 +5741,7 @@ function ft_next_booking_form_shortcode() {
                             postalCode: postalCode,
                             flooringType: state.flooringType,
                             propertyType: state.propertyType,
+                            numberOfRooms: data.get('numberOfRooms'),
                             startTime: data.get('startTime'),
                             preferredVisitTime: data.get('preferredVisitTime'),
                             ftInboxTrap: data.get('ftInboxTrap'),
@@ -5758,7 +5776,7 @@ function ft_next_booking_form_shortcode() {
                 } catch (requestError) {
                     showError(requestError.message || 'We could not send your request. Please try again.');
                     submit.disabled = false;
-                    submit.innerHTML = 'Get My Free Estimate <span class="ft-bf__arrow" aria-hidden="true">&rarr;</span>';
+                    submit.innerHTML = 'Book Your Appointment <span class="ft-bf__arrow" aria-hidden="true">&rarr;</span>';
                 }
             });
 
