@@ -120,7 +120,8 @@ function ft_inbox_default_settings() {
         'newsletter_template'          => ft_inbox_default_newsletter_template(),
         'newsletter_from_name'         => get_bloginfo('name'),
         'newsletter_from_email'        => 'info@floorstoday.ca',
-        'form_redirect_url'            => '',
+        'booking_form_redirect_url'    => '',
+        'contact_form_redirect_url'    => '',
     ];
 }
 
@@ -634,7 +635,8 @@ function ft_inbox_handle_settings_save() {
         'newsletter_template'          => $newsletter_template !== '' ? $newsletter_template : $defaults['newsletter_template'],
         'newsletter_from_name'         => sanitize_text_field(wp_unslash($_POST['newsletter_from_name'] ?? '')),
         'newsletter_from_email'        => sanitize_email(wp_unslash($_POST['newsletter_from_email'] ?? $defaults['newsletter_from_email'])),
-        'form_redirect_url'            => esc_url_raw(wp_unslash($_POST['form_redirect_url'] ?? '')),
+        'booking_form_redirect_url'    => esc_url_raw(wp_unslash($_POST['booking_form_redirect_url'] ?? '')),
+        'contact_form_redirect_url'    => esc_url_raw(wp_unslash($_POST['contact_form_redirect_url'] ?? '')),
     ]);
 
     wp_safe_redirect(admin_url('options-general.php?page=ft-form-settings&updated=1'));
@@ -1366,14 +1368,22 @@ function ft_inbox_render_settings_page() {
             <div class="ft-fs-panel" id="ft-fs-tab-redirects">
                 <div>
                     <div class="ft-fs-card">
-                        <h2>Thank-You Redirect</h2>
+                        <h2>Thank-You Redirects</h2>
                         <div class="ft-fs-field">
-                            <label for="form_redirect_url">Redirect URL</label>
-                            <input type="url" name="form_redirect_url" id="form_redirect_url"
-                                value="<?php echo esc_attr($settings['form_redirect_url']); ?>"
+                            <label for="booking_form_redirect_url">Booking Form Redirect URL</label>
+                            <input type="url" name="booking_form_redirect_url" id="booking_form_redirect_url"
+                                value="<?php echo esc_attr($settings['booking_form_redirect_url']); ?>"
                                 placeholder="https://floorstoday.ca/lead-form-thankyou/">
-                            <small>Applies to the main booking form (<code>[floors_booking_form]</code>) and the contact form (<code>[floors_booking_form_contact]</code>). On a successful submission, the visitor is redirected here about half a second after the lead is sent - just long enough for ad-tracking pixels to fire first. Leave blank to show the inline "Request received" success message instead.</small>
+                            <small>Applies to the main booking form (<code>[floors_booking_form]</code>) only.</small>
                         </div>
+                        <div class="ft-fs-field" style="margin-top:16px;">
+                            <label for="contact_form_redirect_url">Contact Form Redirect URL</label>
+                            <input type="url" name="contact_form_redirect_url" id="contact_form_redirect_url"
+                                value="<?php echo esc_attr($settings['contact_form_redirect_url']); ?>"
+                                placeholder="https://floorstoday.ca/contact-thankyou/">
+                            <small>Applies to the contact form (<code>[floors_booking_form_contact]</code>) only.</small>
+                        </div>
+                        <p style="font-size:12px;color:#555;margin-top:12px;">On a successful submission, the visitor is redirected about half a second after the lead is sent - just long enough for ad-tracking pixels to fire first. Leave a field blank to show that form's inline "Request received" success message instead.</p>
                     </div>
 
                     <div style="margin-top:16px;">

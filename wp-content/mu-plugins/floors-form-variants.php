@@ -702,7 +702,7 @@ function ft_next_booking_form_contact_shortcode($atts) {
         var form  = root.querySelector('.ft-cf__form');
         var error = root.querySelector('.ft-cf__error');
         <?php $inbox_settings = function_exists('ft_inbox_settings') ? ft_inbox_settings() : []; ?>
-        var FT_REDIRECT_URL = <?php echo wp_json_encode((string) ($inbox_settings['form_redirect_url'] ?? '')); ?>;
+        var FT_REDIRECT_URL = <?php echo wp_json_encode((string) ($inbox_settings['contact_form_redirect_url'] ?? '')); ?>;
 
         function showError(msg) {
             error.textContent = msg || '';

@@ -5586,7 +5586,7 @@ function ft_next_booking_form_shortcode() {
             var error = root.querySelector('.ft-bf__error');
             var state = { step: 1, flooringType: '', propertyType: '', totalSteps: 3 };
             <?php $inbox_settings = function_exists('ft_inbox_settings') ? ft_inbox_settings() : []; ?>
-            var FT_REDIRECT_URL = <?php echo wp_json_encode((string) ($inbox_settings['form_redirect_url'] ?? '')); ?>;
+            var FT_REDIRECT_URL = <?php echo wp_json_encode((string) ($inbox_settings['booking_form_redirect_url'] ?? '')); ?>;
 
             function showError(message) {
                 error.textContent = message || '';
