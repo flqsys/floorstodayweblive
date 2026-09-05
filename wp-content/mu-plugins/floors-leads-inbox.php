@@ -33,6 +33,7 @@ function ft_inbox_field_labels() {
         'full_name' => 'Full Name',
         'email' => 'Email',
         'phone' => 'Phone',
+        'address' => 'Full Address',
         'unit' => 'Unit / Apt',
         'street' => 'Street Address',
         'city' => 'City',
@@ -145,6 +146,8 @@ function ft_inbox_template_variables() {
         'email',
         'phone',
         'address',
+        'city',
+        'province',
         'postal_code',
         'flooring_type',
         'property_type',
@@ -883,7 +886,7 @@ function ft_inbox_render_detail($lead_id) {
 
     echo '<div class="ft-inbox-data-grid">';
     foreach (ft_inbox_field_labels() as $key => $label) {
-        if (in_array($key, array_merge(['user_agent', 'ip_address'], $tracking_fields, $consent_fields), true)) {
+        if (in_array($key, array_merge(['user_agent', 'ip_address', 'address'], $tracking_fields, $consent_fields), true)) {
             continue;
         }
 
