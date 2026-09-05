@@ -611,6 +611,8 @@ function ft_next_booking_form_contact_shortcode($atts) {
             .ft-cf__title { margin: 0; color: #020617; font-family: Georgia,"Times New Roman",serif; font-size: 1.9rem !important; font-weight: 700; line-height: 1.12; }
             .ft-cf__subtitle { margin: 8px 0 0; color: #475569; font-size: 14px; }
             .ft-cf__field { display: block; margin: 0 0 16px; }
+            .ft-cf__columns { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; margin: 0 0 16px; }
+            .ft-cf__columns .ft-cf__field { margin: 0; }
             .ft-cf__field > span { display: block; margin-bottom: 7px; color: #475569; font-size: 14px; font-weight: 600; }
             .ft-cf__req { color: #dc2626; margin-left: 2px; }
             .ft-cf__input, .elementor-widget-container .ft-cf__input { display: block; width: 100%; height: 48px; padding: 0 14px; border: 1px solid #d6d3d1 !important; border-radius: 8px !important; background: #fff !important; color: #0f172a; font: inherit; font-size: 16px; box-shadow: none !important; transition: border-color .18s ease, box-shadow .18s ease; }
@@ -641,6 +643,7 @@ function ft_next_booking_form_contact_shortcode($atts) {
             @media (max-width: 560px) {
                 .ft-cf, .elementor-shortcode > .ft-cf, .elementor-widget-shortcode .ft-cf, .elementor-widget-container > .ft-cf { margin-left: 10px !important; margin-right: 10px !important; width: calc(100% - 20px) !important; max-width: calc(100% - 20px) !important; }
                 .ft-cf__title { font-size: 25px !important; }
+                .ft-cf__columns { grid-template-columns: 1fr; }
             }
         </style>
         <?php
@@ -664,17 +667,19 @@ function ft_next_booking_form_contact_shortcode($atts) {
                 <span>Full name<span class="ft-cf__req" aria-hidden="true">*</span></span>
                 <input class="ft-cf__input" name="fullName" type="text" autocomplete="name" placeholder="Jane Doe" required>
             </label>
-            <label class="ft-cf__field">
-                <span>Email<span class="ft-cf__req" aria-hidden="true">*</span></span>
-                <input class="ft-cf__input" name="email" type="email" autocomplete="email" placeholder="jane@email.com" required>
-            </label>
-            <label class="ft-cf__field">
-                <span>Phone<span class="ft-cf__req" aria-hidden="true">*</span></span>
-                <div class="ft-cf__phone-wrap">
-                    <span class="ft-cf__phone-pfx" aria-hidden="true">+1</span>
-                    <input class="ft-cf__input" name="phoneLocal" type="tel" autocomplete="tel" placeholder="(416) 555-0199" required>
-                </div>
-            </label>
+            <div class="ft-cf__columns">
+                <label class="ft-cf__field">
+                    <span>Email<span class="ft-cf__req" aria-hidden="true">*</span></span>
+                    <input class="ft-cf__input" name="email" type="email" autocomplete="email" placeholder="jane@email.com" required>
+                </label>
+                <label class="ft-cf__field">
+                    <span>Phone<span class="ft-cf__req" aria-hidden="true">*</span></span>
+                    <div class="ft-cf__phone-wrap">
+                        <span class="ft-cf__phone-pfx" aria-hidden="true">+1</span>
+                        <input class="ft-cf__input" name="phoneLocal" type="tel" autocomplete="tel" placeholder="(416) 555-0199" required>
+                    </div>
+                </label>
+            </div>
             <label class="ft-cf__field">
                 <span>Message <span style="font-weight:400;color:#94a3b8;">(optional)</span></span>
                 <textarea class="ft-cf__textarea" name="message" placeholder="How can we help you?"></textarea>
