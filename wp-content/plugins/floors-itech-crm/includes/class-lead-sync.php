@@ -154,6 +154,7 @@ class FT_XD_Lead_Sync {
         $field_values = [
             'flooring_type'   => $data['flooring_type']   ?? '',
             'property_type'   => $data['property_type']   ?? '',
+            'number_of_rooms' => $data['number_of_rooms'] ?? '',
             'start_time'      => $data['start_time']       ?? '',
             'preferred_visit_time' => $data['preferred_visit_time'] ?? '',
             // Resolved channel name (e.g. "Facebook", "Google", "Direct") -

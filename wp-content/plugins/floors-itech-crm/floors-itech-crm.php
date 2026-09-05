@@ -196,7 +196,7 @@ add_action('wp_ajax_ft_xd_crm_resync_lead', function () {
 
     $meta_keys = [
         'full_name', 'email', 'phone', 'street', 'unit', 'city', 'province',
-        'postal_code', 'flooring_type', 'property_type', 'start_time', 'preferred_visit_time', 'source',
+        'postal_code', 'flooring_type', 'property_type', 'number_of_rooms', 'start_time', 'preferred_visit_time', 'source',
         'traffic_source', 'utm_source', 'utm_medium', 'utm_campaign',
         'utm_content', 'utm_term', 'referrer_url', 'page_url', 'device_platform',
     ];
@@ -277,7 +277,7 @@ add_action('admin_post_ft_xd_crm_save_settings', function () {
     }
 
     $cf_fields = [
-        'flooring_type', 'property_type', 'start_time', 'preferred_visit_time',
+        'flooring_type', 'property_type', 'number_of_rooms', 'start_time', 'preferred_visit_time',
         'traffic_source', 'utm_source',
         'utm_campaign', 'utm_medium', 'utm_content', 'utm_term',
         'page_url', 'device_platform',
@@ -349,6 +349,7 @@ function ft_xd_crm_render_settings_page(): void {
     $cf_fields = [
         'flooring_type'   => 'Flooring Type',
         'property_type'   => 'Property Type',
+        'number_of_rooms' => 'Number of Rooms',
         'start_time'      => 'Start Time',
         'preferred_visit_time' => 'Preferred Visit Time',
         'traffic_source'  => 'Traffic Source (resolved channel, e.g. Facebook/Google/Direct)',

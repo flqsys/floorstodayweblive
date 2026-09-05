@@ -691,6 +691,12 @@ function ft_inbox_handle_admin_actions() {
         wp_safe_redirect(admin_url('admin.php?page=ft-inbox&lead=' . $lead_id . '&updated=1'));
         exit;
     }
+
+    if ($action === 'delete_lead') {
+        wp_trash_post($lead_id);
+        wp_safe_redirect(admin_url('admin.php?page=ft-inbox&deleted=1'));
+        exit;
+    }
 }
 
 add_action('admin_init', 'ft_inbox_handle_admin_actions');
@@ -751,6 +757,10 @@ function ft_inbox_render_list() {
     );
 
     $query = new WP_Query($args);
+
+    if (isset($_GET['deleted'])) {
+        echo '<div class="notice notice-success is-dismissible"><p>Lead moved to Trash.</p></div>';
+    }
 
     echo '<div class="ft-inbox-hero">';
     echo '<div><span class="ft-inbox-eyebrow">Sales workspace</span><h1>Inbox</h1><p>Review estimate requests and keep every follow-up moving.</p></div>';
@@ -846,6 +856,12 @@ function ft_inbox_render_detail($lead_id) {
     if ($lead['email']) {
         echo '<a class="button" href="mailto:' . esc_attr($lead['email']) . '"><span class="dashicons dashicons-email-alt"></span> Email</a>';
     }
+    echo '<form method="post" style="display:inline;margin-left:auto;" onsubmit="return confirm(\'Delete this lead? It will be moved to Trash.\');">';
+    wp_nonce_field('ft_inbox_action', 'ft_inbox_nonce');
+    echo '<input type="hidden" name="ft_inbox_action" value="delete_lead">';
+    echo '<input type="hidden" name="lead_id" value="' . (int) $lead['id'] . '">';
+    echo '<button type="submit" class="button button-link-delete"><span class="dashicons dashicons-trash"></span> Delete</button>';
+    echo '</form>';
     echo '</div>';
 
     echo '<section class="ft-inbox-email-delivery"><h2 class="ft-inbox-data-grid__heading">Email Delivery</h2><div class="ft-inbox-data-grid">';
