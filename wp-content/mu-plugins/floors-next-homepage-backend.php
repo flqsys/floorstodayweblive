@@ -5452,13 +5452,13 @@ function ft_next_booking_form_shortcode() {
                 <label>Leave this field empty<input name="ftInboxTrap" type="text" tabindex="-1" autocomplete="new-password"></label>
             </div>
             <section class="ft-bf__step" data-step="1">
-                <h3 class="ft-bf__question">Property type</h3>
+                <div class="ft-bf__question">Property type</div>
                 <div class="ft-bf__choices ft-bf__choices--property">
                     <?php foreach ($property_types as $property_type) : ?>
                         <button class="ft-bf__choice ft-bf__property" type="button" data-field="propertyType" data-value="<?php echo esc_attr($property_type); ?>"><span class="ft-bf__property-icon"><?php echo $property_icons[$property_type] ?? ''; ?></span><span><?php echo esc_html($property_type); ?></span></button>
                     <?php endforeach; ?>
                 </div>
-                <h3 class="ft-bf__question" style="margin-top:24px">What floors interest you?</h3>
+                <div class="ft-bf__question" style="margin-top:24px">What floors interest you?</div>
                 <div class="ft-bf__choices ft-bf__choices--flooring">
                     <?php foreach ($flooring_types as $flooring_type) : ?>
                         <button class="ft-bf__choice" type="button" data-field="flooringType" data-value="<?php echo esc_attr($flooring_type); ?>"><?php echo esc_html($flooring_type); ?></button>
@@ -5467,7 +5467,7 @@ function ft_next_booking_form_shortcode() {
                 <div class="ft-bf__actions"><span></span><button class="ft-bf__next" type="button">Continue <span class="ft-bf__arrow" aria-hidden="true">&rarr;</span></button></div>
             </section>
             <section class="ft-bf__step" data-step="2" hidden>
-                <h3 class="ft-bf__question">Where should we visit?</h3>
+                <div class="ft-bf__question">Where should we visit?</div>
                 <div class="ft-bf__addr-row">
                     <label class="ft-bf__field">
                         <span>Street address</span>
@@ -5520,7 +5520,7 @@ function ft_next_booking_form_shortcode() {
                 <div class="ft-bf__actions"><button class="ft-bf__back" type="button">&larr; Back</button><button class="ft-bf__next" type="button">Continue <span class="ft-bf__arrow" aria-hidden="true">&rarr;</span></button></div>
             </section>
             <section class="ft-bf__step" data-step="3" hidden>
-                <h3 class="ft-bf__question">Your contact details</h3>
+                <div class="ft-bf__question">Your contact details</div>
                 <div class="ft-bf__columns">
                     <label class="ft-bf__field"><span>Full name</span><input class="ft-bf__input" name="fullName" type="text" autocomplete="name" placeholder="Jane Doe" required></label>
                     <label class="ft-bf__field"><span>Email</span><input class="ft-bf__input" name="email" type="email" autocomplete="email" placeholder="jane@email.com" required></label>
