@@ -615,6 +615,8 @@ function ft_next_booking_form_contact_shortcode($atts) {
             .ft-cf__columns .ft-cf__field { margin: 0; }
             .ft-cf__field > span { display: block; margin-bottom: 7px; color: #475569; font-size: 14px; font-weight: 600; }
             .ft-cf__req { color: #dc2626; margin-left: 2px; }
+            .ft-cf__hint { display: block; margin-top: 6px; font-size: 12px; color: #94a3b8; }
+            .ft-cf__hint.is-ok { color: #059669; }
             .ft-cf__input, .elementor-widget-container .ft-cf__input { display: block; width: 100%; height: 48px; padding: 0 14px; border: 1px solid #d6d3d1 !important; border-radius: 8px !important; background: #fff !important; color: #0f172a; font: inherit; font-size: 16px; box-shadow: none !important; transition: border-color .18s ease, box-shadow .18s ease; }
             .ft-cf__input:focus, .elementor-widget-container .ft-cf__input:focus { border-color: var(--ft-cf-primary) !important; outline: 0; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ft-cf-primary) 18%, transparent) !important; }
             .ft-cf__textarea { display: block; width: 100%; min-height: 120px; padding: 12px 14px; border: 1px solid #d6d3d1 !important; border-radius: 8px !important; background: #fff !important; color: #0f172a; font: inherit; font-size: 16px; line-height: 1.5; resize: vertical; box-shadow: none !important; transition: border-color .18s ease, box-shadow .18s ease; }
@@ -681,8 +683,9 @@ function ft_next_booking_form_contact_shortcode($atts) {
                 </label>
             </div>
             <label class="ft-cf__field">
-                <span>Message <span style="font-weight:400;color:#94a3b8;">(optional)</span></span>
-                <textarea class="ft-cf__textarea" name="message" placeholder="How can we help you?"></textarea>
+                <span>Message<span class="ft-cf__req" aria-hidden="true">*</span></span>
+                <textarea class="ft-cf__textarea" name="message" placeholder="How can we help you?" required minlength="50"></textarea>
+                <small class="ft-cf__hint" data-message-counter>0 / 50 characters minimum</small>
             </label>
             <div class="ft-cf__consents">
                 <label class="ft-cf__consent"><input name="privacyConsent" type="checkbox" required><span>I agree to receive promotional emails from Floors Today and have read the <a href="/privacy-policy/">Privacy Policy</a> and <a href="/terms-of-use/">Terms &amp; Conditions</a>.</span></label>
@@ -704,8 +707,11 @@ function ft_next_booking_form_contact_shortcode($atts) {
         if (!root || root.dataset.ready === '1') return;
         root.dataset.ready = '1';
 
-        var form  = root.querySelector('.ft-cf__form');
-        var error = root.querySelector('.ft-cf__error');
+        var form     = root.querySelector('.ft-cf__form');
+        var error    = root.querySelector('.ft-cf__error');
+        var message  = root.querySelector('textarea[name="message"]');
+        var msgCount = root.querySelector('[data-message-counter]');
+        var MESSAGE_MIN_LENGTH = 50;
         <?php $inbox_settings = function_exists('ft_inbox_settings') ? ft_inbox_settings() : []; ?>
         var FT_REDIRECT_URL = <?php echo wp_json_encode((string) ($inbox_settings['contact_form_redirect_url'] ?? '')); ?>;
 
@@ -714,22 +720,33 @@ function ft_next_booking_form_contact_shortcode($atts) {
             error.hidden = !msg;
         }
 
+        function updateMessageCount() {
+            var len = message.value.trim().length;
+            var ok  = len >= MESSAGE_MIN_LENGTH;
+            msgCount.textContent = len + ' / ' + MESSAGE_MIN_LENGTH + ' characters minimum';
+            msgCount.classList.toggle('is-ok', ok);
+        }
+        message.addEventListener('input', updateMessageCount);
+        updateMessageCount();
+
         form.addEventListener('submit', async function (event) {
             event.preventDefault();
             showError('');
 
-            var data       = new FormData(form);
-            var fullName   = String(data.get('fullName') || '').trim();
-            var email      = String(data.get('email')    || '').trim();
-            var phoneLocal = String(data.get('phoneLocal') || '').trim();
-            var smsConsent = data.get('smsConsent') === 'on';
-            var emailConsent = data.get('emailConsent') === 'on';
+            var data          = new FormData(form);
+            var fullName      = String(data.get('fullName') || '').trim();
+            var email         = String(data.get('email')    || '').trim();
+            var phoneLocal    = String(data.get('phoneLocal') || '').trim();
+            var messageText   = String(data.get('message') || '').trim();
+            var smsConsent    = data.get('smsConsent') === 'on';
+            var emailConsent  = data.get('emailConsent') === 'on';
             var privacyConsent = data.get('privacyConsent') === 'on';
 
             if (!fullName) return showError('Please enter your full name.');
             if (fullName.split(/\s+/).filter(Boolean).length < 2) return showError('Please enter your first and last name.');
             if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError('Please enter a valid email address.');
             if (!phoneLocal || phoneLocal.replace(/\D/g, '').length < 7) return showError('Please enter a valid phone number.');
+            if (messageText.length < MESSAGE_MIN_LENGTH) return showError('Please enter a message of at least ' + MESSAGE_MIN_LENGTH + ' characters (' + messageText.length + ' so far).');
 
             var phone  = '+1 ' + phoneLocal;
             var submit = root.querySelector('.ft-cf__submit');
