@@ -120,6 +120,7 @@ function ft_inbox_default_settings() {
         'newsletter_template'          => ft_inbox_default_newsletter_template(),
         'newsletter_from_name'         => get_bloginfo('name'),
         'newsletter_from_email'        => 'info@floorstoday.ca',
+        'form_redirect_url'            => '',
     ];
 }
 
@@ -633,6 +634,7 @@ function ft_inbox_handle_settings_save() {
         'newsletter_template'          => $newsletter_template !== '' ? $newsletter_template : $defaults['newsletter_template'],
         'newsletter_from_name'         => sanitize_text_field(wp_unslash($_POST['newsletter_from_name'] ?? '')),
         'newsletter_from_email'        => sanitize_email(wp_unslash($_POST['newsletter_from_email'] ?? $defaults['newsletter_from_email'])),
+        'form_redirect_url'            => esc_url_raw(wp_unslash($_POST['form_redirect_url'] ?? '')),
     ]);
 
     wp_safe_redirect(admin_url('options-general.php?page=ft-form-settings&updated=1'));
@@ -1033,6 +1035,7 @@ function ft_inbox_render_settings_page() {
                 <button type="button" class="ft-fs-tab" data-tab="admin-email">Admin Notifications</button>
                 <button type="button" class="ft-fs-tab" data-tab="client-email">Customer Confirmation</button>
                 <button type="button" class="ft-fs-tab" data-tab="newsletter-email">Newsletter Email</button>
+                <button type="button" class="ft-fs-tab" data-tab="redirects">Redirects</button>
             </div>
 
             <!-- ── Tab 1: Email Design & Logo ─────────────────────────── -->
@@ -1355,6 +1358,33 @@ function ft_inbox_render_settings_page() {
                     <div class="ft-fs-card">
                         <h3 style="font-size:13px;margin:0 0 8px;">How it works</h3>
                         <p style="font-size:12px;color:#555;margin:0;">This template is only triggered when the form source is <strong>Newsletter CTA</strong>. Estimate forms send the Customer Confirmation email instead.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Tab 5: Redirects ───────────────────────────────────── -->
+            <div class="ft-fs-panel" id="ft-fs-tab-redirects">
+                <div>
+                    <div class="ft-fs-card">
+                        <h2>Thank-You Redirect</h2>
+                        <div class="ft-fs-field">
+                            <label for="form_redirect_url">Redirect URL</label>
+                            <input type="url" name="form_redirect_url" id="form_redirect_url"
+                                value="<?php echo esc_attr($settings['form_redirect_url']); ?>"
+                                placeholder="https://floorstoday.ca/lead-form-thankyou/">
+                            <small>Applies to the main booking form (<code>[floors_booking_form]</code>) and the contact form (<code>[floors_booking_form_contact]</code>). On a successful submission, the visitor is redirected here about half a second after the lead is sent - just long enough for ad-tracking pixels to fire first. Leave blank to show the inline "Request received" success message instead.</small>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:16px;">
+                        <?php submit_button('Save Settings', 'primary large', 'submit', false); ?>
+                    </div>
+                </div>
+
+                <div class="ft-fs-sidebar">
+                    <div class="ft-fs-card">
+                        <h3 style="font-size:13px;margin:0 0 8px;">How it works</h3>
+                        <p style="font-size:12px;color:#555;margin:0;">Doesn't affect the product-page booking form variant (<code>[floors_booking_form_products]</code>) - that one always shows its inline success message.</p>
                     </div>
                 </div>
             </div>

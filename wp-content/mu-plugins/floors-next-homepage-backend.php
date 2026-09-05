@@ -94,7 +94,6 @@ function ft_next_homepage_defaults() {
         'hero_overlay_opacity' => '0.72',
         'form_title' => 'Get Your FREE In-Home Estimate',
         'form_subtitle' => 'No obligation. Takes just 2 minutes.',
-        'form_redirect_url' => '',
         'process_title' => 'How It Works',
         'process_text' => 'Getting beautiful new floors has never been easier. Our simple 3-step process takes the stress out of flooring.',
         'process_bg_color_1' => 'oklch(0.985 0.002 90)',
@@ -2305,7 +2304,7 @@ add_action('admin_post_ft_next_homepage_save', function () {
         'seo_title', 'seo_canonical_url', 'seo_robots', 'seo_og_title', 'seo_og_image', 'hero_badge',
         'hero_badge_font_size', 'hero_badge_mobile_font_size', 'hero_badge_padding_x', 'hero_badge_padding_y',
         'hero_title', 'hero_highlight', 'hero_title_font_size', 'hero_title_mobile_font_size',
-        'hero_badge_animation_location', 'hero_badge_animation_speed', 'form_title', 'form_subtitle', 'form_redirect_url',
+        'hero_badge_animation_location', 'hero_badge_animation_speed', 'form_title', 'form_subtitle',
         'process_title', 'comparison_title', 'comparison_table_title', 'comparison_button',
         'cta_title', 'cta_subtitle', 'cta_button', 'hero_image', 'hero_image_mobile', 'hero_overlay_opacity',
         'button_radius', 'button_font_weight', 'button_text_transform',
@@ -2876,11 +2875,6 @@ function ft_next_homepage_render_admin() {
                                                 <input name="form_subtitle" type="text" value="<?php echo esc_attr($settings['form_subtitle']); ?>">
                                             </label>
                                         </div>
-                                        <label style="display:block;margin-top:12px;">
-                                            Thank-you redirect URL
-                                            <input name="form_redirect_url" type="text" value="<?php echo esc_attr($settings['form_redirect_url']); ?>" placeholder="https://floorstoday.ca/lead-form-thankyou/">
-                                            <small style="display:block;color:#666;margin-top:4px;">Used by both the main booking form and the contact form. Leave blank to show the inline "Request received" success message instead of redirecting.</small>
-                                        </label>
                                     </div>
                                 </div>
                                 <div class="ft-next-media-panel">
@@ -5591,7 +5585,8 @@ function ft_next_booking_form_shortcode() {
             var form = root.querySelector('.ft-bf__form');
             var error = root.querySelector('.ft-bf__error');
             var state = { step: 1, flooringType: '', propertyType: '', totalSteps: 3 };
-            var FT_REDIRECT_URL = <?php echo wp_json_encode((string) ($settings['form_redirect_url'] ?? '')); ?>;
+            <?php $inbox_settings = function_exists('ft_inbox_settings') ? ft_inbox_settings() : []; ?>
+            var FT_REDIRECT_URL = <?php echo wp_json_encode((string) ($inbox_settings['form_redirect_url'] ?? '')); ?>;
 
             function showError(message) {
                 error.textContent = message || '';
