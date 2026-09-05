@@ -5235,7 +5235,7 @@ function ft_next_booking_form_shortcode() {
                 from { transform: translateY(4px); }
                 to { transform: translateY(0); }
             }
-            .ft-bf__question { margin: 0 0 16px; color: #0f172a; font-size: 16px; font-weight: 700; }
+            .ft-bf__question { margin: 0 0 16px; color: #0f172a; font-family: inherit; font-size: 16px; font-weight: 700; }
             .ft-bf__choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
             .ft-bf__choices--flooring { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
             .ft-bf__choices--property { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
