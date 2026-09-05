@@ -5528,7 +5528,7 @@ function ft_next_booking_form_shortcode() {
                         <span>Phone</span>
                         <div class="ft-bf__phone-wrap">
                             <span class="ft-bf__phone-pfx" aria-hidden="true">+1</span>
-                            <input class="ft-bf__input" name="phoneLocal" type="tel" autocomplete="tel" placeholder="(416) 555-0199" required>
+                            <input class="ft-bf__input" name="phoneLocal" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="(416) 555-0199" required>
                         </div>
                     </label>
                     <label class="ft-bf__field">
@@ -5600,6 +5600,12 @@ function ft_next_booking_form_shortcode() {
                 if (digits.length !== 10) return false;
                 if (digits.charAt(3) === '0' || digits.charAt(3) === '1') return false;
                 return CANADIAN_AREA_CODES.indexOf(digits.slice(0, 3)) !== -1;
+            }
+            var phoneLocalInput = root.querySelector('[name="phoneLocal"]');
+            if (phoneLocalInput) {
+                phoneLocalInput.addEventListener('input', function () {
+                    this.value = this.value.replace(/\D/g, '').slice(0, 10);
+                });
             }
 
             function setCselectValue(name, value) {
