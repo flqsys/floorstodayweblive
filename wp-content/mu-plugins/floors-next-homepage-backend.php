@@ -156,6 +156,7 @@ function ft_next_homepage_defaults() {
         'chat_embed_code' => '',
         'estimate_form_embed_code' => '',
         'openai_ads_embed_code' => '',
+        'google_ads_embed_code' => '',
         'fb_pixel_id' => '',
         'ga4_measurement_id' => '',
         'gtm_container_id' => '',
@@ -1204,6 +1205,15 @@ add_action('template_redirect', function () {
     if ($openai_ads_code !== '') {
         $openai_ads_head = "\n" . $openai_ads_code . "\n";
         $html = preg_replace('/<head(\s[^>]*)?>/i', '$0' . str_replace('$', '\\$', $openai_ads_head), $html, 1);
+    }
+
+    // Google Ads Manager tag (gtag.js) - same reasoning as GTM/OpenAI Ads
+    // above, needs direct <head> injection since this page never fires
+    // wp_head.
+    $google_ads_code = ft_next_ensure_script_wrapped($settings['google_ads_embed_code'] ?? '');
+    if ($google_ads_code !== '') {
+        $google_ads_head = "\n" . $google_ads_code . "\n";
+        $html = preg_replace('/<head(\s[^>]*)?>/i', '$0' . str_replace('$', '\\$', $google_ads_head), $html, 1);
     }
 
     status_header(200);
@@ -2356,6 +2366,7 @@ add_action('admin_post_ft_next_homepage_save', function () {
     $data['chat_embed_code'] = isset($_POST['chat_embed_code']) ? wp_unslash($_POST['chat_embed_code']) : ($current['chat_embed_code'] ?? '');
     $data['estimate_form_embed_code'] = isset($_POST['estimate_form_embed_code']) ? wp_unslash($_POST['estimate_form_embed_code']) : ($current['estimate_form_embed_code'] ?? '');
     $data['openai_ads_embed_code'] = isset($_POST['openai_ads_embed_code']) ? wp_unslash($_POST['openai_ads_embed_code']) : ($current['openai_ads_embed_code'] ?? '');
+    $data['google_ads_embed_code'] = isset($_POST['google_ads_embed_code']) ? wp_unslash($_POST['google_ads_embed_code']) : ($current['google_ads_embed_code'] ?? '');
     $data['hero_show_background'] = isset($_POST['hero_show_background']) ? '1' : '0';
     $data['hero_show_overlay'] = isset($_POST['hero_show_overlay']) ? '1' : '0';
 
@@ -3509,46 +3520,71 @@ function ft_next_homepage_render_admin() {
 
             <div style="margin-top:32px;">
             <?php ft_next_homepage_card_open('Integrations'); ?>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;">
-                    <div class="ft-next-field-stack" style="gap:28px;">
-                        <label>
-                            Google Places API Key
-                            <input name="google_places_api_key" type="text" value="<?php echo esc_attr($settings['google_places_api_key'] ?? ''); ?>" placeholder="AIza..." style="font-family:monospace">
-                            <span class="description">Enables live address autocomplete on the booking form. Requires the <strong>Places API</strong> enabled in your project. <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">Create API Key →</a></span>
-                        </label>
-                        <label>
-                            Facebook Pixel ID
-                            <input name="fb_pixel_id" type="text" value="<?php echo esc_attr($settings['fb_pixel_id'] ?? ''); ?>" placeholder="1234567890123456" style="font-family:monospace">
-                            <span class="description">Your numeric Pixel ID — fires a PageView event on every page automatically. No need to paste the full script. <a href="https://www.facebook.com/events_manager2/list/pixel/" target="_blank" rel="noopener">Get Pixel ID →</a></span>
-                        </label>
-                        <label>
-                            Google Tag Manager Container ID
-                            <input name="gtm_container_id" type="text" value="<?php echo esc_attr($settings['gtm_container_id'] ?? ''); ?>" placeholder="GTM-XXXXXXX" style="font-family:monospace">
-                            <span class="description">Just the container ID — the head script and body noscript tag are added automatically on every page. <a href="https://tagmanager.google.com/" target="_blank" rel="noopener">Find your container ID →</a></span>
-                        </label>
-                        <label>
-                            reCAPTCHA v3 Site Key
-                            <input name="recaptcha_site_key" type="text" value="<?php echo esc_attr($settings['recaptcha_site_key'] ?? ''); ?>" placeholder="6Lc..." style="font-family:monospace">
-                            <span class="description">Adds invisible bot protection to the homepage booking form — visitors never see a challenge. <a href="https://www.google.com/recaptcha/admin/create" target="_blank" rel="noopener">Create reCAPTCHA v3 key →</a></span>
-                        </label>
-                    </div>
-                    <div class="ft-next-field-stack" style="gap:28px;">
-                        <label>
-                            Chat Widget Embed Code
-                            <textarea name="chat_embed_code" rows="4" placeholder="&lt;script id=&quot;...&quot; src=&quot;https://...&quot; defer&gt;&lt;/script&gt;" style="font-family:monospace"><?php echo esc_textarea($settings['chat_embed_code'] ?? ''); ?></textarea>
-                            <span class="description">Paste the <code>&lt;script&gt;</code> tag from your chat provider. Loads on every page — homepage and all other pages. Works with Tidio, LiveChat, Intercom, and others.</span>
-                        </label>
-                        <label>
-                            OpenAI Ads Pixel Setup Code
-                            <textarea name="openai_ads_embed_code" rows="4" placeholder="&lt;script&gt;...&lt;/script&gt;" style="font-family:monospace"><?php echo esc_textarea($settings['openai_ads_embed_code'] ?? ''); ?></textarea>
-                            <span class="description">Paste the full setup <code>&lt;script&gt;</code> tag from OpenAI Ads' "Set up your data source" screen. Loads in <code>&lt;head&gt;</code> on every page — homepage and all other pages.</span>
-                        </label>
-                        <label>
-                            Estimate Form Embed Code
-                            <textarea name="estimate_form_embed_code" rows="6" placeholder="&lt;iframe id=&quot;...&quot; src=&quot;https://...&quot;&gt;&lt;/iframe&gt;&#10;&lt;script&gt;...&lt;/script&gt;" style="font-family:monospace"><?php echo esc_textarea($settings['estimate_form_embed_code'] ?? ''); ?></textarea>
-                            <span class="description">Paste the itech-core CRM estimate form's embed code here (iframe + resize script) so it can be updated anytime without a code change. Stored here for reference/use — not automatically placed on the page yet.</span>
-                        </label>
-                    </div>
+                <?php
+                // Small monochrome "platform" marks shown before each field's
+                // label - not exact trademarked logo files, just enough of a
+                // recognizable mark to tell fields apart at a glance (fill
+                // uses currentColor so they follow each label's text color).
+                $ft_next_platform_icons = [
+                    'google'   => '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M21.6 12.23c0-.68-.06-1.34-.17-1.98H12v3.74h5.4a4.62 4.62 0 0 1-2 3.03v2.5h3.24c1.9-1.75 3-4.32 3-7.3Z"/><path d="M12 22c2.7 0 4.97-.9 6.63-2.44l-3.24-2.5c-.9.6-2.05.96-3.39.96-2.6 0-4.8-1.76-5.59-4.12H3.06v2.58A10 10 0 0 0 12 22Z"/><path d="M6.41 13.9a6 6 0 0 1 0-3.8V7.52H3.06a10 10 0 0 0 0 8.96l3.35-2.58Z"/><path d="M12 5.98c1.47 0 2.79.5 3.83 1.5l2.87-2.87A9.6 9.6 0 0 0 12 2a10 10 0 0 0-8.94 5.52l3.35 2.58c.79-2.36 2.99-4.12 5.59-4.12Z"/></svg>',
+                    'facebook' => '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-9h3l.5-3.5h-3.5V7.3c0-1 .3-1.8 1.8-1.8H17V2.4c-.3 0-1.4-.1-2.7-.1-2.7 0-4.6 1.7-4.6 4.8v2.4H7V13h2.7v9h3.8Z"/></svg>',
+                    'shield'   => '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>',
+                    'tag'      => '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12.6 2H4a2 2 0 0 0-2 2v8.6c0 .5.2 1 .6 1.4l8.4 8.4c.8.8 2 .8 2.8 0l7-7c.8-.8.8-2 0-2.8L12.4 2.6a2 2 0 0 0-1.4-.6Z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>',
+                    'chat'     => '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H6l-3 2 .5-3.4A8.5 8.5 0 1 1 21 11.5Z"/></svg>',
+                    'spark'    => '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2c.6 3.6 2.4 6.4 5 8-2.6 1.6-4.4 4.4-5 8-.6-3.6-2.4-6.4-5-8 2.6-1.6 4.4-4.4 5-8Z"/><path d="M19 2c.2 1.4.9 2.4 1.8 3-.9.6-1.6 1.6-1.8 3-.2-1.4-.9-2.4-1.8-3 .9-.6 1.6-1.6 1.8-3Z"/></svg>',
+                    'bullhorn' => '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10v4a1 1 0 0 0 1 1h2l4 5v-6M3 10l14-6v18L3 15M3 10v5"/><path d="M21 9a5 5 0 0 1 0 6"/></svg>',
+                    'clipboard'=> '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M8 10h8M8 14h8M8 18h5"/></svg>',
+                ];
+                if (!function_exists('ft_next_field_icon')) {
+                    function ft_next_field_icon($key) {
+                        global $ft_next_platform_icons;
+                        return '<span style="display:inline-flex;flex:none;margin-right:6px;vertical-align:-3px;color:#6b7280;">' . ($ft_next_platform_icons[$key] ?? '') . '</span>';
+                    }
+                }
+                ?>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+                    <label>
+                        <?php echo ft_next_field_icon('google'); ?>Google Places API Key
+                        <input name="google_places_api_key" type="text" value="<?php echo esc_attr($settings['google_places_api_key'] ?? ''); ?>" placeholder="AIza..." style="font-family:monospace">
+                        <span class="description">Enables live address autocomplete on the booking form. Requires the <strong>Places API</strong> enabled in your project. <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">Create API Key →</a></span>
+                    </label>
+                    <label>
+                        <?php echo ft_next_field_icon('facebook'); ?>Facebook Pixel ID
+                        <input name="fb_pixel_id" type="text" value="<?php echo esc_attr($settings['fb_pixel_id'] ?? ''); ?>" placeholder="1234567890123456" style="font-family:monospace">
+                        <span class="description">Your numeric Pixel ID — fires a PageView event on every page automatically. No need to paste the full script. <a href="https://www.facebook.com/events_manager2/list/pixel/" target="_blank" rel="noopener">Get Pixel ID →</a></span>
+                    </label>
+                    <label>
+                        <?php echo ft_next_field_icon('tag'); ?>Google Tag Manager Container ID
+                        <input name="gtm_container_id" type="text" value="<?php echo esc_attr($settings['gtm_container_id'] ?? ''); ?>" placeholder="GTM-XXXXXXX" style="font-family:monospace">
+                        <span class="description">Just the container ID — the head script and body noscript tag are added automatically on every page. <a href="https://tagmanager.google.com/" target="_blank" rel="noopener">Find your container ID →</a></span>
+                    </label>
+                    <label>
+                        <?php echo ft_next_field_icon('shield'); ?>reCAPTCHA v3 Site Key
+                        <input name="recaptcha_site_key" type="text" value="<?php echo esc_attr($settings['recaptcha_site_key'] ?? ''); ?>" placeholder="6Lc..." style="font-family:monospace">
+                        <span class="description">Adds invisible bot protection to the homepage booking form — visitors never see a challenge. <a href="https://www.google.com/recaptcha/admin/create" target="_blank" rel="noopener">Create reCAPTCHA v3 key →</a></span>
+                    </label>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:28px;">
+                    <label>
+                        <?php echo ft_next_field_icon('chat'); ?>Chat Widget Embed Code
+                        <textarea name="chat_embed_code" rows="4" placeholder="&lt;script id=&quot;...&quot; src=&quot;https://...&quot; defer&gt;&lt;/script&gt;" style="font-family:monospace"><?php echo esc_textarea($settings['chat_embed_code'] ?? ''); ?></textarea>
+                        <span class="description">Paste the <code>&lt;script&gt;</code> tag from your chat provider. Loads on every page — homepage and all other pages. Works with Tidio, LiveChat, Intercom, and others.</span>
+                    </label>
+                    <label>
+                        <?php echo ft_next_field_icon('spark'); ?>OpenAI Ads Pixel Setup Code
+                        <textarea name="openai_ads_embed_code" rows="4" placeholder="&lt;script&gt;...&lt;/script&gt;" style="font-family:monospace"><?php echo esc_textarea($settings['openai_ads_embed_code'] ?? ''); ?></textarea>
+                        <span class="description">Paste the full setup <code>&lt;script&gt;</code> tag from OpenAI Ads' "Set up your data source" screen. Loads in <code>&lt;head&gt;</code> on every page — homepage and all other pages.</span>
+                    </label>
+                    <label>
+                        <?php echo ft_next_field_icon('bullhorn'); ?>Google Ads Manager Tag
+                        <textarea name="google_ads_embed_code" rows="6" placeholder="&lt;script async src=&quot;https://www.googletagmanager.com/gtag/js?id=AW-XXXXXXXXX&quot;&gt;&lt;/script&gt;&#10;&lt;script&gt;...&lt;/script&gt;" style="font-family:monospace"><?php echo esc_textarea($settings['google_ads_embed_code'] ?? ''); ?></textarea>
+                        <span class="description">Paste the full gtag.js setup code from Google Ads' "Install your tag" screen (both <code>&lt;script&gt;</code> tags). Loads in <code>&lt;head&gt;</code> on every page — homepage and all other pages.</span>
+                    </label>
+                    <label>
+                        <?php echo ft_next_field_icon('clipboard'); ?>Estimate Form Embed Code
+                        <textarea name="estimate_form_embed_code" rows="6" placeholder="&lt;iframe id=&quot;...&quot; src=&quot;https://...&quot;&gt;&lt;/iframe&gt;&#10;&lt;script&gt;...&lt;/script&gt;" style="font-family:monospace"><?php echo esc_textarea($settings['estimate_form_embed_code'] ?? ''); ?></textarea>
+                        <span class="description">Paste the itech-core CRM estimate form's embed code here (iframe + resize script) so it can be updated anytime without a code change. Stored here for reference/use — not automatically placed on the page yet.</span>
+                    </label>
                 </div>
             <?php ft_next_homepage_card_close(); ?>
             </div>
@@ -5794,6 +5830,17 @@ fbq('init','<?php echo esc_js($pixel_id); ?>');fbq('track','PageView');
 add_action('wp_head', function () {
     $settings = ft_next_homepage_settings();
     $code = ft_next_ensure_script_wrapped($settings['openai_ads_embed_code'] ?? '');
+    if ($code === '') return;
+    echo "\n" . $code . "\n";
+});
+
+// Inject the Google Ads Manager tag (gtag.js) in <head> of every standard
+// WordPress page. Same trust boundary and reasoning as openai_ads_embed_code
+// above - the homepage gets its own copy injected directly in
+// template_redirect (it exits before wp_head ever fires there).
+add_action('wp_head', function () {
+    $settings = ft_next_homepage_settings();
+    $code = ft_next_ensure_script_wrapped($settings['google_ads_embed_code'] ?? '');
     if ($code === '') return;
     echo "\n" . $code . "\n";
 });
