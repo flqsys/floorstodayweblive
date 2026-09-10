@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useRef, useEffect, useState } from "react"
+import { useRef, useEffect } from "react"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Phone, Calendar, Shield, Star, ArrowRight, MapPin, Home } from "lucide-react"
@@ -39,41 +39,10 @@ declare global {
 // are re-created and run manually instead, the standard workaround.
 function EstimateFormEmbed({ html }: { html: string }) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const wrapperRef = useRef<HTMLDivElement>(null)
-  const [isNearViewport, setIsNearViewport] = useState(false)
-
-  // Defer the heavy work below (innerHTML on a large embed, then manually
-  // re-executing each of its <script> tags) until the form is about to be
-  // visible, instead of doing it immediately on mount. This form can be
-  // the raw output of a WP shortcode (tens of KB of inline HTML/CSS/JS) -
-  // parsing and running all of that the instant settings arrive was
-  // blocking the main thread right as the rest of the page was trying to
-  // become interactive.
-  useEffect(() => {
-    const wrapper = wrapperRef.current
-    if (!wrapper || isNearViewport) return
-
-    if (typeof IntersectionObserver === "undefined") {
-      setIsNearViewport(true)
-      return
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting) {
-          setIsNearViewport(true)
-          observer.disconnect()
-        }
-      },
-      { rootMargin: "300px" }
-    )
-    observer.observe(wrapper)
-    return () => observer.disconnect()
-  }, [isNearViewport])
 
   useEffect(() => {
     const container = containerRef.current
-    if (!container || !html || !isNearViewport) return
+    if (!container || !html) return
 
     container.innerHTML = html
 
@@ -86,7 +55,7 @@ function EstimateFormEmbed({ html }: { html: string }) {
       newScript.textContent = oldScript.textContent
       oldScript.replaceWith(newScript)
     })
-  }, [html, isNearViewport])
+  }, [html])
 
   if (!html) {
     return (
@@ -96,16 +65,7 @@ function EstimateFormEmbed({ html }: { html: string }) {
     )
   }
 
-  return (
-    <div ref={wrapperRef}>
-      {!isNearViewport && (
-        <div className="flex min-h-[420px] animate-pulse items-center justify-center rounded-2xl border border-white/50 bg-white p-6 text-center text-sm text-slate-500 shadow-2xl shadow-black/20">
-          Loading estimate form…
-        </div>
-      )}
-      <div ref={containerRef} className={isNearViewport ? "" : "hidden"} />
-    </div>
-  )
+  return <div ref={containerRef} />
 }
 
 export function HeroSection() {
