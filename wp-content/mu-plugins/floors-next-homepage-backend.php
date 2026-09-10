@@ -155,6 +155,8 @@ function ft_next_homepage_defaults() {
         'testimonials_bg_color_1' => 'oklch(0.985 0.002 90)',
         'chat_embed_code' => '',
         'estimate_form_embed_code' => '',
+        'estimate_form_shortcode' => '',
+        'estimate_form_use_shortcode' => '0',
         'openai_ads_embed_code' => '',
         'google_ads_embed_code' => '',
         'fb_pixel_id' => '',
@@ -2365,6 +2367,8 @@ add_action('admin_post_ft_next_homepage_save', function () {
     $data['testimonials_embed_code'] = isset($_POST['testimonials_embed_code']) ? wp_unslash($_POST['testimonials_embed_code']) : ($current['testimonials_embed_code'] ?? '');
     $data['chat_embed_code'] = isset($_POST['chat_embed_code']) ? wp_unslash($_POST['chat_embed_code']) : ($current['chat_embed_code'] ?? '');
     $data['estimate_form_embed_code'] = isset($_POST['estimate_form_embed_code']) ? wp_unslash($_POST['estimate_form_embed_code']) : ($current['estimate_form_embed_code'] ?? '');
+    $data['estimate_form_shortcode'] = isset($_POST['estimate_form_shortcode']) ? wp_unslash($_POST['estimate_form_shortcode']) : ($current['estimate_form_shortcode'] ?? '');
+    $data['estimate_form_use_shortcode'] = isset($_POST['estimate_form_use_shortcode']) ? '1' : '0';
     $data['openai_ads_embed_code'] = isset($_POST['openai_ads_embed_code']) ? wp_unslash($_POST['openai_ads_embed_code']) : ($current['openai_ads_embed_code'] ?? '');
     $data['google_ads_embed_code'] = isset($_POST['google_ads_embed_code']) ? wp_unslash($_POST['google_ads_embed_code']) : ($current['google_ads_embed_code'] ?? '');
     $data['hero_show_background'] = isset($_POST['hero_show_background']) ? '1' : '0';
@@ -3591,8 +3595,18 @@ function ft_next_homepage_render_admin() {
                     <label>
                         <?php echo ft_next_field_label('clipboard', 'Estimate Form Embed Code'); ?>
                         <textarea name="estimate_form_embed_code" rows="6" placeholder="&lt;iframe id=&quot;...&quot; src=&quot;https://...&quot;&gt;&lt;/iframe&gt;&#10;&lt;script&gt;...&lt;/script&gt;" style="font-family:monospace"><?php echo esc_textarea($settings['estimate_form_embed_code'] ?? ''); ?></textarea>
-                        <span class="description">Paste the itech-core CRM estimate form's embed code here (iframe + resize script) so it can be updated anytime without a code change. Stored here for reference/use — not automatically placed on the page yet.</span>
+                        <span class="description">Paste the itech-core CRM estimate form's embed code here (iframe + resize script). Used when the toggle on the right is set to <strong>Embed Code</strong>.</span>
                     </label>
+                    <label>
+                        <?php echo ft_next_field_label('clipboard', 'Estimate Form Shortcode'); ?>
+                        <textarea name="estimate_form_shortcode" rows="6" placeholder="[my_estimate_form]" style="font-family:monospace"><?php echo esc_textarea($settings['estimate_form_shortcode'] ?? ''); ?></textarea>
+                        <span class="description">A WordPress shortcode (e.g. from a form-builder plugin) — resolved server-side with <code>do_shortcode()</code> and sent to the homepage in place of the embed code. Used when the toggle is set to <strong>Shortcode</strong>.</span>
+                    </label>
+                    <div style="align-self:center;">
+                        <?php echo ft_next_field_label('clipboard', 'Homepage Estimate Form Source'); ?>
+                        <p class="description" style="margin:6px 0 14px;">Which of the two fields above actually renders on the homepage.</p>
+                        <?php ft_next_homepage_field($settings, 'estimate_form_use_shortcode', 'Use Shortcode instead of Embed Code', 'checkbox'); ?>
+                    </div>
                 </div>
             <?php ft_next_homepage_card_close(); ?>
             </div>
@@ -5958,7 +5972,19 @@ add_action('rest_api_init', function () {
                 );
             }
 
-            return rest_ensure_response(ft_next_homepage_settings());
+            $response = ft_next_homepage_settings();
+
+            // Estimate form: shortcode vs raw embed code is a toggle in the
+            // admin (estimate_form_use_shortcode), but the homepage itself
+            // just reads a single estimate_form_embed_code value (see
+            // EstimateFormEmbed in hero-section.tsx) - resolved here, on the
+            // response only, so the admin page's own textarea still shows
+            // exactly what was typed/saved rather than the rendered output.
+            if (!empty($response['estimate_form_use_shortcode']) && trim((string) ($response['estimate_form_shortcode'] ?? '')) !== '') {
+                $response['estimate_form_embed_code'] = do_shortcode($response['estimate_form_shortcode']);
+            }
+
+            return rest_ensure_response($response);
         },
     ]);
 });
