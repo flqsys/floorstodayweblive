@@ -35,6 +35,17 @@ function ft_pf_category_field_allowlist() {
     ];
 }
 
+// Individual field values to hide per category, even when real products in
+// that category carry them - e.g. a Vinyl product tagged "Floating" under
+// Flooring Types shouldn't offer "Floating" as a filter choice on the Vinyl
+// page. Keyed by category slug -> field key -> array of value slugs
+// (sanitize_title() form, matching $options[$key] keys below).
+function ft_pf_category_field_value_blocklist() {
+    return [
+        'vinyl' => ['flooring_types' => ['floating']],
+    ];
+}
+
 function ft_pf_clean_product_title($title) {
     $title = (string) $title;
 
@@ -198,6 +209,15 @@ function ft_pf_build_data($atts, $fixed_category = '') {
         }
     }
 
+    $value_blocklist = ft_pf_category_field_value_blocklist();
+    if ($fixed_category !== '' && isset($value_blocklist[$fixed_category])) {
+        foreach ($value_blocklist[$fixed_category] as $key => $blocked_slugs) {
+            foreach ($blocked_slugs as $slug) {
+                unset($options[$key][$slug]);
+            }
+        }
+    }
+
     foreach ($options as $key => $values) {
         asort($values, SORT_NATURAL | SORT_FLAG_CASE);
         $options[$key] = array_map(
@@ -258,6 +278,7 @@ function ft_pf_shortcode($atts) {
     $fixed_category = $hide_category ? sanitize_title($atts['category']) : '';
     $data = ft_pf_build_data($atts, $fixed_category);
     $data['categoryFieldAllowlist'] = (object) ft_pf_category_field_allowlist();
+    $data['categoryFieldValueBlocklist'] = (object) ft_pf_category_field_value_blocklist();
     $instance_id = wp_unique_id('ft-product-filter-');
 
     ob_start();
@@ -1170,6 +1191,21 @@ function ft_pf_shortcode($atts) {
                                     }
                                 });
                             });
+                            // Same per-category value blocklist the fixed-category
+                            // pages apply server-side (ft_pf_category_field_value_blocklist) -
+                            // a value hidden for a slug there shouldn't reappear
+                            // just because that category was picked here instead.
+                            selectedSlugs.forEach(function (slug) {
+                                var blocked = data.categoryFieldValueBlocklist[slug];
+                                var blockedValues = blocked && blocked[key];
+                                if (!blockedValues) return;
+                                blockedValues.forEach(function (valueSlug) {
+                                    delete seen[valueSlug];
+                                    var i = order.indexOf(valueSlug);
+                                    if (i !== -1) order.splice(i, 1);
+                                });
+                            });
+
                             order.sort(function (a, b) {
                                 return seen[a].localeCompare(seen[b], undefined, { numeric: true, sensitivity: 'base' });
                             });
