@@ -278,7 +278,7 @@ add_action('admin_post_ft_xd_crm_save_settings', function () {
     }
 
     $cf_fields = [
-        'flooring_type', 'property_type', 'number_of_rooms', 'start_time', 'preferred_visit_time',
+        'property_type', 'number_of_rooms', 'start_time', 'preferred_visit_time',
         'traffic_source', 'utm_source',
         'utm_campaign', 'utm_medium', 'utm_content', 'utm_term',
         'page_url', 'device_platform',
@@ -350,7 +350,6 @@ function ft_xd_crm_render_settings_page(): void {
     }
 
     $cf_fields = [
-        'flooring_type'   => 'Flooring Type',
         'property_type'   => 'Property Type',
         'number_of_rooms' => 'Number of Rooms',
         'start_time'      => 'Start Time',
@@ -585,7 +584,7 @@ function ft_xd_crm_render_settings_page(): void {
 
             <div class="ft-xd-card">
                 <h2>Custom Field Mapping</h2>
-                <p class="description">Which CRM lead custom field each website field should be saved into. Leave as "Don't sync" to skip.</p>
+                <p class="description">Which CRM lead custom field each website field should be saved into. Leave as "Don't sync" to skip. Flooring Type isn't listed here - it always syncs straight into the lead's core Title field (the "Service" dropdown on the lead profile), not a custom field.</p>
                 <table class="form-table">
                     <?php foreach ($cf_fields as $field_key => $label): ?>
                         <tr>

@@ -140,6 +140,16 @@ class FT_XD_Lead_Sync {
         if (!empty($settings['default_assigned_to'])) {
             $payload['assigned'] = $settings['default_assigned_to'];
         }
+        // Flooring Type goes straight into the CRM's core "title" column,
+        // not a custom field - the lead profile's "Service" dropdown is
+        // really that same core field relabeled (see my_profile.php), and
+        // custom field #34 it used to sync to is inactive in the CRM and
+        // not what that dropdown is meant to read from. One field, no
+        // duplicate sync - see build_custom_fields() below, which no
+        // longer even offers flooring_type as a custom-field target.
+        if (!empty($data['flooring_type'])) {
+            $payload['title'] = $data['flooring_type'];
+        }
 
         $custom_fields = $this->build_custom_fields($data, $settings);
         if (!empty($custom_fields)) {
@@ -181,7 +191,6 @@ class FT_XD_Lead_Sync {
         $out    = [];
 
         $field_values = [
-            'flooring_type'   => $data['flooring_type']   ?? '',
             'property_type'   => $data['property_type']   ?? '',
             'number_of_rooms' => $data['number_of_rooms'] ?? '',
             'start_time'      => $data['start_time']       ?? '',
