@@ -235,6 +235,7 @@ add_action('admin_post_ft_xd_crm_save_settings', function () {
     $default_source = sanitize_text_field(wp_unslash($_POST['default_source'] ?? 'Direct'));
     $default_status = sanitize_text_field(wp_unslash($_POST['default_status'] ?? ''));
     $default_country = sanitize_text_field(wp_unslash($_POST['default_country'] ?? ''));
+    $default_assigned_to = sanitize_text_field(wp_unslash($_POST['default_assigned_to'] ?? ''));
 
     // Old settings may have a stale field-options cache from before this
     // save (e.g. base URL/key just changed) - clear it so the page re-fetches
@@ -297,6 +298,7 @@ add_action('admin_post_ft_xd_crm_save_settings', function () {
         'default_source'   => $default_source,
         'default_status'   => $default_status,
         'default_country'  => $default_country,
+        'default_assigned_to' => $default_assigned_to,
         'source_mapping'   => $source_mapping ?: FT_XD_Lead_Sync::default_source_mapping(),
         'custom_field_ids' => $custom_field_ids,
     ]);
@@ -322,6 +324,7 @@ function ft_xd_crm_render_settings_page(): void {
     $default_source = $settings['default_source']   ?? 'Direct';
     $default_status = $settings['default_status']   ?? '';
     $default_country = $settings['default_country'] ?? '';
+    $default_assigned_to = $settings['default_assigned_to'] ?? '';
     $source_mapping = $settings['source_mapping']   ?? FT_XD_Lead_Sync::default_source_mapping();
     $cf_ids         = $settings['custom_field_ids'] ?? [];
     $newsletter     = FT_XD_Newsletter_Integration::get_settings();
@@ -447,6 +450,39 @@ function ft_xd_crm_render_settings_page(): void {
                             <?php endif; ?>
                         </td>
                     </tr>
+                    <tr>
+                        <th><label for="default_source">Default Source</label></th>
+                        <td>
+                            <?php if ($field_options && !empty($field_options['sources'])): ?>
+                                <select name="default_source" id="default_source">
+                                    <?php foreach ($field_options['sources'] as $s): ?>
+                                        <option value="<?php echo esc_attr($s['name']); ?>" <?php selected($default_source, $s['name']); ?>><?php echo esc_html($s['name']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <p class="description">Used when no UTM source keyword matches. Picking a name not yet in the CRM's source list still works - it gets created there automatically.</p>
+                            <?php else: ?>
+                                <input type="text" name="default_source" id="default_source" value="<?php echo esc_attr($default_source); ?>" class="regular-text" placeholder="Direct">
+                                <p class="description">Used when no UTM source keyword matches. Connect to the CRM above to pick this from a dropdown instead.</p>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="default_assigned_to">Default Assigned Staff</label></th>
+                        <td>
+                            <?php if ($field_options && !empty($field_options['staff'])): ?>
+                                <select name="default_assigned_to" id="default_assigned_to">
+                                    <option value="">— Leave unassigned —</option>
+                                    <?php foreach ($field_options['staff'] as $st): ?>
+                                        <option value="<?php echo esc_attr($st['staffid']); ?>" <?php selected($default_assigned_to, $st['staffid']); ?>><?php echo esc_html($st['name']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <p class="description">New leads from the website are assigned to this staff member. Leave unassigned to let the CRM's own default rule apply.</p>
+                            <?php else: ?>
+                                <input type="text" name="default_assigned_to" id="default_assigned_to" value="<?php echo esc_attr($default_assigned_to); ?>" class="small-text" placeholder="e.g. 1">
+                                <p class="description">Connect to the CRM above to pick this from a dropdown instead.</p>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
                 </table>
             </div>
 
@@ -545,16 +581,6 @@ function ft_xd_crm_render_settings_page(): void {
                     </tbody>
                 </table>
                 <button type="button" id="ft-xd-add-row" class="button">+ Add Mapping</button>
-
-                <table class="form-table" style="margin-top:20px;">
-                    <tr>
-                        <th><label for="default_source">Default Source</label></th>
-                        <td>
-                            <input type="text" name="default_source" id="default_source" value="<?php echo esc_attr($default_source); ?>" class="regular-text" placeholder="Direct">
-                            <p class="description">Used when no UTM source keyword matches.</p>
-                        </td>
-                    </tr>
-                </table>
             </div>
 
             <div class="ft-xd-card">

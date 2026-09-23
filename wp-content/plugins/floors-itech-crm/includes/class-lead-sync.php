@@ -137,6 +137,9 @@ class FT_XD_Lead_Sync {
         if (!empty($settings['default_country'])) {
             $payload['country'] = $settings['default_country'];
         }
+        if (!empty($settings['default_assigned_to'])) {
+            $payload['assigned'] = $settings['default_assigned_to'];
+        }
 
         $custom_fields = $this->build_custom_fields($data, $settings);
         if (!empty($custom_fields)) {
