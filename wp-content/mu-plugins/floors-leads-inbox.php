@@ -802,6 +802,29 @@ function ft_inbox_render_list() {
         echo '<div class="ft-inbox-empty">No leads found.</div>';
     }
 
+    // Delete is a POST (nonce-protected, same as the detail page's Delete
+    // button) but each row is a whole clickable <a> card - one shared,
+    // hidden form outside the loop plus a small JS helper lets the trash
+    // icon on a row submit it without a <form> nested inside that <a>
+    // (invalid HTML) or turning the whole card into a non-link.
+    echo '<form method="post" id="ft-inbox-list-delete-form" style="display:none;">';
+    wp_nonce_field('ft_inbox_action', 'ft_inbox_nonce');
+    echo '<input type="hidden" name="ft_inbox_action" value="delete_lead">';
+    echo '<input type="hidden" name="lead_id" value="">';
+    echo '</form>';
+    ?>
+    <script>
+    function ftInboxDeleteLead(event, leadId) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!window.confirm('Delete this lead? It will be moved to Trash.')) return;
+        var form = document.getElementById('ft-inbox-list-delete-form');
+        form.lead_id.value = leadId;
+        form.submit();
+    }
+    </script>
+    <?php
+
     while ($query->have_posts()) {
         $query->the_post();
         $lead = ft_inbox_get_lead(get_the_ID());
@@ -821,6 +844,7 @@ function ft_inbox_render_list() {
         echo '</div>';
         echo '<div class="ft-inbox-card__status">';
         echo '<em>' . esc_html(ft_inbox_allowed_statuses()[$lead['status']] ?? 'New') . '</em>';
+        echo '<span class="ft-inbox-card__delete" role="button" tabindex="0" aria-label="Delete lead" title="Delete lead" onclick="ftInboxDeleteLead(event, ' . (int) $lead['id'] . ')"><span class="dashicons dashicons-trash" aria-hidden="true"></span></span>';
         echo '<span class="dashicons dashicons-arrow-right-alt2" aria-hidden="true"></span>';
         echo '</div>';
         echo '</a>';

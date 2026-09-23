@@ -232,6 +232,30 @@
   font-weight: 700;
 }
 
+.ft-inbox-card__delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: #97a3b3;
+  cursor: pointer;
+}
+
+.ft-inbox-card__delete:hover,
+.ft-inbox-card__delete:focus-visible {
+  background: #fdeaea;
+  color: #d63638;
+  outline: none;
+}
+
+.ft-inbox-card__delete .dashicons {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
 .ft-inbox-card.ft-status-new .ft-inbox-card__status em {
   background: #e8f7ee;
   color: #15803d;
