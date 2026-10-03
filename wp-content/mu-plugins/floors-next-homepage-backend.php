@@ -4845,6 +4845,7 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                 background: #fff;
                 border-radius: 16px;
                 padding: 52px 28px;
+                width: 100%;
                 max-width: 520px;
                 margin: 0 auto;
                 text-align: center;
@@ -5036,6 +5037,7 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                         var name = (data.fullName || '').trim().split(' ')[0];
                         var inner = form.closest('.ft-ncta-inner');
                         var successCard = inner ? inner.querySelector('.ft-ncta-success-card') : null;
+                        var formHeight = form.offsetHeight;
                         form.reset();
                         form.hidden = true;
                         if (successCard) {
@@ -5044,6 +5046,15 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                                 if (msgEl) msgEl.textContent = 'Thank you, ' + name + '! Your $300 store credit details will be sent to your email shortly.';
                             }
                             successCard.hidden = false;
+                            // Centre the card in the space the form took (so the
+                            // page doesn't jump), then bring it to the middle of
+                            // the screen - works in portrait and landscape.
+                            var gap = Math.max(0, (formHeight - successCard.offsetHeight) / 2);
+                            successCard.style.marginTop = gap + 'px';
+                            successCard.style.marginBottom = gap + 'px';
+                            if (successCard.scrollIntoView) {
+                                successCard.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+                            }
                         }
                     } else {
                         window.alert((result.body && result.body.message) || 'Something went wrong. Please try again.');
