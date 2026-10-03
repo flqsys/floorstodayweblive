@@ -153,6 +153,26 @@ class FT_XD_Newsletter_Integration {
             return new WP_Error('xd_newsletter_invalid_email', 'Please enter a valid email address.', ['status' => 400]);
         }
 
+        $email_check = self::check_email($data['email']);
+        if ($email_check['status'] === 'typo') {
+            return new WP_Error('xd_newsletter_email_typo', 'That email looks misspelled - did you mean ' . $email_check['suggestion'] . '?', ['status' => 400]);
+        }
+        if ($email_check['status'] !== 'ok') {
+            return new WP_Error('xd_newsletter_email_undeliverable', 'That email address cannot receive email. Please check it and try again.', ['status' => 400]);
+        }
+
+        // Name and phone are required too, and the phone must be a real
+        // 10-digit Canadian number - stored as "+1 6135550199".
+        if (trim($data['name']) === '') {
+            return new WP_Error('xd_newsletter_missing_name', 'Please enter your full name.', ['status' => 400]);
+        }
+
+        $phone = self::normalize_ca_phone($data['phone']);
+        if ($phone === '') {
+            return new WP_Error('xd_newsletter_invalid_phone', 'Please enter a valid 10-digit Canadian phone number.', ['status' => 400]);
+        }
+        $data['phone'] = $phone;
+
         $log_id = $this->create_log($data);
         $settings = self::get_settings();
         $results = [];
@@ -179,6 +199,60 @@ class FT_XD_Newsletter_Integration {
             'ok' => true,
             'message' => 'Thanks! You are subscribed.',
         ]);
+    }
+
+    /**
+     * Free email check, run before a signup is accepted - no paid
+     * verification service, so it can't tell whether a specific mailbox
+     * exists, only catch the obvious problems before they bounce. Returns
+     * ['status' => ok|typo|no_mail|format, 'suggestion' => string]. The CRM
+     * runs the same checks on its own list (xd_coupons_check_email() in
+     * xd_coupons_helper.php) - keep the two in step.
+     */
+    public static function check_email(string $email): array {
+        $email = strtolower(trim($email));
+        if ($email === '' || !is_email($email)) {
+            return ['status' => 'format', 'suggestion' => ''];
+        }
+
+        [$local, $domain] = explode('@', $email, 2);
+
+        $typos = [
+            'gmial.com' => 'gmail.com', 'gmai.com' => 'gmail.com', 'gmal.com' => 'gmail.com', 'gamil.com' => 'gmail.com',
+            'gnail.com' => 'gmail.com', 'gmaill.com' => 'gmail.com', 'gmail.co' => 'gmail.com', 'gmail.cm' => 'gmail.com',
+            'hotmial.com' => 'hotmail.com', 'hotmal.com' => 'hotmail.com', 'hotmai.com' => 'hotmail.com',
+            'hotmil.com' => 'hotmail.com', 'hotmail.co' => 'hotmail.com', 'yaho.com' => 'yahoo.com', 'yahooo.com' => 'yahoo.com',
+            'yhoo.com' => 'yahoo.com', 'yahoo.co' => 'yahoo.com', 'outlok.com' => 'outlook.com', 'outloo.com' => 'outlook.com',
+            'outlook.co' => 'outlook.com', 'iclould.com' => 'icloud.com', 'icoud.com' => 'icloud.com', 'icloud.co' => 'icloud.com',
+        ];
+        $fixed = $typos[$domain] ?? preg_replace('/\.(con|cmo|coom|comm|vom|xom|om|cim)$/', '.com', $domain);
+        if ($fixed !== $domain) {
+            return ['status' => 'typo', 'suggestion' => $local . '@' . $fixed];
+        }
+
+        // A failed lookup looks the same as "no mail server", so only trust a
+        // miss when DNS is demonstrably working (a known-good domain resolves).
+        if (!checkdnsrr($domain . '.', 'MX') && !checkdnsrr($domain . '.', 'A') && checkdnsrr('gmail.com.', 'MX')) {
+            return ['status' => 'no_mail', 'suggestion' => ''];
+        }
+
+        return ['status' => 'ok', 'suggestion' => ''];
+    }
+
+    /**
+     * "+1 6135550199" for a valid Canadian (North American) number, '' for
+     * anything else. Accepts any punctuation and an optional leading 1/+1;
+     * the area code and the next three digits can't start with 0 or 1.
+     */
+    public static function normalize_ca_phone(string $phone): string {
+        $digits = preg_replace('/\D+/', '', $phone);
+        // The forms prepend "+1" themselves, so someone who also typed the
+        // country code arrives with it twice - drop every extra leading 1.
+        while (strlen($digits) > 10 && $digits[0] === '1') {
+            $digits = substr($digits, 1);
+        }
+
+        return preg_match('/^[2-9]\d{2}[2-9]\d{6}$/', $digits) ? '+1 ' . $digits : '';
     }
 
     /**
