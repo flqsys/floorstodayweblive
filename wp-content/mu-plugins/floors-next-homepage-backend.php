@@ -4837,6 +4837,10 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                 transition: opacity .18s ease;
             }
             .ft-ncta-details:hover { opacity: .75; }
+            /* .ft-ncta-card's display:grid otherwise beats the hidden attribute,
+               leaving the form on screen above the "You're subscribed!" card. */
+            .ft-ncta-form[hidden],
+            .ft-ncta-success-card[hidden] { display: none !important; }
             .ft-ncta-success-card {
                 background: #fff;
                 border-radius: 16px;
