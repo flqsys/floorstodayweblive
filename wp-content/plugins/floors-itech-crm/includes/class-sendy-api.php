@@ -50,7 +50,9 @@ class FT_XD_Sendy_API {
             $body['city'] = $city;
         }
 
-        $ip = sanitize_text_field($_SERVER['REMOTE_ADDR'] ?? '');
+        // skip_ip: a staff edit relayed from the CRM, where REMOTE_ADDR is
+        // the CRM server, not the subscriber.
+        $ip = empty($subscriber['skip_ip']) ? sanitize_text_field($_SERVER['REMOTE_ADDR'] ?? '') : '';
         if ($ip !== '') {
             $body['ipaddress'] = $ip;
         }

@@ -67,6 +67,12 @@ class FT_XD_Newsletter_Integration {
             'permission_callback' => [$this, 'check_status_auth'],
             'callback' => [$this, 'handle_status'],
         ]);
+
+        register_rest_route('floors-integrations/v1', '/newsletter-update', [
+            'methods' => 'POST',
+            'permission_callback' => [$this, 'check_status_auth'],
+            'callback' => [$this, 'handle_update'],
+        ]);
     }
 
     /**
@@ -138,6 +144,10 @@ class FT_XD_Newsletter_Integration {
             'page_url' => esc_url_raw($params['pageUrl'] ?? $params['page_url'] ?? ''),
             'referrer_url' => esc_url_raw($params['referrerUrl'] ?? $params['referrer_url'] ?? wp_get_referer()),
         ];
+        $data['traffic_source'] = $this->resolve_traffic_source(
+            sanitize_text_field($params['utmSource'] ?? $params['utm_source'] ?? ''),
+            sanitize_text_field($params['trafficSource'] ?? $params['traffic_source'] ?? '')
+        );
 
         if ($data['email'] === '' || !is_email($data['email'])) {
             return new WP_Error('xd_newsletter_invalid_email', 'Please enter a valid email address.', ['status' => 400]);
@@ -169,6 +179,81 @@ class FT_XD_Newsletter_Integration {
             'ok' => true,
             'message' => 'Thanks! You are subscribed.',
         ]);
+    }
+
+    /**
+     * Where the signup came from, as a readable channel name ("Google",
+     * "Home Show") - same Traffic Source Mapping keywords leads use (see
+     * FT_XD_Lead_Sync::resolve_source()). An unmapped value is kept as-is
+     * rather than dropped, so a new campaign keyword still shows up.
+     */
+    private function resolve_traffic_source(string $utm_source, string $traffic_source): string {
+        $crm = get_option(FT_XD_CRM_SETTINGS_KEY, []);
+        $mapping = !empty($crm['source_mapping']) && is_array($crm['source_mapping'])
+            ? $crm['source_mapping']
+            : FT_XD_Lead_Sync::default_source_mapping();
+
+        $candidates = array_filter([strtolower(trim($utm_source)), strtolower(trim($traffic_source))]);
+        foreach ($candidates as $candidate) {
+            foreach ($mapping as $keyword => $label) {
+                if (str_contains($candidate, strtolower((string) $keyword))) {
+                    return (string) $label;
+                }
+            }
+        }
+
+        return trim($utm_source) ?: (trim($traffic_source) ?: 'Direct');
+    }
+
+    /**
+     * CRM -> WP: a staff member edited a subscriber on the CRM's Newsletter
+     * Subscribers page - push the new name/phone/city to Sendy. Only touches
+     * someone who is currently subscribed: Sendy's subscribe call would
+     * otherwise re-subscribe a person who had unsubscribed.
+     */
+    public function handle_update(WP_REST_Request $request): WP_REST_Response {
+        $params = $request->get_json_params();
+        if (!is_array($params) || empty($params)) {
+            $params = $request->get_body_params();
+        }
+
+        $email = sanitize_email((string) ($params['email'] ?? ''));
+        if ($email === '' || !is_email($email)) {
+            return rest_ensure_response(['updated' => false, 'raw' => 'invalid_email']);
+        }
+
+        $settings = self::get_settings();
+        $list_id = sanitize_text_field((string) ($params['list_id'] ?? ''));
+        $list_id = $list_id !== '' ? $list_id : (string) ($settings['sendy_list_id'] ?? '');
+
+        if (empty($settings['sendy_url']) || empty($settings['sendy_api_key']) || $list_id === '') {
+            return rest_ensure_response(['updated' => false, 'raw' => 'sendy_not_configured']);
+        }
+
+        $api = new FT_XD_Sendy_API($settings['sendy_url'], $settings['sendy_api_key']);
+        $status = $api->subscription_status($list_id, $email);
+        if (is_wp_error($status)) {
+            return rest_ensure_response(['updated' => false, 'raw' => $status->get_error_message()]);
+        }
+        if (strtolower(trim($status)) !== 'subscribed') {
+            return rest_ensure_response(['updated' => false, 'raw' => 'Not updated - Sendy status is "' . $status . '".']);
+        }
+
+        $result = $api->subscribe([
+            'list_id' => $list_id,
+            'name' => sanitize_text_field($params['name'] ?? ''),
+            'email' => $email,
+            'phone' => sanitize_text_field($params['phone'] ?? ''),
+            'city' => sanitize_text_field($params['city'] ?? ''),
+            'country' => 'CA',
+            'skip_ip' => true,
+        ]);
+
+        if (is_wp_error($result)) {
+            return rest_ensure_response(['updated' => false, 'raw' => $result->get_error_message()]);
+        }
+
+        return rest_ensure_response(['updated' => true]);
     }
 
     private function send_to_sendy(array $data, array $settings): true|WP_Error {
@@ -209,6 +294,7 @@ class FT_XD_Newsletter_Integration {
             'email' => $data['email'],
             'phone' => $data['phone'],
             'city' => $data['city'],
+            'source' => $data['traffic_source'],
             'page_url' => $data['page_url'],
             'referrer_url' => $data['referrer_url'],
         ];

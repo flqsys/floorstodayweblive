@@ -4453,6 +4453,10 @@ function ft_next_footer_shortcode() {
                 delete data.phoneLocal;
                 data.source = 'Newsletter CTA';
                 data.pageUrl = window.location.href;
+                var attribution = window.ftGetAttribution ? window.ftGetAttribution() : {};
+                data.utmSource = attribution.utmSource || '';
+                data.trafficSource = attribution.trafficSource || '';
+                data.referrerUrl = attribution.referrerUrl || document.referrer || '';
                 fetch(form.dataset.endpoint || '', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': window.ftNonce },
@@ -5011,7 +5015,10 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                 delete data.phoneLocal;
                 data.source = 'Newsletter CTA';
                 data.pageUrl = window.location.href;
-                data.referrerUrl = document.referrer || '';
+                var attribution = window.ftGetAttribution ? window.ftGetAttribution() : {};
+                data.utmSource = attribution.utmSource || '';
+                data.trafficSource = attribution.trafficSource || '';
+                data.referrerUrl = attribution.referrerUrl || document.referrer || '';
                 fetch(form.dataset.endpoint || '', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': (window.ftNonce || '') },
