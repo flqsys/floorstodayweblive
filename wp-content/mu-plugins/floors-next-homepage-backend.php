@@ -2589,6 +2589,32 @@ function ft_next_homepage_utm_links() {
         'Meta Ads' => 'meta-ads',
         'OpenAI Ad' => 'openaiad',
     ];
+
+    // Every keyword added under Settings -> FT XD CRM -> Traffic Source
+    // Mapping gets a link here too, so a new source (e.g. homeshow ->
+    // Home Show) needs no code edit. Aliases of a channel already listed
+    // (fb, ig, adwords...) and "direct" are skipped to avoid duplicates.
+    $crm_settings = get_option(defined('FT_XD_CRM_SETTINGS_KEY') ? FT_XD_CRM_SETTINGS_KEY : 'ft_xd_crm_settings', []);
+    $mapping = !empty($crm_settings['source_mapping']) && is_array($crm_settings['source_mapping'])
+        ? $crm_settings['source_mapping']
+        : (class_exists('FT_XD_Lead_Sync') ? FT_XD_Lead_Sync::default_source_mapping() : []);
+    $known_sources = array_map('strtolower', array_values($platforms));
+    $known_labels = array_map('strtolower', array_keys($platforms));
+
+    foreach ($mapping as $keyword => $label) {
+        $keyword = strtolower(trim((string) $keyword));
+        $label = trim((string) $label);
+        if ($keyword === '' || $label === '' || $keyword === 'direct') {
+            continue;
+        }
+        if (in_array($keyword, $known_sources, true) || in_array(strtolower($label), $known_labels, true)) {
+            continue;
+        }
+        $platforms[$label] = $keyword;
+        $known_sources[] = $keyword;
+        $known_labels[] = strtolower($label);
+    }
+
     $links = [];
 
     foreach ($platforms as $label => $source) {
