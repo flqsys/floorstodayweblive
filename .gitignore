@@ -132,3 +132,33 @@ Thumbs.db
 
 # WordPress core auto-generated during updates
 /wp-content/upgrade-temp-backup/
+
+# ---- Secrets, database dumps, backups and logs: never commit (added 2026-10-23) ----
+.env
+.env.*
+!.env.example
+!.env.sample
+application/config/app-config.php
+application/config/app-config-live.php
+application/config/app-config-*.php
+!application/config/app-config-sample.php
+*.sql
+*.sql.gz
+*.sql.zip
+/backups/*
+!/backups/index.html
+!/backups/.htaccess
+application/logs/*
+!application/logs/index.html
+!application/logs/.htaccess
+*.log
+token.txt
+credentials.json
+*-credentials.json
+service-account*.json
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+*.p12
+*.pfx
