@@ -72,7 +72,7 @@ export function Header() {
                 alt={settings.logo_text}
                 width={250}
                 height={80}
-                className={`block h-auto object-contain sm:max-h-16 sm:max-w-[250px] ${slim ? "max-h-[54px] max-w-[180px]" : "max-h-14 max-w-[180px]"}`}
+                className={`block h-auto object-contain sm:max-h-16 sm:max-w-[250px] ${slim ? "max-h-[60px] max-w-[210px]" : "max-h-14 max-w-[180px]"}`}
                 style={{ width: settings.logo_size }}
                 loading="eager"
                 fetchPriority="high"
