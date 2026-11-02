@@ -72,7 +72,7 @@ export function Header() {
                 alt={settings.logo_text}
                 width={250}
                 height={80}
-                className="block h-auto max-h-14 max-w-[180px] object-contain sm:max-h-16 sm:max-w-[250px]"
+                className={`block h-auto object-contain sm:max-h-16 sm:max-w-[250px] ${slim ? "max-h-11 max-w-[140px]" : "max-h-14 max-w-[180px]"}`}
                 style={{ width: settings.logo_size }}
                 loading="eager"
                 fetchPriority="high"
@@ -145,7 +145,7 @@ export function Header() {
                 className={`flex h-9 w-9 flex-none items-center justify-center rounded-full border transition-colors duration-200 lg:hidden ${
                   mobileMenuOpen
                     ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-card text-foreground hover:border-primary/40"
+                    : "border-gray-300 bg-card text-gray-700 hover:border-gray-400"
                 }`}
                 style={{ WebkitTapHighlightColor: "transparent" }}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
