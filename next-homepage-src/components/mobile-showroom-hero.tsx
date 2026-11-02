@@ -578,7 +578,7 @@ export function MobileShowroomHero() {
           className="absolute inset-x-0 bottom-0 -z-10 block h-10 bg-gradient-to-t from-background to-transparent"
         />
         {settings.mobile_hero_tag && (
-          <p className="inline-flex rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">
+          <p className="inline-flex rounded-full bg-primary/10 px-4 py-1.5 text-sm font-bold uppercase tracking-wide text-primary">
             {settings.mobile_hero_tag}
           </p>
         )}
