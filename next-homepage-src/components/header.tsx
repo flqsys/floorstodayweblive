@@ -147,7 +147,17 @@ export function Header() {
                     ? "border-primary bg-primary/10 text-primary"
                     : "border-gray-300 bg-card text-gray-700 hover:border-gray-400"
                 }`}
-                style={{ WebkitTapHighlightColor: "transparent" }}
+                // Inline so the site-wide button style (Home Settings > Button Style:
+                // padding, no border) can't squeeze the icon away or hide the border.
+                style={{
+                  WebkitTapHighlightColor: "transparent",
+                  padding: 0,
+                  borderWidth: 1,
+                  borderStyle: "solid",
+                  borderColor: mobileMenuOpen ? "var(--primary)" : "#d1d5db",
+                  borderRadius: 9999,
+                  minHeight: 0,
+                }}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 <span className="sr-only">{mobileMenuOpen ? "Close menu" : "Open menu"}</span>
