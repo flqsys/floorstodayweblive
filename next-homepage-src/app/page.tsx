@@ -82,13 +82,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const initialSettings = await getInitialHomepageSettings()
 
-  const schemaServices = initialSettings?.nav_items?.length
-    ? initialSettings.nav_items.map((item) => ({
-        "@type": "Offer",
-        itemOffered: { "@type": "Service", name: `${item.name} Installation` },
-      }))
-    : []
-
   return (
     <HomepageSettingsProvider initialSettings={initialSettings}>
       <HeaderSlot />
@@ -103,31 +96,9 @@ export default async function HomePage() {
         <CTASection />
       </main>
       <FooterSlot />
-
-      <script
-        id="ft-home-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "LocalBusiness",
-            ...(initialSettings?.logo_text ? { name: initialSettings.logo_text } : {}),
-            ...(initialSettings?.seo_description ? { description: initialSettings.seo_description } : {}),
-            ...(initialSettings?.seo_canonical_url ? { url: initialSettings.seo_canonical_url } : {}),
-            ...(initialSettings?.phone ? { telephone: initialSettings.phone } : {}),
-            ...(initialSettings?.service_area ? { areaServed: initialSettings.service_area } : {}),
-            priceRange: "$$",
-            openingHours: "Mo-Fr 09:00-18:00, Sa 10:00-16:00",
-            ...(schemaServices.length ? {
-              hasOfferCatalog: {
-                "@type": "OfferCatalog",
-                name: "Flooring Services",
-                itemListElement: schemaServices,
-              },
-            } : {}),
-          }),
-        }}
-      />
+      {/* The LocalBusiness schema (ld+json) is added to <head> by the WordPress
+          mu-plugin from live settings. Rendering it here too made WordPress
+          rewrite React's markup, which broke hydration (React error #418). */}
     </HomepageSettingsProvider>
   )
 }

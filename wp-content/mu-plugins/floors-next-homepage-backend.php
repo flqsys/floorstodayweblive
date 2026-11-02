@@ -1221,16 +1221,26 @@ add_action('template_redirect', function () {
         'image' => $seo_og_image,
         'areaServed' => $settings['service_area'],
         'priceRange' => '$$',
+        'openingHours' => 'Mo-Fr 09:00-18:00, Sa 10:00-16:00',
     ];
+    $schema_offers = [];
+    foreach ((array) ($settings['nav_items'] ?? []) as $nav_item) {
+        $nav_name = is_array($nav_item) ? trim((string) ($nav_item['name'] ?? '')) : '';
+        if ($nav_name !== '') {
+            $schema_offers[] = ['@type' => 'Offer', 'itemOffered' => ['@type' => 'Service', 'name' => $nav_name . ' Installation']];
+        }
+    }
+    if ($schema_offers) {
+        $schema['hasOfferCatalog'] = ['@type' => 'OfferCatalog', 'name' => 'Flooring Services', 'itemListElement' => $schema_offers];
+    }
     $schema_script = '<script type="application/ld+json" id="ft-home-schema">'
         . wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
         . '</script>';
-    $html = preg_replace(
-        '/<script[^>]*id="ft-home-schema"[^>]*>.*?<\/script>/is',
-        $schema_script,
-        $html,
-        1
-    );
+    // The schema goes in <head>. Older Next builds rendered it inside <body>;
+    // drop that copy. Rewriting React-rendered <body> markup breaks hydration
+    // (React error #418), which is why it no longer lives there.
+    $html = preg_replace('/<script[^>]*id="ft-home-schema"[^>]*>.*?<\/script>/is', '', $html, 1);
+    $html = str_replace('</head>', $schema_script . '</head>', $html);
 
 
     // Settings and static markup can contain URLs saved before the site moved.
@@ -1251,13 +1261,17 @@ add_action('template_redirect', function () {
             . '\'https://www.googletagmanager.com/gtm.js?id=\'+i+dl;f.parentNode.insertBefore(j,f);'
             . '})(window,document,\'script\',\'dataLayer\',\'' . esc_js($gtm_id) . '\');</script>' . "\n"
             . '<!-- End Google Tag Manager -->' . "\n";
-        $gtm_noscript = "\n" . '<!-- Google Tag Manager (noscript) -->' . "\n"
-            . '<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=' . esc_attr($gtm_id) . '" '
-            . 'height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>' . "\n"
-            . '<!-- End Google Tag Manager (noscript) -->' . "\n";
+        // No comments/newlines around it: <body> is rendered by React, and any
+        // extra node at the top of it breaks hydration (React error #418).
+        // Placed just before </body> instead, which React ignores.
+        $gtm_noscript = '<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=' . esc_attr($gtm_id) . '" '
+            . 'height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>';
 
         $html = preg_replace('/<head(\s[^>]*)?>/i', '$0' . str_replace('$', '\\$', $gtm_head), $html, 1);
-        $html = preg_replace('/<body(\s[^>]*)?>/i', '$0' . str_replace('$', '\\$', $gtm_noscript), $html, 1);
+        $body_close = strripos($html, '</body>');
+        if ($body_close !== false) {
+            $html = substr_replace($html, $gtm_noscript, $body_close, 0);
+        }
     }
 
     // OpenAI Ads pixel - same reasoning as GTM above, needs direct <head>
