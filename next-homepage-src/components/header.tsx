@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Menu, X, MapPin, Phone } from "lucide-react"
+import { ChevronRight, Menu, X, MapPin, Phone } from "lucide-react"
 import { useHomepageSettingsStatus } from "@/components/homepage-settings-provider"
 import { PromoBar } from "@/components/promo-bar"
 
@@ -10,7 +10,7 @@ export function Header() {
   const { settings } = useHomepageSettingsStatus()
   const logoSrc = settings.logo_image
   const phoneHref = `tel:${settings.phone.replace(/[^\d+]/g, "")}`
-  // Estimate form layout on phones: logo + Call only (no menu, info bar or promo bar)
+  // Estimate form layout on phones: logo, Call and menu (no info bar or promo bar)
   const slim = settings.hero_variant === "estimate"
   const headerRef = useRef<HTMLElement>(null)
 
@@ -135,9 +135,34 @@ export function Header() {
             </a>
             )}
 
+            {slim ? (
+              // Light hero on phones: round button the same height as Call,
+              // the icon turns into an X while the menu is open.
+              <button
+                type="button"
+                aria-expanded={mobileMenuOpen}
+                aria-controls="ft-mobile-menu"
+                className={`flex h-9 w-9 flex-none items-center justify-center rounded-full border transition-colors duration-200 lg:hidden ${
+                  mobileMenuOpen
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-card text-foreground hover:border-primary/40"
+                }`}
+                style={{ WebkitTapHighlightColor: "transparent" }}
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                <span className="sr-only">{mobileMenuOpen ? "Close menu" : "Open menu"}</span>
+                <span key={mobileMenuOpen ? "x" : "menu"} className="animate-in fade-in zoom-in-75 duration-200">
+                  {mobileMenuOpen ? (
+                    <X className="h-[18px] w-[18px]" aria-hidden="true" />
+                  ) : (
+                    <Menu className="h-[18px] w-[18px]" aria-hidden="true" />
+                  )}
+                </span>
+              </button>
+            ) : (
             <button
               type="button"
-              className={`${slim ? "hidden sm:flex" : "flex"} h-11 w-11 items-center justify-center rounded-md p-0 text-foreground lg:hidden`}
+              className="flex h-11 w-11 items-center justify-center rounded-md p-0 text-foreground lg:hidden"
               style={{ WebkitTapHighlightColor: "transparent" }}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
@@ -148,10 +173,52 @@ export function Header() {
                 <Menu className="h-6 w-6" aria-hidden="true" />
               )}
             </button>
+            )}
           </div>
         </div>
 
-        {mobileMenuOpen && (
+        {mobileMenuOpen && slim && (
+          // Light hero: menu drops down as tappable rows with arrows
+          <div id="ft-mobile-menu" className="animate-in fade-in slide-in-from-top-2 duration-200 lg:hidden">
+            <div className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-border pb-4 pt-2">
+              <ul className="divide-y divide-border">
+                {settings.nav_items.map((item) => (
+                  <li key={item.name}>
+                    <a
+                      href={item.href}
+                      className="group flex min-h-12 items-center justify-between gap-3 px-1 text-base font-semibold text-foreground transition-colors hover:text-primary"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <span className="flex items-center gap-2">
+                        {item.name}
+                        {item.badge === "new" && (
+                          <span className="ft-nav-badge-new rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-extrabold uppercase leading-none tracking-wide text-white">
+                            New
+                          </span>
+                        )}
+                      </span>
+                      <ChevronRight className="h-4 w-4 flex-none text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" aria-hidden="true" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-3 grid grid-cols-3 gap-2 text-center text-sm font-medium">
+                <a href="/financing/" className="rounded-lg bg-muted px-2 py-2.5 text-foreground hover:text-primary">Financing</a>
+                <a href="/contact/" className="rounded-lg bg-muted px-2 py-2.5 text-foreground hover:text-primary">Contact</a>
+                <a href="/faqs/" className="rounded-lg bg-muted px-2 py-2.5 text-foreground hover:text-primary">FAQs</a>
+              </div>
+              <a
+                href={phoneHref}
+                className="mt-3 flex h-12 items-center justify-center gap-2 rounded-full bg-primary text-base font-bold text-primary-foreground"
+              >
+                <Phone className="h-4 w-4" aria-hidden="true" />
+                {settings.phone}
+              </a>
+            </div>
+          </div>
+        )}
+
+        {mobileMenuOpen && !slim && (
           <div className="lg:hidden border-t border-border py-4">
             <div className="flex flex-col gap-4">
               {settings.nav_items.map((item) => (
