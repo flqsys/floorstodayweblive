@@ -93,6 +93,34 @@ function ft_next_homepage_defaults() {
         'hero_show_background' => '1',
         'hero_show_overlay' => '1',
         'hero_overlay_opacity' => '0.72',
+        'hero_variant' => 'classic',
+        'promo_bar_show' => '1',
+        'promo_bar_title' => 'Limited-Time Flooring Sale',
+        'promo_bar_text' => 'Up to 50% off select hardwood, engineered hardwood, vinyl, laminate & carpet flooring.',
+        'promo_bar_mobile_text' => 'Up to 50% off select flooring.',
+        'promo_bar_ends' => '',
+        'promo_bar_bg_color' => '#cc9c2e',
+        'mobile_hero_tag' => 'Mobile flooring · GTA & Ottawa',
+        'mobile_hero_offer_note' => 'Select styles · ends Dec 31, 2026',
+        'mobile_hero_title' => 'The Flooring Showroom',
+        'mobile_hero_highlight' => 'Comes to You.',
+        'mobile_hero_text' => 'We bring hundreds of samples to your home, measure every room, and give you one all-in price, installation included.',
+        'mobile_hero_button' => 'Book In-Home Consultation',
+        'mobile_hero_trust' => 'From the team behind Flooring Liquidators, rated 4.9/5 by 2,000+ Ontario homeowners',
+        'mobile_form_title' => 'Book In-Home Consultation',
+        'mobile_form_subtitle' => 'Takes under a minute. No obligation.',
+        'mobile_form_button' => 'Book Now',
+        'mobile_form_note' => "We'll text you within 1 business hour to set your visit time.",
+        'mobile_hero_map_url' => '',
+        'mobile_hero_image' => '',
+        // Estimate form hero (desktop/tablet): a library of images plus the one shown.
+        // Empty estimate_hero_image means the photo bundled with the Next build.
+        'estimate_hero_images' => [],
+        'estimate_hero_image' => '',
+        // Estimate form buttons (Continue / Book My In-Home Consultation). Empty = use the accent color.
+        'form_button_color' => '',
+        'form_button_text_color' => '',
+        'promo_bar_text_color' => '#ffffff',
         'form_title' => 'Get Your FREE In-Home Estimate',
         'form_subtitle' => 'No obligation. Takes just 2 minutes.',
         'process_title' => 'How It Works',
@@ -521,6 +549,29 @@ function ft_next_homepage_normalize_static_html($html) {
     $asset_placeholder = '%%FT_NEXT_PUBLIC_PATH%%';
     $uploads_placeholder = '%%FT_NEXT_UPLOADS_PATH%%';
     $s3_uploads_placeholder = '%%FT_NEXT_S3_UPLOADS_PATH%%';
+    $local_uploads_placeholder = '%%FT_NEXT_LOCAL_UPLOADS_PATH%%';
+
+    // Full URLs to this site's own uploads (e.g. https://floorstoday.ca/wp-content/uploads/...).
+    // Keep them local when the file is on this server; only files that live on
+    // S3 alone get the S3 URL. Without this, the generic "/wp-content/uploads/"
+    // rule below turned them into "https://site.comhttps://...s3..." (broken images).
+    $upload_dir = wp_get_upload_dir();
+    $local_base_url = untrailingslashit((string) ($upload_dir['baseurl'] ?? ''));
+    $local_base_dir = untrailingslashit((string) ($upload_dir['basedir'] ?? ''));
+    if ($local_base_url !== '' && $local_base_dir !== '') {
+        $local_base_no_scheme = preg_replace('#^https?:#i', '', $local_base_url);
+        $html = preg_replace_callback(
+            '#(?:https?:)?' . preg_quote($local_base_no_scheme, '#') . '/([^"\'\s<>()\\\\]+)#i',
+            function ($m) use ($local_base_dir, $local_uploads_placeholder, $s3_uploads_placeholder) {
+                $relative = rawurldecode((string) strtok($m[1], '?#'));
+                if (!str_contains($relative, '..') && is_file($local_base_dir . '/' . $relative)) {
+                    return $local_uploads_placeholder . $m[1];
+                }
+                return $s3_uploads_placeholder . $m[1];
+            },
+            $html
+        );
+    }
 
     $html = str_replace(
         [
@@ -563,8 +614,8 @@ function ft_next_homepage_normalize_static_html($html) {
     $html = ft_next_homepage_normalize_category_urls($html);
 
     $html = str_replace(
-        [$asset_placeholder, $uploads_placeholder, $s3_uploads_placeholder],
-        [$runtime_asset_path, $uploads_url, $uploads_url],
+        [$asset_placeholder, $uploads_placeholder, $s3_uploads_placeholder, $local_uploads_placeholder],
+        [$runtime_asset_path, $uploads_url, $uploads_url, $local_base_url . '/'],
         $html
     );
 
@@ -677,6 +728,8 @@ function ft_next_homepage_shell_style_vars($settings) {
         '--secondary' => $settings['secondary_color'] ?? '',
         '--accent' => $settings['secondary_color'] ?? '',
         '--chart-2' => $settings['secondary_color'] ?? '',
+        '--ft-form-button' => $settings['form_button_color'] ?? '',
+        '--ft-form-button-text' => $settings['form_button_text_color'] ?? '',
         '--background' => $settings['background_color'] ?? '',
         '--foreground' => $settings['foreground_color'] ?? '',
         '--ft-button-radius' => $settings['button_radius'] ?? '',
@@ -772,8 +825,13 @@ function ft_next_homepage_runtime_bridge($settings) {
         'guarantee_title' => (string) ($settings['guarantee_title'] ?? ''),
     ]);
 
+    // The static build only contains the hero layout selected when it was built;
+    // hide it until React swaps in the selected one so switching never flashes.
+    $hero_variant = ($settings['hero_variant'] ?? 'classic') === 'estimate' ? 'estimate' : 'classic';
+
     return ft_next_homepage_attribution_script()
         . '<style id="ft-homepage-runtime-bridge">'
+        . '.ft-homepage-shell [data-ft-hero-variant]:not([data-ft-hero-variant="' . $hero_variant . '"]){display:none!important;}'
         . '.ft-homepage-shell .ft-hero-badge{'
         . 'display:inline-flex!important;'
         . 'font-size:' . esc_attr($hero_badge_font_size) . '!important;'
@@ -818,7 +876,7 @@ function ft_next_homepage_runtime_bridge($settings) {
         . '}'
         . '@media(max-width:640px){'
         . ($hero_background_image_mobile !== '' ? '.ft-homepage-shell main>section:first-child>div.absolute.inset-0{background-image:url("' . esc_url($hero_background_image_mobile) . '")!important;}' : '')
-        . 'body:has(.ft-homepage-shell>header){padding-top:112px!important;}'
+        . 'body:has(.ft-homepage-shell>header){padding-top:var(--ft-mobile-header-h, calc(112px + var(--ft-promo-bar-h, 0px)))!important;}'
         . '.ft-homepage-shell>header{position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:1000!important;width:100%!important;}'
         . '.admin-bar .ft-homepage-shell>header{top:46px!important;}'
         . '.ft-homepage-shell>header>.bg-primary .min-h-10{min-height:46px!important;padding-block:5px!important;align-items:center!important;}'
@@ -2276,6 +2334,47 @@ add_action('admin_enqueue_scripts', function ($hook) {
                 frame.open();
             });
 
+            // Hero images library (Estimate form layout): add several at once, remove, pick one.
+            $('.ft-hero-gallery__add').on('click', function(event) {
+                event.preventDefault();
+                var grid = $(this).closest('.ft-hero-gallery').find('.ft-hero-gallery__grid');
+                var frame = wp.media({
+                    title: 'Select hero images',
+                    button: { text: 'Add to hero images' },
+                    library: { type: 'image' },
+                    multiple: 'add'
+                });
+
+                frame.on('select', function() {
+                    var existing = grid.find('input[name=\"estimate_hero_images[]\"]').map(function() { return this.value; }).get();
+                    frame.state().get('selection').each(function(model) {
+                        var url = model.get('url') || '';
+                        if (!url || existing.indexOf(url) !== -1) return;
+                        existing.push(url);
+                        var item = $('<label class=\"ft-hero-gallery__item\"></label>');
+                        item.append($('<input type=\"hidden\" name=\"estimate_hero_images[]\">').val(url));
+                        item.append($('<input type=\"radio\" name=\"estimate_hero_image\">').val(url));
+                        item.append($('<img class=\"ft-hero-gallery__thumb\" alt=\"\">').attr('src', url));
+                        item.append('<button type=\"button\" class=\"ft-hero-gallery__remove\" aria-label=\"Remove image\">&times;</button>');
+                        grid.append(item);
+                    });
+                });
+
+                frame.open();
+            });
+
+            $(document).on('click', '.ft-hero-gallery__remove', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                var item = $(this).closest('.ft-hero-gallery__item');
+                var grid = item.closest('.ft-hero-gallery__grid');
+                var wasSelected = item.find('input[type=radio]').prop('checked');
+                item.remove();
+                if (wasSelected) {
+                    grid.find('.ft-hero-gallery__item--builtin input[type=radio]').prop('checked', true);
+                }
+            });
+
             $('.ft-next-image-input').on('input change', function() {
                 var input = $(this);
                 var preview = input.closest('.ft-next-image-field').find('.ft-next-image-preview');
@@ -2299,6 +2398,8 @@ add_action('admin_post_ft_next_homepage_save', function () {
     $current = ft_next_homepage_settings();
     $data = [];
     $text_fields = [
+        'promo_bar_title', 'promo_bar_text', 'promo_bar_mobile_text', 'promo_bar_ends',
+        'mobile_hero_tag', 'mobile_hero_offer_note', 'mobile_hero_title', 'mobile_hero_highlight', 'mobile_hero_text', 'mobile_hero_button', 'mobile_hero_trust', 'mobile_form_title', 'mobile_form_subtitle', 'mobile_form_button', 'mobile_form_note', 'mobile_hero_image',
         'phone', 'email', 'service_area', 'logo_text', 'logo_image', 'favicon_image', 'logo_size', 'cta_label',
         'facebook_url', 'instagram_url', 'linkedin_url', 'youtube_url', 'tiktok_url', 'footer_credit_url',
         'footer_badge_image_1', 'footer_badge_image_2', 'footer_badge_image_3',
@@ -2336,7 +2437,9 @@ add_action('admin_post_ft_next_homepage_save', function () {
         'testimonials_text', 'newsletter_details_text', 'warranty_details_content',
     ];
     $color_fields = [
+        'promo_bar_bg_color', 'promo_bar_text_color',
         'primary_color', 'secondary_color', 'background_color', 'foreground_color',
+        'form_button_color', 'form_button_text_color',
         'button_border_color', 'hero_badge_bg_color', 'hero_badge_text_color',
         'hero_badge_animation_color_1', 'hero_badge_animation_color_2',
         'process_bg_color_1', 'process_bg_color_2',
@@ -2363,6 +2466,8 @@ add_action('admin_post_ft_next_homepage_save', function () {
 
     $data['show_header'] = isset($_POST['show_header']) ? '1' : '0';
     $data['show_footer'] = isset($_POST['show_footer']) ? '1' : '0';
+    $data['promo_bar_show'] = isset($_POST['promo_bar_show']) ? '1' : '0';
+    $data['mobile_hero_map_url'] = isset($_POST['mobile_hero_map_url']) ? ft_next_clean_menu_url($_POST['mobile_hero_map_url']) : ($current['mobile_hero_map_url'] ?? '');
     $data['show_testimonials'] = isset($_POST['show_testimonials']) ? '1' : '0';
     // Saved without tag-stripping — only admins can reach this page (verified by manage_options cap check above).
     $data['testimonials_embed_code'] = isset($_POST['testimonials_embed_code']) ? wp_unslash($_POST['testimonials_embed_code']) : ($current['testimonials_embed_code'] ?? '');
@@ -2374,6 +2479,27 @@ add_action('admin_post_ft_next_homepage_save', function () {
     $data['google_ads_embed_code'] = isset($_POST['google_ads_embed_code']) ? wp_unslash($_POST['google_ads_embed_code']) : ($current['google_ads_embed_code'] ?? '');
     $data['hero_show_background'] = isset($_POST['hero_show_background']) ? '1' : '0';
     $data['hero_show_overlay'] = isset($_POST['hero_show_overlay']) ? '1' : '0';
+    $data['hero_variant'] = isset($_POST['hero_variant'])
+        ? (sanitize_key(wp_unslash($_POST['hero_variant'])) === 'estimate' ? 'estimate' : 'classic')
+        : ($current['hero_variant'] ?? 'classic');
+
+    // Hero images library for the Estimate form layout. The selected image must
+    // be one of the saved images; anything else falls back to the built-in photo.
+    if (isset($_POST['estimate_hero_images_present'])) {
+        $hero_images = [];
+        foreach ((array) wp_unslash($_POST['estimate_hero_images'] ?? []) as $url) {
+            $url = esc_url_raw(trim((string) $url));
+            if ($url !== '' && !in_array($url, $hero_images, true)) {
+                $hero_images[] = $url;
+            }
+        }
+        $selected_hero = esc_url_raw(trim((string) wp_unslash($_POST['estimate_hero_image'] ?? '')));
+        $data['estimate_hero_images'] = $hero_images;
+        $data['estimate_hero_image'] = in_array($selected_hero, $hero_images, true) ? $selected_hero : '';
+    } else {
+        $data['estimate_hero_images'] = $current['estimate_hero_images'] ?? [];
+        $data['estimate_hero_image'] = $current['estimate_hero_image'] ?? '';
+    }
 
     $data['comparison_rows'] = isset($_POST['comparison_rows'])
         ? ft_next_clean_lines($_POST['comparison_rows'])
@@ -2737,6 +2863,14 @@ function ft_next_homepage_render_admin() {
                                 Hover strength
                                 <input name="button_hover_mix" type="text" value="<?php echo esc_attr($settings['button_hover_mix']); ?>">
                             </label>
+                            <label>
+                                Form button color (empty = accent)
+                                <?php ft_next_homepage_color_control($settings, 'form_button_color'); ?>
+                            </label>
+                            <label>
+                                Form button text color (empty = white)
+                                <?php ft_next_homepage_color_control($settings, 'form_button_text_color'); ?>
+                            </label>
                         </div>
                     <?php ft_next_homepage_card_close(); ?>
 
@@ -2793,11 +2927,98 @@ function ft_next_homepage_render_admin() {
                         </table>
                     <?php ft_next_homepage_card_close(); ?>
 
+                    <?php ft_next_homepage_card_open('Promotion bar'); ?>
+                        <?php
+                            ft_next_homepage_field($settings, 'promo_bar_show', 'Show promotion bar above the header', 'checkbox');
+                            ft_next_homepage_field($settings, 'promo_bar_title', 'Bold lead-in (e.g. Limited-Time Flooring Sale)');
+                            ft_next_homepage_field($settings, 'promo_bar_text', 'Offer text (tablet and desktop)');
+                            ft_next_homepage_field($settings, 'promo_bar_mobile_text', 'Short offer text (phones)');
+                            ft_next_homepage_field($settings, 'promo_bar_ends', 'End date text (e.g. Ends Oct 31) - leave empty to hide');
+                        ?>
+                        <div class="ft-next-inline-grid ft-next-inline-grid--2">
+                            <label>
+                                Background color
+                                <?php ft_next_homepage_color_control($settings, 'promo_bar_bg_color'); ?>
+                            </label>
+                            <label>
+                                Text color
+                                <?php ft_next_homepage_color_control($settings, 'promo_bar_text_color'); ?>
+                            </label>
+                        </div>
+                        <p class="description">The bar's link uses the Deals &rarr; &quot;details&quot; label and opens the same offer details popup.</p>
+                    <?php ft_next_homepage_card_close(); ?>
+
                     <?php ft_next_homepage_card_open('Hero'); ?>
                         <div class="ft-next-repeater">
                             <div class="ft-next-repeater-item ft-next-repeater-item--hero">
                                 <h3>Hero settings</h3>
                                 <div class="ft-next-field-stack">
+                                    <div class="ft-next-subgroup">
+                                        <h4>Hero layout</h4>
+                                        <label>
+                                            Layout
+                                            <select name="hero_variant">
+                                                <option value="classic" <?php selected($settings['hero_variant'] ?? 'classic', 'classic'); ?>>Classic &mdash; image hero with the CRM estimate form embed</option>
+                                                <option value="estimate" <?php selected($settings['hero_variant'] ?? 'classic', 'estimate'); ?>>Estimate form &mdash; light hero with the built-in 3-step form</option>
+                                            </select>
+                                        </label>
+                                        <p class="description">The estimate form layout sends leads straight to the Floors Today Inbox (and on to the CRM). The settings below apply to the Classic layout.</p>
+                                    </div>
+                                    <?php
+                                        $ft_hero_images = array_values(array_filter((array) ($settings['estimate_hero_images'] ?? []), 'is_string'));
+                                        $ft_hero_selected = (string) ($settings['estimate_hero_image'] ?? '');
+                                    ?>
+                                    <div class="ft-next-subgroup ft-hero-gallery">
+                                        <h4>Estimate form layout &mdash; hero images (desktop &amp; tablet)</h4>
+                                        <p class="description">Add as many images as you like, then click the one to show behind the hero. Choose &quot;Built-in photo&quot; to use the default image.</p>
+                                        <input type="hidden" name="estimate_hero_images_present" value="1">
+                                        <div class="ft-hero-gallery__grid">
+                                            <label class="ft-hero-gallery__item ft-hero-gallery__item--builtin">
+                                                <input type="radio" name="estimate_hero_image" value="" <?php checked($ft_hero_selected, ''); ?>>
+                                                <img class="ft-hero-gallery__thumb" src="<?php echo esc_url(ft_next_homepage_asset_url() . 'images/estimate-hero/hero-wood.webp'); ?>" alt="" loading="lazy">
+                                                <span class="ft-hero-gallery__caption">Built-in photo</span>
+                                            </label>
+                                            <?php foreach ($ft_hero_images as $ft_hero_url) : ?>
+                                                <label class="ft-hero-gallery__item">
+                                                    <input type="hidden" name="estimate_hero_images[]" value="<?php echo esc_attr($ft_hero_url); ?>">
+                                                    <input type="radio" name="estimate_hero_image" value="<?php echo esc_attr($ft_hero_url); ?>" <?php checked($ft_hero_selected, $ft_hero_url); ?>>
+                                                    <img class="ft-hero-gallery__thumb" src="<?php echo esc_url($ft_hero_url); ?>" alt="" loading="lazy">
+                                                    <button type="button" class="ft-hero-gallery__remove" aria-label="Remove image">&times;</button>
+                                                </label>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <p><button type="button" class="button ft-hero-gallery__add">Add images</button></p>
+                                        <style>
+                                            .ft-hero-gallery__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:12px 0;}
+                                            /* Scoped under .ft-hero-gallery so the page's ".ft-next-field-stack label/input" rules (grid labels, full-width 38px inputs) don't apply here */
+                                            .ft-hero-gallery label.ft-hero-gallery__item{position:relative;display:block;gap:0;cursor:pointer;border:3px solid #dcdcde;border-radius:8px;overflow:hidden;background:#f0f0f1;font-weight:400;}
+                                            .ft-hero-gallery label.ft-hero-gallery__item:has(input[type=radio]:checked){border-color:#2271b1;box-shadow:0 0 0 2px rgba(34,113,177,.25);}
+                                            .ft-hero-gallery .ft-hero-gallery__item input[type=radio]{position:absolute;top:8px;left:8px;z-index:1;width:18px;height:18px;min-height:0;max-width:none;margin:0;padding:0;border-radius:50%;background:#fff;}
+                                            .ft-hero-gallery__thumb{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;}
+                                            .ft-hero-gallery__caption{position:absolute;left:0;right:0;bottom:0;padding:4px 8px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;font-weight:600;text-align:center;}
+                                            .ft-hero-gallery__remove{position:absolute;top:6px;right:6px;width:24px;height:24px;border:0;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;font-size:16px;line-height:1;cursor:pointer;}
+                                            .ft-hero-gallery__remove:hover{background:#b32d2e;}
+                                        </style>
+                                    </div>
+                                    <div class="ft-next-subgroup">
+                                        <h4>Estimate form layout &mdash; phones</h4>
+                                        <p class="description">On phones the Estimate form layout shows a slim header (logo + Call), this hero, and a button that slides the consultation form up. The offer badge uses &quot;Promo badge&quot; text below; &quot;Offer details&quot; opens the Deals popup.</p>
+                                        <?php
+                                            ft_next_homepage_field($settings, 'mobile_hero_tag', 'Tag above the offer');
+                                            ft_next_homepage_field($settings, 'mobile_hero_offer_note', 'Line under the offer badge');
+                                            ft_next_homepage_field($settings, 'mobile_hero_title', 'Title');
+                                            ft_next_homepage_field($settings, 'mobile_hero_highlight', 'Title highlight (second line)');
+                                            ft_next_homepage_field($settings, 'mobile_hero_text', 'Intro text');
+                                            ft_next_homepage_field($settings, 'mobile_hero_button', 'Button that opens the form');
+                                            ft_next_homepage_field($settings, 'mobile_hero_trust', 'Trust line under the Call button');
+                                            ft_next_homepage_field($settings, 'mobile_form_title', 'Form title');
+                                            ft_next_homepage_field($settings, 'mobile_form_subtitle', 'Form subtitle');
+                                            ft_next_homepage_field($settings, 'mobile_form_button', 'Form submit button');
+                                            ft_next_homepage_field($settings, 'mobile_form_note', 'Note under the submit button');
+                                            ft_next_homepage_field($settings, 'mobile_hero_image', 'Phone hero image (leave empty for the built-in photo)', 'image');
+                                            ft_next_homepage_field($settings, 'mobile_hero_map_url', '"Check if we serve your area" link (leave empty to hide)');
+                                        ?>
+                                    </div>
                                     <div class="ft-next-subgroup">
                                         <h4>Main content</h4>
                                         <div class="ft-next-inline-grid ft-next-inline-grid--2" style="margin-bottom:0;">
@@ -4652,13 +4873,25 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                 gap: 14px;
                 margin-bottom: 30px;
             }
-            .ft-ncta-badge-warranty {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 5px;
+            .ft-ncta-trap { position: absolute !important; left: -9999px !important; width: 1px !important; height: 1px !important; opacity: 0 !important; }
+            .ft-ncta-error {
+                margin: 0 !important;
+                padding: 10px 12px;
+                border-radius: 8px;
+                background: #fef2f2;
+                color: #b91c1c !important;
+                font-size: 14px !important;
+                line-height: 1.4 !important;
+                text-align: left;
             }
-            .ft-ncta-badge-warranty .ft-ncta-warranty-btn {
+            .ft-ncta-error[hidden] { display: none !important; }
+            /* "View warranty details" sits on its own line under the subtitle */
+            .ft-ncta-warranty-line {
+                display: flex;
+                justify-content: center;
+                margin: -18px 0 26px;
+            }
+            .ft-ncta-warranty-btn {
                 all: unset;
                 display: block !important;
                 background: transparent !important;
@@ -4675,7 +4908,7 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                 white-space: nowrap;
                 line-height: 1.2 !important;
             }
-            .ft-ncta-badge-warranty .ft-ncta-warranty-btn:hover { opacity: .7 !important; }
+            .ft-ncta-warranty-btn:hover { opacity: .7 !important; }
             .ft-ncta-badges img {
                 display: block;
                 height: var(--ft-ncta-badge-h, 60px) !important;
@@ -4973,7 +5206,105 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                 text-decoration: none !important;
             }
             .ft-ncta-warranty-more:hover { opacity: .85; }
+            /* Phone slide-up sheet. On larger screens the wrappers vanish
+               (display:contents) and the form shows inline as before. */
+            .ft-ncta-mopen,
+            .ft-ncta-sheet-backdrop,
+            .ft-ncta-sheet-head { display: none; }
+            .ft-ncta-sheet,
+            .ft-ncta-sheet-panel,
+            .ft-ncta-sheet-body { display: contents; }
             @media (max-width: 640px) {
+                .ft-ncta-mopen { display: flex; justify-content: center; margin-top: 18px; }
+                .ft-ncta-mopen[hidden] { display: none; }
+                .ft-ncta-mopen-btn {
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    gap: 8px;
+                    width: 100% !important;
+                    height: 52px !important;
+                    border: none !important;
+                    border-radius: 999px !important;
+                    background: var(--ft-ncta-secondary) !important;
+                    color: #fff !important;
+                    font-family: inherit;
+                    font-size: 17px !important;
+                    font-weight: 700 !important;
+                    cursor: pointer;
+                    box-shadow: 0 10px 24px -8px color-mix(in srgb, var(--ft-ncta-secondary) 60%, transparent);
+                }
+                .ft-ncta-sheet {
+                    display: block;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 99990; /* below the Details/Warranty popups (999999) so they open on top */
+                    visibility: hidden;
+                    pointer-events: none;
+                }
+                .ft-ncta-sheet.is-open { visibility: visible; pointer-events: auto; }
+                .ft-ncta-sheet-backdrop {
+                    display: block;
+                    position: absolute;
+                    inset: 0;
+                    background: rgba(0, 0, 0, .5);
+                    opacity: 0;
+                    transition: opacity .3s;
+                }
+                .ft-ncta-sheet.is-open .ft-ncta-sheet-backdrop { opacity: 1; }
+                .ft-ncta-sheet-panel {
+                    display: flex;
+                    flex-direction: column;
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    max-height: 92dvh;
+                    background: #fff;
+                    border-radius: 16px 16px 0 0;
+                    box-shadow: 0 -10px 40px rgba(0, 0, 0, .25);
+                    transform: translateY(100%);
+                    transition: transform .3s ease-out;
+                    outline: none;
+                }
+                .ft-ncta-sheet.is-open .ft-ncta-sheet-panel { transform: translateY(0); }
+                .ft-ncta-sheet-head {
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: space-between;
+                    gap: 12px;
+                    padding: 16px 16px 12px;
+                    border-bottom: 1px solid #e5e7eb;
+                }
+                .ft-ncta-sheet-title {
+                    margin: 0 !important;
+                    color: #111827 !important;
+                    font-size: 19px !important;
+                    font-weight: 700 !important;
+                    line-height: 1.25 !important;
+                }
+                .ft-ncta-sheet-close {
+                    all: unset;
+                    flex-shrink: 0;
+                    display: flex !important;
+                    align-items: center;
+                    justify-content: center;
+                    width: 36px;
+                    height: 36px;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 50%;
+                    color: #111827;
+                    font-size: 22px;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+                .ft-ncta-sheet-body {
+                    display: block;
+                    overflow-y: auto;
+                    overscroll-behavior: contain;
+                    padding: 14px 12px calc(16px + env(safe-area-inset-bottom));
+                }
+                .ft-ncta-sheet-body .ft-ncta-card { margin: 0; box-shadow: none; }
                 .ft-ncta-inner { width: min(100% - 24px, 1200px); }
                 .ft-ncta-card { grid-template-columns: 1fr; }
                 .ft-ncta-badges {
@@ -4982,34 +5313,19 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                     align-items: end;
                     justify-items: center;
                     --ft-ncta-mobile-badge-size: clamp(152px, 45vw, 178px);
-                    --ft-ncta-mobile-warranty-size: clamp(166px, 48vw, 190px);
                     gap: 12px 6px;
                     margin-bottom: 26px;
                 }
-                .ft-ncta-badge-warranty {
-                    order: 1;
-                    grid-column: 1 / -1;
-                    gap: 0;
-                    margin-top: -22px;
-                    margin-bottom: -6px;
-                }
-                .ft-ncta-badge-warranty img {
-                    width: var(--ft-ncta-mobile-warranty-size) !important;
-                    height: var(--ft-ncta-mobile-warranty-size) !important;
-                    max-width: 100% !important;
-                    object-fit: contain;
-                }
-                .ft-ncta-badge-warranty .ft-ncta-warranty-btn {
+                .ft-ncta-warranty-btn {
                     color: #111 !important;
-                    font-size: 20px !important;
+                    font-size: 16px !important;
                     line-height: 1.25 !important;
-                    text-decoration-thickness: 1px !important;
                     text-underline-offset: 3px !important;
-                    margin-top: -10px !important;
                     white-space: normal;
                 }
+                /* An odd last badge gets its own centred row */
+                .ft-ncta-badges > img:last-child:nth-child(odd) { grid-column: 1 / -1; }
                 .ft-ncta-badges > img {
-                    order: 2;
                     width: var(--ft-ncta-mobile-badge-size) !important;
                     height: var(--ft-ncta-mobile-badge-size) !important;
                     max-width: 100% !important;
@@ -5020,6 +5336,42 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
         </style>
         <script id="ft-newsletter-cta-script">
             window.ftNonce = <?php echo wp_json_encode(wp_create_nonce('wp_rest')); ?>;
+            // Phone slide-up sheet for the newsletter form (same pattern as the hero form).
+            window.ftNctaSheet = (function () {
+                var phone = window.matchMedia('(max-width: 640px)');
+                var saved = { overflow: '', chat: '' };
+                var openSheet = null, opener = null;
+                function chatEl() { return document.getElementById('chatbot-container'); }
+                function open(sheet, fromBtn) {
+                    if (!sheet || !phone.matches) return;
+                    openSheet = sheet; opener = fromBtn || null;
+                    var panel = sheet.querySelector('.ft-ncta-sheet-panel');
+                    panel.setAttribute('role', 'dialog');
+                    panel.setAttribute('aria-modal', 'true');
+                    sheet.classList.add('is-open');
+                    if (opener) opener.setAttribute('aria-expanded', 'true');
+                    saved.overflow = document.body.style.overflow;
+                    document.body.style.overflow = 'hidden';
+                    var chat = chatEl();
+                    if (chat) { saved.chat = chat.style.visibility; chat.style.visibility = 'hidden'; }
+                    setTimeout(function () { panel.focus({ preventScroll: true }); }, 50);
+                }
+                function close() {
+                    if (!openSheet) return;
+                    var panel = openSheet.querySelector('.ft-ncta-sheet-panel');
+                    openSheet.classList.remove('is-open');
+                    panel.removeAttribute('role');
+                    panel.removeAttribute('aria-modal');
+                    document.body.style.overflow = saved.overflow;
+                    var chat = chatEl();
+                    if (chat) chat.style.visibility = saved.chat;
+                    if (opener) { opener.setAttribute('aria-expanded', 'false'); opener.focus({ preventScroll: true }); }
+                    openSheet = null; opener = null;
+                }
+                // Rotating / resizing past phone width closes the sheet
+                phone.addEventListener('change', function () { if (!phone.matches) close(); });
+                return { open: open, close: close, isOpen: function () { return !!openSheet; } };
+            })();
             document.addEventListener('submit', function (event) {
                 var form = event.target.closest('.ft-ncta-form');
                 if (!form) return;
@@ -5035,10 +5387,33 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                 delete data.phoneLocal;
                 data.source = 'Newsletter CTA';
                 data.pageUrl = window.location.href;
+                // Consents as true/false (FormData only includes checked boxes, as "on")
+                ['privacyConsent', 'smsConsent', 'emailConsent'].forEach(function (k) {
+                    var box = form.querySelector('input[name="' + k + '"]');
+                    data[k] = !!(box && box.checked);
+                });
+                // Same attribution as the hero estimate form (lib/lead-tracking.ts getLeadAttribution):
+                // site-wide first-touch ftGetAttribution() wins, then URL params, then the referrer.
                 var attribution = window.ftGetAttribution ? window.ftGetAttribution() : {};
-                data.utmSource = attribution.utmSource || '';
-                data.trafficSource = attribution.trafficSource || '';
+                var qs = new URLSearchParams(window.location.search);
+                var refHost = attribution.referrerHost || '';
+                if (!refHost && document.referrer) { try { refHost = new URL(document.referrer).hostname.replace(/^www\./, ''); } catch (e) {} }
+                data.utmSource = attribution.utmSource || qs.get('hello_social') || qs.get('utm_source') || '';
+                data.utmMedium = attribution.utmMedium || qs.get('utm_medium') || '';
+                data.utmCampaign = attribution.utmCampaign || qs.get('utm_campaign') || '';
+                data.utmContent = attribution.utmContent || qs.get('utm_content') || '';
+                data.utmTerm = attribution.utmTerm || qs.get('utm_term') || '';
+                data.trafficSource = attribution.trafficSource || data.utmSource || refHost || 'Direct';
                 data.referrerUrl = attribution.referrerUrl || document.referrer || '';
+                data.devicePlatform = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Mobile / Tablet' : 'Desktop';
+                var errorEl = form.querySelector('.ft-ncta-error');
+                function showError(msg) {
+                    if (!errorEl) { window.alert(msg); return; }
+                    errorEl.textContent = msg;
+                    errorEl.hidden = false;
+                    if (errorEl.scrollIntoView) errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+                if (errorEl) errorEl.hidden = true;
                 fetch(form.dataset.endpoint || '', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': (window.ftNonce || '') },
@@ -5049,10 +5424,26 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                     });
                 }).then(function (result) {
                     if (result.ok) {
+                        // Conversion tracking - same channels as the hero estimate form, but as
+                        // a newsletter sign-up (not an estimate lead) so ad lead counts stay clean.
+                        try {
+                            if (window.fbq) window.fbq('track', 'CompleteRegistration', { content_name: 'Newsletter CTA', currency: 'CAD' });
+                            if (window.gtag) window.gtag('event', 'sign_up', { method: 'newsletter', form_id: 'newsletter_cta', lead_source: data.trafficSource });
+                            if (window.dataLayer) window.dataLayer.push({ event: 'newsletter_signup', form_id: 'newsletter_cta', form_name: 'Newsletter CTA', lead_source: data.trafficSource, utm_source: data.utmSource });
+                            if (window.oaiq) window.oaiq('measure', 'custom', { type: 'custom' }, { custom_event_name: 'newsletter_signup' });
+                        } catch (e) {}
                         var name = (data.fullName || '').trim().split(' ')[0];
                         var inner = form.closest('.ft-ncta-inner');
                         var successCard = inner ? inner.querySelector('.ft-ncta-success-card') : null;
                         var formHeight = form.offsetHeight;
+                        // Phones: close the sheet and hide its opener; the success card shows in the section
+                        var inSheet = window.ftNctaSheet && window.ftNctaSheet.isOpen();
+                        if (inSheet) {
+                            window.ftNctaSheet.close();
+                            formHeight = 0;
+                        }
+                        var mopen = inner ? inner.querySelector('.ft-ncta-mopen') : null;
+                        if (mopen) mopen.hidden = true;
                         form.reset();
                         form.hidden = true;
                         if (successCard) {
@@ -5072,15 +5463,26 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                             }
                         }
                     } else {
-                        window.alert((result.body && result.body.message) || 'Something went wrong. Please try again.');
+                        showError((result.body && result.body.message) || 'Something went wrong. Please try again.');
                     }
                 }).catch(function () {
-                    window.alert('Something went wrong. Please try again.');
+                    showError('Something went wrong. Please try again.');
                 }).finally(function () {
                     if (btn) { btn.disabled = false; btn.textContent = claimLabel; }
                 });
             });
             document.addEventListener('click', function (event) {
+                var sheetOpener = event.target.closest('[data-ncta-sheet-open]');
+                if (sheetOpener) {
+                    event.preventDefault();
+                    window.ftNctaSheet.open(document.getElementById(sheetOpener.getAttribute('aria-controls')), sheetOpener);
+                    return;
+                }
+                if (event.target.closest('[data-ncta-sheet-close]')) {
+                    event.preventDefault();
+                    window.ftNctaSheet.close();
+                    return;
+                }
                 var opener = event.target.closest('.ft-ncta-details, .ft-ncta-warranty-btn');
                 if (opener) {
                     event.preventDefault();
@@ -5100,7 +5502,13 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
             });
             document.addEventListener('keydown', function (event) {
                 if (event.key !== 'Escape') return;
-                document.querySelectorAll('.ft-ncta-popup.is-open').forEach(function (popup) { popup.classList.remove('is-open'); });
+                var popups = document.querySelectorAll('.ft-ncta-popup.is-open');
+                // Close the top-most layer first: a Details popup, then the sheet
+                if (popups.length) {
+                    popups.forEach(function (popup) { popup.classList.remove('is-open'); });
+                } else if (window.ftNctaSheet) {
+                    window.ftNctaSheet.close();
+                }
             });
         </script>
         <?php
@@ -5110,25 +5518,34 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
         <div class="ft-ncta-inner">
             <?php if (!empty($badge_images)) : ?>
             <div class="ft-ncta-badges">
-                <?php foreach ($badge_images as $badge_index => $img) : ?>
-                    <?php if ($badge_index === 2) : ?>
-                    <div class="ft-ncta-badge-warranty">
-                        <img src="<?php echo esc_url($img); ?>" alt="" loading="lazy" decoding="async">
-                        <button type="button" class="ft-ncta-warranty-btn" aria-controls="ft-ncta-warranty-popup-<?php echo esc_attr($instance_id); ?>" aria-haspopup="dialog"><?php esc_html_e('View warranty details', 'floors-today'); ?></button>
-                    </div>
-                    <?php else : ?>
+                <?php foreach ($badge_images as $img) : ?>
                     <img src="<?php echo esc_url($img); ?>" alt="" loading="lazy" decoding="async">
-                    <?php endif; ?>
                 <?php endforeach; ?>
             </div>
             <?php endif; ?>
             <h2 class="ft-ncta-title"<?php echo $title_color ? ' style="color:' . esc_attr($title_color) . '!important"' : ''; ?>><?php echo esc_html($settings['newsletter_title'] ?? 'Subscribe and Get $300 Store Credit'); ?></h2>
             <p class="ft-ncta-subtitle"<?php echo $subtitle_color ? ' style="color:' . esc_attr($subtitle_color) . '!important"' : ($title_color ? ' style="color:' . esc_attr($title_color) . 'cc!important"' : ''); ?>><?php echo esc_html($settings['newsletter_text'] ?? 'Join our newsletter for exclusive flooring offers, project tips, and your $300 store credit details.'); ?></p>
+            <p class="ft-ncta-warranty-line">
+                <button type="button" class="ft-ncta-warranty-btn" aria-controls="ft-ncta-warranty-popup-<?php echo esc_attr($instance_id); ?>" aria-haspopup="dialog"><?php esc_html_e('View warranty details', 'floors-today'); ?></button>
+            </p>
+            <?php /* Phones: this button slides the form up as a sheet (like the hero form). Hidden on larger screens. */ ?>
+            <div class="ft-ncta-mopen">
+                <button type="button" class="ft-ncta-mopen-btn" data-ncta-sheet-open aria-controls="ft-ncta-sheet-<?php echo esc_attr($instance_id); ?>" aria-expanded="false"><?php echo esc_html($settings['newsletter_claim_button'] ?? 'Claim $300'); ?> <span aria-hidden="true">&rarr;</span></button>
+            </div>
+            <?php /* On larger screens the sheet wrappers are display:contents, so the form renders inline as before. */ ?>
+            <div class="ft-ncta-sheet" id="ft-ncta-sheet-<?php echo esc_attr($instance_id); ?>">
+            <div class="ft-ncta-sheet-backdrop" data-ncta-sheet-close></div>
+            <div class="ft-ncta-sheet-panel" aria-labelledby="ft-ncta-sheet-title-<?php echo esc_attr($instance_id); ?>" tabindex="-1">
+            <div class="ft-ncta-sheet-head">
+                <h3 class="ft-ncta-sheet-title" id="ft-ncta-sheet-title-<?php echo esc_attr($instance_id); ?>"><?php echo esc_html($settings['newsletter_title'] ?? 'Subscribe and Get $300 Store Credit'); ?></h3>
+                <button type="button" class="ft-ncta-sheet-close" data-ncta-sheet-close aria-label="<?php esc_attr_e('Close', 'floors-today'); ?>">&times;</button>
+            </div>
+            <div class="ft-ncta-sheet-body">
             <form class="ft-ncta-card ft-ncta-form" data-endpoint="<?php echo esc_url($endpoint); ?>">
                 <div class="ft-ncta-consents">
                     <label class="ft-ncta-consent">
                         <input name="privacyConsent" type="checkbox" required>
-                        <span>I agree to receive promotional emails from Floors Today and have read the <a href="/privacy-policy/">Privacy Policy</a> and <a href="/terms-of-use/">Terms &amp; Conditions</a>.</span>
+                        <span>I agree to receive promotional emails from Floors Today and have read the <a href="<?php echo esc_url(home_url('/privacy-policy/')); ?>">Privacy Policy</a> and <a href="<?php echo esc_url(home_url('/terms-of-use/')); ?>">Terms &amp; Conditions</a>.</span>
                     </label>
                     <label class="ft-ncta-consent">
                         <input name="smsConsent" type="checkbox" required>
@@ -5152,12 +5569,18 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                         <input name="email" type="email" autocomplete="email" placeholder="<?php esc_attr_e('Email Address', 'floors-today'); ?>" required>
                     </div>
+                    <?php /* Spam trap: hidden from people, bots fill it in and get silently ignored (same as the hero form) */ ?>
+                    <input class="ft-ncta-trap" type="text" name="ftInboxTrap" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <p class="ft-ncta-error" role="alert" hidden></p>
                     <div class="ft-ncta-buttons">
                         <button class="ft-ncta-claim" type="submit"><?php echo esc_html($settings['newsletter_claim_button'] ?? 'Claim $300'); ?></button>
                         <button class="ft-ncta-details" type="button" aria-controls="ft-ncta-popup-<?php echo esc_attr($instance_id); ?>" aria-haspopup="dialog"><?php echo esc_html($settings['newsletter_button'] ?? 'See Details'); ?></button>
                     </div>
                 </div>
             </form>
+            </div><?php /* .ft-ncta-sheet-body */ ?>
+            </div><?php /* .ft-ncta-sheet-panel */ ?>
+            </div><?php /* .ft-ncta-sheet */ ?>
             <div class="ft-ncta-success-card" hidden>
                 <div class="ft-ncta-success-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
@@ -6046,6 +6469,12 @@ add_action('rest_api_init', function () {
             if (!empty($response['estimate_form_use_shortcode']) && trim((string) ($response['estimate_form_shortcode'] ?? '')) !== '') {
                 $response['estimate_form_embed_code'] = do_shortcode($response['estimate_form_shortcode']);
             }
+
+            // Thank-you page the booking form goes to after a lead (Form
+            // Settings). The homepage hero forms use the same one, so ad
+            // conversions on that page keep counting whichever hero is on.
+            $inbox_settings = function_exists('ft_inbox_settings') ? ft_inbox_settings() : [];
+            $response['booking_form_redirect_url'] = (string) ($inbox_settings['booking_form_redirect_url'] ?? '');
 
             return rest_ensure_response($response);
         },

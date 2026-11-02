@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -35,7 +36,7 @@ function localInstallPath() {
   return firstSegment ? `/${firstSegment}` : ""
 }
 
-function endpointUrl(endpoint: string) {
+export function endpointUrl(endpoint: string) {
   if (/^https?:\/\//i.test(endpoint)) {
     return endpoint
   }
@@ -58,6 +59,29 @@ function wordpressInstallPath() {
   }
 
   return endpoint.split("/wp-json/")[0] || ""
+}
+
+const liveSiteOrigin = /^https?:\/\/(?:www\.)?floorstoday\.ca(?=[/?#]|$)/i
+
+// Menu/footer links are saved for the live site (root-relative "/contact/" or
+// absolute "https://floorstoday.ca/contact/"). Point them at whichever install
+// is actually serving the page, e.g. http://localhost/floorstoday/contact/.
+// On the live site both rewrites are no-ops.
+function siteUrl(href: string) {
+  if (typeof window === "undefined" || !href) return href
+
+  const installPath = wordpressInstallPath()
+
+  if (liveSiteOrigin.test(href)) {
+    return href.replace(liveSiteOrigin, `${window.location.origin}${installPath}`)
+  }
+
+  if (href.startsWith("/") && !href.startsWith("//")) {
+    if (!installPath || href === installPath || href.startsWith(`${installPath}/`)) return href
+    return `${installPath}${href}`
+  }
+
+  return href
 }
 
 function normalizeAssetUrl(value: unknown) {
@@ -92,6 +116,8 @@ function normalizeHomepageSettings(data: Partial<HomepageSettings>) {
     logo_image: normalizeAssetUrl(data.logo_image) as string,
     favicon_image: normalizeAssetUrl(data.favicon_image) as string,
     hero_image: normalizeAssetUrl(data.hero_image) as string,
+    mobile_hero_image: normalizeAssetUrl(data.mobile_hero_image) as string,
+    estimate_hero_image: normalizeAssetUrl(data.estimate_hero_image ?? "") as string,
     guarantee_image: normalizeAssetUrl(data.guarantee_image) as string,
     process_steps: data.process_steps?.map((step) => ({
       ...step,
@@ -118,12 +144,14 @@ type HomepageSettingsContextValue = {
   settings: HomepageSettings
   isLoaded: boolean
   hasError: boolean
+  siteUrl: (href: string) => string
 }
 
 const HomepageSettingsContext = createContext<HomepageSettingsContextValue>({
   settings: homepageDefaults,
   isLoaded: false,
   hasError: false,
+  siteUrl: (href) => href,
 })
 
 export function HomepageSettingsProvider({
@@ -141,6 +169,9 @@ export function HomepageSettingsProvider({
   )
   const [isLoaded, setIsLoaded] = useState(true)
   const [hasError, setHasError] = useState(false)
+  // Links render as saved until after hydration, so server and client HTML match
+  const [hydrated, setHydrated] = useState(false)
+  const toSiteUrl = useCallback((href: string) => (hydrated ? siteUrl(href) : href), [hydrated])
 
   useLayoutEffect(() => {
     // Normalize asset URLs after hydration so the install prefix is computed client-side.
@@ -148,6 +179,7 @@ export function HomepageSettingsProvider({
     setSettings(mergeHomepageSettings(normalizeHomepageSettings(source)))
     setIsLoaded(true)
     setHasError(false)
+    setHydrated(true)
   }, [])
 
   useEffect(() => {
@@ -266,6 +298,9 @@ export function HomepageSettingsProvider({
         "--secondary": settings.secondary_color,
         "--accent": settings.secondary_color,
         "--chart-2": settings.secondary_color,
+        // undefined (not "") when empty, so .ft-form-button falls back to the accent color
+        "--ft-form-button": settings.form_button_color || undefined,
+        "--ft-form-button-text": settings.form_button_text_color || undefined,
         "--background": settings.background_color,
         "--foreground": settings.foreground_color,
         "--ft-button-radius": settings.button_radius,
@@ -291,7 +326,7 @@ export function HomepageSettingsProvider({
   )
 
   return (
-    <HomepageSettingsContext.Provider value={{ settings, isLoaded, hasError }}>
+    <HomepageSettingsContext.Provider value={{ settings, isLoaded, hasError, siteUrl: toSiteUrl }}>
       <div className="ft-homepage-shell" data-ready={isLoaded && !hasError ? "true" : "false"} style={style}>
         {!isLoaded ? (
           <main className="grid min-h-screen place-items-center bg-background px-4 text-foreground">
@@ -320,4 +355,8 @@ export function useHomepageSettings() {
 
 export function useHomepageSettingsStatus() {
   return useContext(HomepageSettingsContext)
+}
+
+export function useSiteUrl() {
+  return useContext(HomepageSettingsContext).siteUrl
 }

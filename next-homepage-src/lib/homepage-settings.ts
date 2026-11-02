@@ -77,6 +77,34 @@ export type HomepageSettings = {
   hero_show_background: string | boolean
   hero_show_overlay: string | boolean
   hero_overlay_opacity: string
+  // Home Settings > Hero > Hero layout: "classic" (image hero) or "estimate" (light hero)
+  hero_variant: string
+  booking_form_redirect_url?: string
+  promo_bar_show: string | boolean
+  promo_bar_title: string
+  promo_bar_text: string
+  promo_bar_mobile_text: string
+  promo_bar_ends: string
+  promo_bar_bg_color: string
+  promo_bar_text_color: string
+  mobile_hero_tag: string
+  mobile_hero_offer_note: string
+  mobile_hero_title: string
+  mobile_hero_highlight: string
+  mobile_hero_text: string
+  mobile_hero_button: string
+  mobile_hero_trust: string
+  mobile_form_title: string
+  mobile_form_subtitle: string
+  mobile_form_button: string
+  mobile_form_note: string
+  mobile_hero_map_url: string
+  mobile_hero_image: string
+  // Desktop/tablet background for the Estimate form hero, chosen in Home Settings > Hero images
+  estimate_hero_image: string
+  // Estimate form button colors (Home Settings > Button Style). Empty = accent color / white.
+  form_button_color: string
+  form_button_text_color: string
   form_title: string
   form_subtitle: string
   estimate_form_embed_code: string
@@ -237,6 +265,30 @@ export const homepageDefaults: HomepageSettings = {
   hero_show_background: "1",
   hero_show_overlay: "1",
   hero_overlay_opacity: "0.72",
+  hero_variant: "classic",
+  promo_bar_show: "1",
+  promo_bar_title: "Limited-Time Flooring Sale",
+  promo_bar_text: "Up to 50% off select hardwood, engineered hardwood, vinyl, laminate & carpet flooring.",
+  promo_bar_mobile_text: "Up to 50% off select flooring.",
+  promo_bar_ends: "",
+  promo_bar_bg_color: "#cc9c2e",
+  promo_bar_text_color: "#ffffff",
+  mobile_hero_tag: "Mobile flooring · GTA & Ottawa",
+  mobile_hero_offer_note: "Select styles · ends Dec 31, 2026",
+  mobile_hero_title: "The Flooring Showroom",
+  mobile_hero_highlight: "Comes to You.",
+  mobile_hero_text: "We bring hundreds of samples to your home, measure every room, and give you one all-in price, installation included.",
+  mobile_hero_button: "Book In-Home Consultation",
+  mobile_hero_trust: "From the team behind Flooring Liquidators, rated 4.9/5 by 2,000+ Ontario homeowners",
+  mobile_form_title: "Book In-Home Consultation",
+  mobile_form_subtitle: "Takes under a minute. No obligation.",
+  mobile_form_button: "Book Now",
+  mobile_form_note: "We'll text you within 1 business hour to set your visit time.",
+  mobile_hero_map_url: "",
+  mobile_hero_image: "",
+  estimate_hero_image: "",
+  form_button_color: "",
+  form_button_text_color: "",
   form_title: "",
   form_subtitle: "",
   estimate_form_embed_code: "",

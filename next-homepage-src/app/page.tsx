@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
-import { HeroSection } from "@/components/hero-section"
 import { ProcessSection } from "@/components/process-section"
 import dynamic from "next/dynamic"
 import { HomepageSettingsProvider } from "@/components/homepage-settings-provider"
-import { HeaderSlot, FooterSlot } from "@/components/homepage-visibility-slots"
+import { HeaderSlot, HeroSlot, FooterSlot } from "@/components/homepage-visibility-slots"
 import type { HomepageSettings } from "@/lib/homepage-settings"
 
 const ComparisonSection = dynamic(() =>
@@ -94,7 +93,7 @@ export default async function HomePage() {
     <HomepageSettingsProvider initialSettings={initialSettings}>
       <HeaderSlot />
       <main>
-        <HeroSection />
+        <HeroSlot />
         <ProcessSection />
         <ComparisonSection />
         <CategoriesSection />

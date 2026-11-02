@@ -1,18 +1,47 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Menu, X, MapPin, Phone } from "lucide-react"
 import { useHomepageSettingsStatus } from "@/components/homepage-settings-provider"
+import { PromoBar } from "@/components/promo-bar"
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { settings } = useHomepageSettingsStatus()
   const logoSrc = settings.logo_image
   const phoneHref = `tel:${settings.phone.replace(/[^\d+]/g, "")}`
+  // Estimate form layout on phones: logo + Call only (no menu, info bar or promo bar)
+  const slim = settings.hero_variant === "estimate"
+  const headerRef = useRef<HTMLElement>(null)
+
+  // On phones the WordPress bridge fixes the header and offsets the page by a
+  // set height; the slim header is shorter, so publish its real height instead.
+  useEffect(() => {
+    const root = document.documentElement
+    const header = headerRef.current
+
+    if (!slim || !header) {
+      root.style.removeProperty("--ft-mobile-header-h")
+      return
+    }
+
+    const update = () => root.style.setProperty("--ft-mobile-header-h", `${header.offsetHeight}px`)
+    update()
+    const observer = new ResizeObserver(update)
+    observer.observe(header)
+
+    return () => {
+      observer.disconnect()
+      root.style.removeProperty("--ft-mobile-header-h")
+    }
+  }, [slim])
 
   return (
-    <header className="sticky top-0 z-50 bg-card shadow-sm">
-      <div className="bg-primary text-primary-foreground">
+    <header ref={headerRef} className="sticky top-0 z-50 bg-card shadow-sm">
+      <div className={slim ? "hidden sm:block" : undefined}>
+        <PromoBar />
+      </div>
+      <div className={`bg-primary text-primary-foreground${slim ? " hidden sm:block" : ""}`}>
         <div className="mx-auto max-w-[1340px] px-4">
           <div className="flex min-h-10 items-center justify-between py-2 text-xs sm:text-sm">
             <div className="flex min-w-0 items-center gap-2">
@@ -85,6 +114,17 @@ export function Header() {
               {settings.phone}
             </a>
 
+            {slim ? (
+              <a
+                href={phoneHref}
+                aria-label={`Call ${settings.phone}`}
+                className="flex h-9 flex-none items-center gap-1.5 rounded-full bg-primary px-4 text-sm font-bold text-primary-foreground sm:hidden"
+                style={{ WebkitTapHighlightColor: "transparent" }}
+              >
+                <Phone className="h-3.5 w-3.5" aria-hidden="true" />
+                Call
+              </a>
+            ) : (
             <a
               href={phoneHref}
               aria-label={`Call ${settings.phone}`}
@@ -93,10 +133,11 @@ export function Header() {
             >
               <Phone className="h-4 w-4" />
             </a>
+            )}
 
             <button
               type="button"
-              className="flex h-11 w-11 items-center justify-center rounded-md p-0 text-foreground lg:hidden"
+              className={`${slim ? "hidden sm:flex" : "flex"} h-11 w-11 items-center justify-center rounded-md p-0 text-foreground lg:hidden`}
               style={{ WebkitTapHighlightColor: "transparent" }}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >

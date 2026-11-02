@@ -156,7 +156,7 @@ export function HeroSection() {
   }, [])
 
   return (
-    <section className="relative flex min-h-0 items-center overflow-hidden lg:min-h-[90vh]">
+    <section data-ft-hero-variant="classic" className="relative flex min-h-0 items-center overflow-hidden lg:min-h-[90vh]">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         {showBackground ? (

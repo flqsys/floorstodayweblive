@@ -175,6 +175,14 @@
     }
   }
 
+  /* Estimate form buttons have their own color (Home Settings > Form button color),
+     falling back to the accent color when it's empty. */
+  .ft-form-button {
+    background-color: var(--ft-form-button, var(--accent));
+    color: var(--ft-form-button-text, var(--accent-foreground));
+    --tw-shadow-color: color-mix(in oklab, var(--ft-form-button, var(--accent)) 25%, transparent);
+  }
+
   .ft-homepage-shell .ft-hero-badge {
     background-image: linear-gradient(
       var(--ft-hero-badge-animation-location, 90deg),

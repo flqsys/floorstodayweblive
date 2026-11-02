@@ -240,6 +240,11 @@ function ft_inbox_sanitize_lead_payload($request) {
     ];
 }
 
+// Forms allowed to submit a first name + phone without an email
+function ft_inbox_quick_lead_sources() {
+    return ['Homepage mobile consultation form'];
+}
+
 function ft_inbox_unread_count() {
     $query = new WP_Query([
         'post_type' => FT_INBOX_POST_TYPE,
@@ -392,12 +397,33 @@ function ft_inbox_handle_rest_submission(WP_REST_Request $request) {
 
     $name_parts = preg_split('/\s+/', trim($data['full_name']), -1, PREG_SPLIT_NO_EMPTY);
 
-    if (count($name_parts) < 2) {
-        return new WP_Error('ft_inbox_invalid_name', 'Please enter your first and last name.', ['status' => 400]);
-    }
+    // The homepage phone consultation form only asks for a first name, mobile
+    // and postal code - email is optional there. Every other form keeps the
+    // full name + email requirement.
+    if (in_array($data['source'], ft_inbox_quick_lead_sources(), true)) {
+        if (count($name_parts) < 1) {
+            return new WP_Error('ft_inbox_invalid_name', 'Please enter your first name.', ['status' => 400]);
+        }
 
-    if ($data['phone'] === '' || $data['phone'] === '+1' || $data['email'] === '' || !is_email($data['email'])) {
-        return new WP_Error('ft_inbox_invalid', 'Please enter your name, phone, and a valid email.', ['status' => 400]);
+        if (strlen(preg_replace('/\D/', '', $data['phone'])) < 10) {
+            return new WP_Error('ft_inbox_invalid', 'Please enter a valid mobile number.', ['status' => 400]);
+        }
+
+        // sanitize_email() turns an invalid address into '', so check what was typed
+        $params = $request->get_json_params();
+        $raw_email = is_array($params) ? trim((string) ($params['email'] ?? '')) : '';
+
+        if ($raw_email !== '' && !is_email($data['email'])) {
+            return new WP_Error('ft_inbox_invalid', 'Please enter a valid email or leave it empty.', ['status' => 400]);
+        }
+    } else {
+        if (count($name_parts) < 2) {
+            return new WP_Error('ft_inbox_invalid_name', 'Please enter your first and last name.', ['status' => 400]);
+        }
+
+        if ($data['phone'] === '' || $data['phone'] === '+1' || $data['email'] === '' || !is_email($data['email'])) {
+            return new WP_Error('ft_inbox_invalid', 'Please enter your name, phone, and a valid email.', ['status' => 400]);
+        }
     }
 
     $title = sprintf(
