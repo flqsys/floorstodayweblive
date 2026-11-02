@@ -2384,6 +2384,12 @@ add_action('admin_enqueue_scripts', function ($hook) {
                     preview.hide();
                 }
             }).trigger('change');
+
+            // Remove button next to Select: empties the image box; Save then hides it on the site.
+            $(document).on('click', '.ft-next-image-remove', function(event) {
+                event.preventDefault();
+                $(this).closest('.ft-next-image-field').find('.ft-next-image-input').val('').trigger('change');
+            });
         });
     ");
 });
@@ -3672,6 +3678,7 @@ function ft_next_homepage_render_admin() {
                                         <div class="ft-next-image-row">
                                             <input id="<?php echo esc_attr($badge_field); ?>" name="<?php echo esc_attr($badge_field); ?>" type="text" class="regular-text ft-next-image-input" value="<?php echo $badge_val; ?>">
                                             <button type="button" class="button ft-next-image-button">Select</button>
+                                            <button type="button" class="button ft-next-image-remove" aria-label="Remove badge <?php echo $bi; ?>">Remove</button>
                                         </div>
                                         <img class="ft-next-image-preview" src="<?php echo esc_url($settings[$badge_field] ?? ''); ?>" alt="" loading="lazy"<?php echo empty($settings[$badge_field]) ? ' style="display:none"' : ''; ?>>
                                     </div>
