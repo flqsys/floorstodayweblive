@@ -48,6 +48,7 @@ function ft_next_homepage_defaults() {
         'linkedin_url' => '',
         'youtube_url' => '',
         'tiktok_url' => '',
+        'footer_credit_url' => '',
         'footer_badge_image_1' => '',
         'footer_badge_image_2' => '',
         'footer_badge_image_3' => '',
@@ -2299,7 +2300,7 @@ add_action('admin_post_ft_next_homepage_save', function () {
     $data = [];
     $text_fields = [
         'phone', 'email', 'service_area', 'logo_text', 'logo_image', 'favicon_image', 'logo_size', 'cta_label',
-        'facebook_url', 'instagram_url', 'linkedin_url', 'youtube_url', 'tiktok_url',
+        'facebook_url', 'instagram_url', 'linkedin_url', 'youtube_url', 'tiktok_url', 'footer_credit_url',
         'footer_badge_image_1', 'footer_badge_image_2', 'footer_badge_image_3',
         'footer_badge_image_4', 'footer_badge_image_5', 'footer_badge_image_6',
         'footer_badge_height',
@@ -3423,6 +3424,11 @@ function ft_next_homepage_render_admin() {
                                 <label>
                                     TikTok URL
                                     <input name="tiktok_url" type="url" value="<?php echo esc_attr($settings['tiktok_url']); ?>">
+                                </label>
+                                <label>
+                                    Website design link
+                                    <input name="footer_credit_url" type="url" value="<?php echo esc_attr($settings['footer_credit_url'] ?? ''); ?>" placeholder="https://ruengine.com">
+                                    <small>Links the name after "by" in the copyright text.</small>
                                 </label>
                             </div>
                             <h3>Footer trust badge logos</h3>
@@ -4562,7 +4568,16 @@ function ft_next_footer_shortcode() {
                         <a href="<?php echo esc_url('mailto:' . $email); ?>"><svg class="ft-sh-footer-bottom-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m22 7-9 5.7a2 2 0 0 1-2 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg><?php echo esc_html($email); ?></a>
                     <?php endif; ?>
                 </div>
-                <p><?php echo esc_html($copyright); ?></p>
+                <p><?php
+                    $credit_url = esc_url((string) ($settings['footer_credit_url'] ?? ''));
+                    $by_at = $credit_url !== '' ? strripos($copyright, ' by ') : false;
+                    if ($by_at !== false && trim(substr($copyright, $by_at + 4)) !== '') {
+                        echo esc_html(substr($copyright, 0, $by_at + 4));
+                        echo '<a href="' . $credit_url . '" target="_blank" rel="noopener">' . esc_html(substr($copyright, $by_at + 4)) . '</a>';
+                    } else {
+                        echo esc_html($copyright);
+                    }
+                ?></p>
             </div>
         </div>
     </footer>

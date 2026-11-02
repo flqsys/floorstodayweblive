@@ -77,6 +77,10 @@ export function Footer() {
   const logoSrc = settings.logo_image
   const phoneHref = `tel:${settings.phone.replace(/[^\d+]/g, "")}`
   const copyright = settings.footer_copyright.replaceAll("{year}", String(new Date().getFullYear()))
+  // "Website design link" setting: links the name after the last " by ".
+  const creditUrl = (settings.footer_credit_url || "").trim()
+  const byAt = creditUrl ? copyright.toLowerCase().lastIndexOf(" by ") : -1
+  const creditName = byAt >= 0 ? copyright.slice(byAt + 4) : ""
   const aboutLinks = resolveLinks(settings.footer_about_links)
   const helpLinks = resolveLinks(settings.footer_help_links)
   const policyLinks = resolveLinks(settings.footer_policy_links)
@@ -129,7 +133,7 @@ export function Footer() {
                 <a href={phoneHref} className="flex items-center gap-2 hover:text-background"><Phone className="h-4 w-4" /><span>{settings.phone}</span></a>
                 <a href={`mailto:${settings.email}`} className="flex items-center gap-2 hover:text-background"><Mail className="h-4 w-4" /><span>{settings.email}</span></a>
               </div>
-              <p className="text-center lg:text-right">{copyright}</p>
+              <p className="text-center lg:text-right">{creditName.trim() ? <>{copyright.slice(0, byAt + 4)}<a href={creditUrl} target="_blank" rel="noopener" className="hover:text-background">{creditName}</a></> : copyright}</p>
             </div>
           </div>
         </div>

@@ -50,6 +50,7 @@ export type HomepageSettings = {
   linkedin_url: string
   youtube_url: string
   tiktok_url: string
+  footer_credit_url?: string
   button_radius: string
   button_font_weight: string
   button_text_transform: string
@@ -209,6 +210,7 @@ export const homepageDefaults: HomepageSettings = {
   linkedin_url: "",
   youtube_url: "",
   tiktok_url: "",
+  footer_credit_url: "",
   button_radius: "8px",
   button_font_weight: "700",
   button_text_transform: "none",
