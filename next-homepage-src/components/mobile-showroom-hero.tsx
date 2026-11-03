@@ -573,8 +573,6 @@ export function MobileShowroomHero() {
         />
         {/* White veil so the text reads on the photo, fading into the page at the bottom */}
         <span aria-hidden="true" className="absolute inset-0 -z-10 block bg-background/70" />
-        {/* Soft warm light gliding across the floor (lower part of the photo) */}
-        <span aria-hidden="true" className="ft-floor-light pointer-events-none absolute inset-x-0 bottom-0 -z-10 block h-3/5 overflow-hidden" />
         <span
           aria-hidden="true"
           className="absolute inset-x-0 bottom-0 -z-10 block h-10 bg-gradient-to-t from-background to-transparent"
