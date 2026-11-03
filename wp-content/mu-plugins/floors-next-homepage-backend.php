@@ -5353,6 +5353,14 @@ function ft_next_newsletter_cta_shortcode( $atts = [] ) {
                     object-fit: contain;
                 }
                 .ft-ncta-buttons { grid-template-columns: 1fr; }
+                /* Phones: name, phone and email first, then the consents, then the buttons */
+                .ft-ncta-form { display: flex; flex-direction: column; gap: 12px; }
+                .ft-ncta-form .ft-ncta-fields { display: contents; }
+                .ft-ncta-form .ft-ncta-input-wrap { order: 1; }
+                .ft-ncta-form .ft-ncta-consents { order: 2; margin-top: 4px; }
+                .ft-ncta-form .ft-ncta-trap,
+                .ft-ncta-form .ft-ncta-error { order: 3; }
+                .ft-ncta-form .ft-ncta-buttons { order: 4; }
             }
         </style>
         <script id="ft-newsletter-cta-script">

@@ -584,7 +584,7 @@ export function MobileShowroomHero() {
         )}
 
         {settings.hero_badge && (
-          <p className="mt-3 rounded-lg bg-gradient-to-r from-[#e9c66b] via-[#d6a934] to-[#e9c66b] py-2.5 text-center text-[28px] font-extrabold leading-none text-[#b3261e] shadow-md shadow-[#d6a934]/30">
+          <p className="ft-mobile-offer relative mt-3 overflow-hidden rounded-lg bg-gradient-to-r from-[#e9c66b] via-[#d6a934] to-[#e9c66b] py-2.5 text-center text-[28px] font-extrabold leading-none text-[#b3261e] shadow-md shadow-[#d6a934]/30">
             {settings.hero_badge}
           </p>
         )}
