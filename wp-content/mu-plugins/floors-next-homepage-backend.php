@@ -4347,8 +4347,8 @@ function ft_next_header_shortcode() {
                 }
                 .ft-sh-logo img {
                     width: 300px;
-                    max-width: 180px;
-                    max-height: 56px;
+                    max-width: 210px;
+                    max-height: 60px;
                 }
                 /* Same as the homepage header on phones: blue "Call" pill and a
                    round menu button that turns blue-tinted with an X when open */
