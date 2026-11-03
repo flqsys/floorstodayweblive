@@ -377,40 +377,37 @@
       transform: translateY(0) scale(1);
     }
   }
-  /* Light hero on phones: "Up to 50% OFF" card - a shine sweeps across it
-     and it glows and grows slightly, every few seconds */
+  /* Light hero on phones: "Up to 50% OFF" card - its gold slowly flows,
+     with one soft shine now and then. Calm on purpose: no growing or pulsing. */
   .ft-mobile-offer {
-    animation: ft-mobile-offer-pulse 1.8s ease-in-out infinite;
+    background-size: 220% 100%;
+    animation: ft-mobile-offer-flow 8s ease-in-out infinite alternate;
   }
 
   .ft-mobile-offer::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.95) 50%, transparent 65%);
+    background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.45) 50%, transparent 62%);
     transform: translateX(-120%);
-    animation: ft-mobile-offer-shine 2.4s ease-in-out infinite;
+    animation: ft-mobile-offer-shine 6s ease-in-out infinite;
     pointer-events: none;
   }
 
-  @keyframes ft-mobile-offer-pulse {
-    0%,
-    100% {
-      transform: scale(1);
-      box-shadow: 0 4px 10px -2px rgba(214, 169, 52, 0.35);
+  @keyframes ft-mobile-offer-flow {
+    from {
+      background-position: 0% 50%;
     }
-    50% {
-      transform: scale(1.07);
-      box-shadow: 0 10px 34px 2px rgba(214, 169, 52, 0.9);
+    to {
+      background-position: 100% 50%;
     }
   }
 
   @keyframes ft-mobile-offer-shine {
     0%,
-    45% {
+    70% {
       transform: translateX(-120%);
     }
-    75%,
     100% {
       transform: translateX(120%);
     }
@@ -419,7 +416,7 @@
   /* Light hero on phones: the photo drifts slowly and a soft warm light
      glides across the floor, like sunlight moving over the boards */
   .ft-floor-drift {
-    animation: ft-floor-drift 18s ease-in-out infinite alternate;
+    animation: ft-floor-drift 30s ease-in-out infinite alternate;
     will-change: transform;
   }
 
@@ -433,22 +430,22 @@
     background: linear-gradient(
       100deg,
       transparent 0%,
-      rgba(255, 226, 160, 0.38) 45%,
-      rgba(255, 255, 255, 0.55) 50%,
-      rgba(255, 226, 160, 0.38) 55%,
+      rgba(255, 226, 160, 0.25) 45%,
+      rgba(255, 255, 255, 0.35) 50%,
+      rgba(255, 226, 160, 0.25) 55%,
       transparent 100%
     );
     filter: blur(6px);
     transform: skewX(-18deg);
-    animation: ft-floor-light 7s ease-in-out infinite;
+    animation: ft-floor-light 14s ease-in-out infinite;
   }
 
   @keyframes ft-floor-drift {
     from {
-      transform: scale(1.04) translateX(-1.5%);
+      transform: scale(1.03) translateX(-1%);
     }
     to {
-      transform: scale(1.1) translateX(1.5%);
+      transform: scale(1.07) translateX(1%);
     }
   }
 
