@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { ChevronRight, Menu, X, MapPin, Phone } from "lucide-react"
+import { ChevronRight, Menu, X, MapPin, Phone, PhoneCall } from "lucide-react"
 import { useHomepageSettingsStatus } from "@/components/homepage-settings-provider"
 import { PromoBar } from "@/components/promo-bar"
 
@@ -190,13 +190,18 @@ export function Header() {
         {mobileMenuOpen && slim && (
           // Light hero: menu drops down as tappable rows with arrows
           <div id="ft-mobile-menu" className="animate-in fade-in slide-in-from-top-2 duration-200 lg:hidden">
-            <div className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-border pb-4 pt-2">
-              <ul className="divide-y divide-border">
-                {settings.nav_items.map((item) => (
-                  <li key={item.name}>
+            <div className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-border pb-5 pt-3">
+              {/* Rows slide in one after the other */}
+              <ul className="flex flex-col gap-1">
+                {settings.nav_items.map((item, index) => (
+                  <li
+                    key={item.name}
+                    className="animate-in fade-in slide-in-from-top-1 fill-mode-both duration-300"
+                    style={{ animationDelay: `${index * 40}ms` }}
+                  >
                     <a
                       href={item.href}
-                      className="group flex min-h-12 items-center justify-between gap-3 px-1 text-base font-semibold text-foreground transition-colors hover:text-primary"
+                      className="group flex min-h-[52px] items-center justify-between gap-3 rounded-xl px-3 text-[17px] font-semibold text-foreground transition-colors hover:bg-muted hover:text-primary active:bg-muted"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <span className="flex items-center gap-2">
@@ -207,21 +212,23 @@ export function Header() {
                           </span>
                         )}
                       </span>
-                      <ChevronRight className="h-4 w-4 flex-none text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" aria-hidden="true" />
+                      <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                        <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                      </span>
                     </a>
                   </li>
                 ))}
               </ul>
-              <div className="mt-3 grid grid-cols-3 gap-2 text-center text-sm font-medium">
-                <a href="/financing/" className="rounded-lg bg-muted px-2 py-2.5 text-foreground hover:text-primary">Financing</a>
-                <a href="/contact/" className="rounded-lg bg-muted px-2 py-2.5 text-foreground hover:text-primary">Contact</a>
-                <a href="/faqs/" className="rounded-lg bg-muted px-2 py-2.5 text-foreground hover:text-primary">FAQs</a>
+              <div className="mt-4 flex flex-wrap justify-center gap-2 border-t border-border pt-4 text-sm font-semibold animate-in fade-in fill-mode-both duration-300 [animation-delay:200ms]">
+                <a href="/financing/" className="rounded-full border border-border px-4 py-2 text-foreground hover:border-primary hover:text-primary">Financing</a>
+                <a href="/contact/" className="rounded-full border border-border px-4 py-2 text-foreground hover:border-primary hover:text-primary">Contact</a>
+                <a href="/faqs/" className="rounded-full border border-border px-4 py-2 text-foreground hover:border-primary hover:text-primary">FAQs</a>
               </div>
               <a
                 href={phoneHref}
-                className="mt-3 flex h-12 items-center justify-center gap-2 rounded-full bg-primary text-base font-bold text-primary-foreground"
+                className="mt-3 flex h-14 items-center justify-center gap-3 text-[22px] font-extrabold tracking-tight text-foreground animate-in fade-in fill-mode-both duration-300 [animation-delay:250ms]"
               >
-                <Phone className="h-4 w-4" aria-hidden="true" />
+                <PhoneCall className="h-6 w-6" strokeWidth={2.25} aria-hidden="true" />
                 {settings.phone}
               </a>
             </div>
