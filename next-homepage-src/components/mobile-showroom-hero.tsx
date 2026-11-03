@@ -607,10 +607,10 @@ export function MobileShowroomHero() {
           )}
         </p>
 
-        <h1 id="ft-mobile-hero-heading" className="mt-4 font-serif text-[32px] font-bold leading-[1.1] tracking-tight">
+        <h2 id="ft-mobile-hero-heading" className="mt-4 font-serif text-[32px] font-bold leading-[1.1] tracking-tight">
           {settings.mobile_hero_title}{" "}
           <span className="block text-primary">{settings.mobile_hero_highlight}</span>
-        </h1>
+        </h2>
         <p className="mt-3 text-[15px] font-medium leading-relaxed text-foreground/85">{settings.mobile_hero_text}</p>
       </div>
 

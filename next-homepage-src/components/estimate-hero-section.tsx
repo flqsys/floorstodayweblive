@@ -63,7 +63,7 @@ export function EstimateHeroSection() {
               id="estimate-hero-heading"
               className="font-serif text-3xl font-bold leading-tight tracking-tight text-balance md:text-4xl xl:text-5xl"
             >
-              New floors, one honest price. <span className="text-primary">Installed by our own crew.</span>
+              New floors in Mississauga &amp; the GTA, one honest price. <span className="text-primary">Installed by our own crew.</span>
             </h1>
             <p className="max-w-xl text-lg font-medium leading-relaxed text-foreground text-pretty">
               We bring hardwood, vinyl, laminate and carpet samples to your home, measure your space and give you a
