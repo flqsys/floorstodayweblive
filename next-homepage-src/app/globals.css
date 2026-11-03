@@ -380,27 +380,24 @@
   /* Light hero on phones: "Up to 50% OFF" card - its gold slowly flows,
      calm on purpose: no shine, growing or pulsing. */
   .ft-mobile-offer {
-    /* Moving gold background: light and deep golds flow left to right in a
-       smooth endless loop (same colour at both ends, so no jump or flash) */
-    background-image: linear-gradient(
-      90deg,
-      #d6a934 0%,
-      #f5dc8f 25%,
-      #c48f22 50%,
-      #f5dc8f 75%,
-      #d6a934 100%
+    /* Moving background: soft diagonal stripes slide slowly across the gold
+       (no light band, no flashing; the text stays still) */
+    background-color: #dcae3f;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, 0.18) 0 14px,
+      rgba(255, 255, 255, 0) 14px 28px
     ) !important;
-    background-size: 200% 100%;
-    background-repeat: repeat-x;
-    animation: ft-mobile-offer-flow 16s linear infinite;
+    background-size: 39.6px 39.6px;
+    animation: ft-mobile-offer-stripes 2.5s linear infinite;
   }
 
-  @keyframes ft-mobile-offer-flow {
+  @keyframes ft-mobile-offer-stripes {
     from {
-      background-position: 0% 50%;
+      background-position: 0 0;
     }
     to {
-      background-position: 200% 50%;
+      background-position: 39.6px 0;
     }
   }
 
