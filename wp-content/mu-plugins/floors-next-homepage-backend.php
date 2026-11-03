@@ -3970,6 +3970,29 @@ function ft_next_homepage_render_utm_admin() {
     <?php
 }
 
+// Small outline icon for a phone-menu quick link, picked from its label.
+function ft_next_header_pill_icon($name) {
+    $n = strtolower((string) $name);
+    $paths = [
+        ['how', '<path d="M3.5 5.5l1.5 1.5l2.5 -2.5"/><path d="M3.5 11.5l1.5 1.5l2.5 -2.5"/><path d="M3.5 17.5l1.5 1.5l2.5 -2.5"/><path d="M11 6h9"/><path d="M11 12h9"/><path d="M11 18h9"/>'],
+        ['financ', '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18"/><path d="M7 15h.01"/><path d="M11 15h2"/>'],
+        ['contact', '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>'],
+        ['faq', '<circle cx="12" cy="12" r="9"/><path d="M12 16v.01"/><path d="M12 13a2 2 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483"/>'],
+        ['about', '<circle cx="12" cy="12" r="9"/><path d="M12 9h.01"/><path d="M11 12h1v4h1"/>'],
+        ['product', '<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>'],
+        ['shop', '<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>'],
+        ['locat', '<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>'],
+        ['store', '<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>'],
+        ['blog', '<path d="M5 4h11l3 3v13H5z"/><path d="M9 9h6"/><path d="M9 13h6"/><path d="M9 17h4"/>'],
+        ['review', '<path d="m12 3 2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.1 6.1-.6z"/>'],
+    ];
+    $inner = '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>';
+    foreach ($paths as $p) {
+        if (strpos($n, $p[0]) !== false) { $inner = $p[1]; break; }
+    }
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $inner . '</svg>';
+}
+
 function ft_next_header_shortcode_url($url) {
     $url = trim((string) $url);
 
@@ -4247,7 +4270,7 @@ function ft_next_header_shortcode() {
             .ft-sh-mobile-row:active .ft-sh-mobile-arrow { background: var(--ft-sh-primary); color: #fff; }
             .ft-sh-mobile-pills {
                 display: grid;
-                grid-template-columns: repeat(3, minmax(0, 1fr));
+                grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 8px;
                 margin-top: 16px;
                 padding-top: 16px;
@@ -4258,19 +4281,24 @@ function ft_next_header_shortcode() {
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                gap: 8px;
                 min-height: 46px;
-                padding: 0 8px;
+                padding: 0 12px;
                 border: 1px solid #e5e7eb;
                 border-radius: 9999px;
                 background: #fff;
                 color: var(--ft-sh-foreground);
-                font-size: 15px;
+                font-size: 14px;
                 font-weight: 700;
+                line-height: 1.2;
+                white-space: nowrap;
                 text-align: center;
                 text-decoration: none;
                 box-shadow: 0 1px 2px rgba(17, 24, 39, .05);
                 transition: border-color .15s, color .15s;
             }
+            .ft-sh-mobile-pill svg { width: 18px; height: 18px; flex: none; color: var(--ft-sh-primary); }
+            .ft-sh-mobile-pill span { overflow: hidden; text-overflow: ellipsis; }
             .ft-sh-mobile-menu a.ft-sh-mobile-pill:hover,
             .ft-sh-mobile-menu a.ft-sh-mobile-pill:focus-visible,
             .ft-sh-mobile-menu a.ft-sh-mobile-pill:active { border-color: var(--ft-sh-primary); color: var(--ft-sh-primary); }
@@ -4506,7 +4534,7 @@ function ft_next_header_shortcode() {
             <?php if (!empty($utility_links)) : ?>
                 <div class="ft-sh-mobile-pills">
                     <?php foreach ($utility_links as $item) : ?>
-                        <a class="ft-sh-mobile-pill" href="<?php echo esc_url($item['href']); ?>"><?php echo esc_html($item['name']); ?></a>
+                        <a class="ft-sh-mobile-pill" href="<?php echo esc_url($item['href']); ?>"><?php echo ft_next_header_pill_icon($item['name']); ?><span><?php echo esc_html($item['name']); ?></span></a>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
