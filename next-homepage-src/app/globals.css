@@ -416,7 +416,62 @@
     }
   }
 
+  /* Light hero on phones: the photo drifts slowly and a soft warm light
+     glides across the floor, like sunlight moving over the boards */
+  .ft-floor-drift {
+    animation: ft-floor-drift 18s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  .ft-floor-light::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -60%;
+    width: 60%;
+    background: linear-gradient(
+      100deg,
+      transparent 0%,
+      rgba(255, 226, 160, 0.38) 45%,
+      rgba(255, 255, 255, 0.55) 50%,
+      rgba(255, 226, 160, 0.38) 55%,
+      transparent 100%
+    );
+    filter: blur(6px);
+    transform: skewX(-18deg);
+    animation: ft-floor-light 7s ease-in-out infinite;
+  }
+
+  @keyframes ft-floor-drift {
+    from {
+      transform: scale(1.04) translateX(-1.5%);
+    }
+    to {
+      transform: scale(1.1) translateX(1.5%);
+    }
+  }
+
+  @keyframes ft-floor-light {
+    0% {
+      left: -60%;
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    70% {
+      opacity: 1;
+    }
+    100% {
+      left: 110%;
+      opacity: 0;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
+    .ft-floor-drift,
+    .ft-floor-light::before,
     .ft-homepage-shell .ft-sale-badge,
     .ft-homepage-shell .ft-sale-badge::after,
     .ft-offer-modal-overlay,
