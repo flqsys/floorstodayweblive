@@ -272,7 +272,8 @@
       transparent 64%
     );
     transform: translateX(-70%);
-    animation: ft-sale-badge-shine 2.8s ease-in-out infinite;
+    animation: none;
+    display: none;
   }
 
   @keyframes ft-sale-badge-shine {
@@ -335,7 +336,8 @@
       transparent 62%
     );
     transform: translateX(-70%);
-    animation: ft-cta-button-shine 2.8s ease-in-out infinite;
+    animation: none;
+    display: none;
   }
 
   @keyframes ft-cta-button-shine {
