@@ -3,7 +3,24 @@
 import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import Link from "next/link"
-import { ArrowRight, Check, Gift } from "lucide-react"
+import { ArrowRight, BadgeDollarSign, CalendarCheck, Check, Gift, Hammer, Layers, ShieldCheck, Truck, type LucideIcon } from "lucide-react"
+
+// Offer cards: an icon that fits each title (titles are edited in Home Settings),
+// falling back to a set order so the cards never all look the same.
+const offerIconRules: [RegExp, LucideIcon][] = [
+  [/estimate|consult|visit|appointment/i, CalendarCheck],
+  [/sample|swatch|colou?r|style/i, Layers],
+  [/pric|cost|quote|$|financ/i, BadgeDollarSign],
+  [/install|crew|workmanship/i, Hammer],
+  [/warrant|guarantee/i, ShieldCheck],
+  [/deliver|free ship/i, Truck],
+]
+const offerIconFallback: LucideIcon[] = [CalendarCheck, Layers, BadgeDollarSign, Hammer]
+
+function offerIcon(title: string, index: number): LucideIcon {
+  const match = offerIconRules.find(([pattern]) => pattern.test(title))
+  return match ? match[1] : offerIconFallback[index % offerIconFallback.length]
+}
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { useHomepageSettings } from "@/components/homepage-settings-provider"
@@ -112,7 +129,10 @@ export function DealsSection() {
             <Card key={`${offer.title}-${index}`} className="border-2 border-primary/10 hover:border-primary/30 transition-colors bg-card">
               <CardContent className="p-4 text-center sm:p-6">
                 <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 sm:mb-4 sm:h-12 sm:w-12">
-                  <Gift className="h-5 w-5 text-primary sm:h-6 sm:w-6" />
+                  {(() => {
+                    const Icon = offerIcon(offer.title, index)
+                    return <Icon className="h-5 w-5 text-primary sm:h-6 sm:w-6" aria-hidden="true" />
+                  })()}
                 </div>
                 <h3 className="mb-2 text-sm font-bold leading-snug text-foreground sm:text-lg">{offer.title}</h3>
                 <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">{offer.description}</p>
