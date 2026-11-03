@@ -48,6 +48,10 @@ function ft_next_booking_form_light_shortcode($atts = []) {
         'subtitle'      => 'Lock in sale pricing today. No obligation.',
         'header'        => 'yes',
         'flooring_type' => '',
+        // Phones: a button slides up the homepage phone form (Details / Address /
+        // Confirm). mobile="inline" shows the 3-step form on phones instead.
+        'mobile'        => 'sheet',
+        'button'        => '',
     ], $atts, 'floors_booking_form_light');
 
     $settings       = function_exists('ft_next_homepage_settings') ? ft_next_homepage_settings() : [];
@@ -270,7 +274,9 @@ function ft_next_booking_form_light_shortcode($atts = []) {
         </script>
         <?php
     }
+    $phone_sheet = $atts['mobile'] !== 'inline' && function_exists('ft_bfl_mobile_sheet_html');
     ?>
+    <div class="ft-bfl-wrap<?php echo $phone_sheet ? ' ft-bfl-wrap--sheet' : ''; ?>" style="--bfl-btn:<?php echo esc_attr($button); ?>;--bfl-btn-text:<?php echo esc_attr($button_text); ?>;">
     <div class="ft-bfl" id="<?php echo esc_attr($id); ?>"
          data-endpoint="<?php echo esc_url($endpoint); ?>"
          data-redirect="<?php echo esc_url($redirect); ?>"
@@ -450,6 +456,8 @@ function ft_next_booking_form_light_shortcode($atts = []) {
             <?php endif; ?>
         </div>
     </div>
+    <?php if ($phone_sheet) { echo ft_bfl_mobile_sheet_html($id, $settings, $atts); } ?>
+    </div><?php /* .ft-bfl-wrap */ ?>
     <script>
     (function () {
         var root = document.getElementById(<?php echo wp_json_encode($id); ?>);

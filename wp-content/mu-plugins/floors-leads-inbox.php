@@ -242,7 +242,7 @@ function ft_inbox_sanitize_lead_payload($request) {
 
 // Forms allowed to submit a first name + phone without an email
 function ft_inbox_quick_lead_sources() {
-    return ['Homepage mobile consultation form'];
+    return ['Homepage mobile consultation form', 'WordPress light booking form (phone)'];
 }
 
 function ft_inbox_unread_count() {
