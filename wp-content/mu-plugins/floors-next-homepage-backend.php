@@ -4207,15 +4207,97 @@ function ft_next_header_shortcode() {
                 background: #fff;
             }
             .ft-sh-mobile-menu[hidden] { display: none !important; }
-            .ft-sh-mobile-menu a {
-                display: block;
-                padding: 10px 0;
+            /* Mobile menu: rounded rows with a round arrow that slide in one
+               after the other, the utility links as pills filling the width,
+               and a big black phone number (matches the homepage menu) */
+            .ft-sh-mobile-list { display: flex; flex-direction: column; gap: 4px; }
+            .ft-sh-mobile-menu a.ft-sh-mobile-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                min-height: 52px;
+                padding: 0 12px;
+                border-radius: 12px;
                 color: var(--ft-sh-foreground);
+                font-size: 17px;
                 font-weight: 600;
+                text-decoration: none;
+                transition: background-color .15s, color .15s;
+                animation: ft-sh-row-in .3s ease-out both;
             }
-            .ft-sh-mobile-menu a:hover,
-            .ft-sh-mobile-menu a:focus-visible { color: var(--ft-sh-primary); }
-            .ft-sh-mobile-phone { border-top: 1px solid #e5e7eb; margin-top: 6px; }
+            .ft-sh-mobile-row-name { display: inline-flex; align-items: center; gap: 8px; }
+            .ft-sh-mobile-menu a.ft-sh-mobile-row:hover,
+            .ft-sh-mobile-menu a.ft-sh-mobile-row:focus-visible,
+            .ft-sh-mobile-menu a.ft-sh-mobile-row:active { background: #f3f5f7; color: var(--ft-sh-primary); }
+            .ft-sh-mobile-arrow {
+                display: inline-flex;
+                flex: none;
+                align-items: center;
+                justify-content: center;
+                width: 32px;
+                height: 32px;
+                border-radius: 9999px;
+                background: #f3f5f7;
+                color: #6b7280;
+                transition: background-color .15s, color .15s;
+            }
+            .ft-sh-mobile-arrow svg { width: 16px; height: 16px; }
+            .ft-sh-mobile-row:hover .ft-sh-mobile-arrow,
+            .ft-sh-mobile-row:active .ft-sh-mobile-arrow { background: var(--ft-sh-primary); color: #fff; }
+            .ft-sh-mobile-pills {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 8px;
+                margin-top: 16px;
+                padding-top: 16px;
+                border-top: 1px solid #e5e7eb;
+                animation: ft-sh-row-in .3s ease-out .2s both;
+            }
+            .ft-sh-mobile-menu a.ft-sh-mobile-pill {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 46px;
+                padding: 0 8px;
+                border: 1px solid #e5e7eb;
+                border-radius: 9999px;
+                background: #fff;
+                color: var(--ft-sh-foreground);
+                font-size: 15px;
+                font-weight: 700;
+                text-align: center;
+                text-decoration: none;
+                box-shadow: 0 1px 2px rgba(17, 24, 39, .05);
+                transition: border-color .15s, color .15s;
+            }
+            .ft-sh-mobile-menu a.ft-sh-mobile-pill:hover,
+            .ft-sh-mobile-menu a.ft-sh-mobile-pill:focus-visible,
+            .ft-sh-mobile-menu a.ft-sh-mobile-pill:active { border-color: var(--ft-sh-primary); color: var(--ft-sh-primary); }
+            .ft-sh-mobile-menu a.ft-sh-mobile-phone {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+                min-height: 56px;
+                margin-top: 12px;
+                color: #111827;
+                font-size: 22px;
+                font-weight: 800;
+                letter-spacing: -0.01em;
+                text-decoration: none;
+                animation: ft-sh-row-in .3s ease-out .25s both;
+            }
+            .ft-sh-mobile-phone svg { width: 24px; height: 24px; flex: none; }
+            @keyframes ft-sh-row-in {
+                from { opacity: 0; transform: translateY(-4px); }
+                to { opacity: 1; transform: none; }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                .ft-sh-mobile-menu a.ft-sh-mobile-row,
+                .ft-sh-mobile-pills,
+                .ft-sh-mobile-menu a.ft-sh-mobile-phone { animation: none; }
+            }
             @media (max-width: 1100px) {
                 .ft-sh-nav { display: none; }
                 .ft-sh-menu-toggle { display: inline-flex; }
@@ -4362,24 +4444,33 @@ function ft_next_header_shortcode() {
             </div>
         </div>
         <nav id="<?php echo esc_attr($instance_id); ?>" class="ft-sh-mobile-menu" aria-label="<?php esc_attr_e('Mobile navigation', 'floors-today'); ?>" hidden>
-            <?php foreach ($nav_items as $item) :
+            <div class="ft-sh-mobile-list">
+            <?php $ft_sh_row = 0; foreach ($nav_items as $item) :
                 $name = trim((string) ($item['name'] ?? ''));
                 if ($name === '') {
                     continue;
                 }
                 ?>
-                <a href="<?php echo esc_url(ft_next_header_shortcode_url($item['href'] ?? '#')); ?>">
-                    <?php echo esc_html($name); ?>
-                    <?php if (($item['badge'] ?? '') === 'new') : ?>
-                        <span class="ft-sh-badge-new">New</span>
-                    <?php endif; ?>
+                <a class="ft-sh-mobile-row" style="animation-delay: <?php echo (int) ($ft_sh_row++ * 40); ?>ms" href="<?php echo esc_url(ft_next_header_shortcode_url($item['href'] ?? '#')); ?>">
+                    <span class="ft-sh-mobile-row-name">
+                        <?php echo esc_html($name); ?>
+                        <?php if (($item['badge'] ?? '') === 'new') : ?>
+                            <span class="ft-sh-badge-new">New</span>
+                        <?php endif; ?>
+                    </span>
+                    <span class="ft-sh-mobile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
                 </a>
             <?php endforeach; ?>
-            <?php foreach ($utility_links as $item) : ?>
-                <a href="<?php echo esc_url($item['href']); ?>"><?php echo esc_html($item['name']); ?></a>
-            <?php endforeach; ?>
+            </div>
+            <?php if (!empty($utility_links)) : ?>
+                <div class="ft-sh-mobile-pills">
+                    <?php foreach ($utility_links as $item) : ?>
+                        <a class="ft-sh-mobile-pill" href="<?php echo esc_url($item['href']); ?>"><?php echo esc_html($item['name']); ?></a>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
             <?php if ($phone !== '' && $phone_href !== '') : ?>
-                <a class="ft-sh-mobile-phone" href="<?php echo esc_url('tel:' . $phone_href); ?>"><?php echo esc_html($phone); ?></a>
+                <a class="ft-sh-mobile-phone" href="<?php echo esc_url('tel:' . $phone_href); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2a9 9 0 0 1 9 9"/><path d="M13 6a5 5 0 0 1 5 5"/><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg><?php echo esc_html($phone); ?></a>
             <?php endif; ?>
         </nav>
     </header>

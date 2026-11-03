@@ -219,10 +219,10 @@ export function Header() {
                   </li>
                 ))}
               </ul>
-              <div className="mt-4 flex flex-wrap justify-center gap-2 border-t border-border pt-4 text-sm font-semibold animate-in fade-in fill-mode-both duration-300 [animation-delay:200ms]">
-                <a href="/financing/" className="rounded-full border border-border px-4 py-2 text-foreground hover:border-primary hover:text-primary">Financing</a>
-                <a href="/contact/" className="rounded-full border border-border px-4 py-2 text-foreground hover:border-primary hover:text-primary">Contact</a>
-                <a href="/faqs/" className="rounded-full border border-border px-4 py-2 text-foreground hover:border-primary hover:text-primary">FAQs</a>
+              <div className="mt-4 grid grid-cols-3 gap-2 border-t border-border pt-4 text-[15px] font-bold animate-in fade-in fill-mode-both duration-300 [animation-delay:200ms]">
+                <a href="/financing/" className="flex h-[46px] items-center justify-center rounded-full border border-border bg-background px-2 text-foreground shadow-sm hover:border-primary hover:text-primary active:border-primary active:text-primary">Financing</a>
+                <a href="/contact/" className="flex h-[46px] items-center justify-center rounded-full border border-border bg-background px-2 text-foreground shadow-sm hover:border-primary hover:text-primary active:border-primary active:text-primary">Contact</a>
+                <a href="/faqs/" className="flex h-[46px] items-center justify-center rounded-full border border-border bg-background px-2 text-foreground shadow-sm hover:border-primary hover:text-primary active:border-primary active:text-primary">FAQs</a>
               </div>
               <a
                 href={phoneHref}
