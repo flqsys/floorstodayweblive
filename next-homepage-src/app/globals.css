@@ -379,27 +379,97 @@
       transform: translateY(0) scale(1);
     }
   }
-  /* Light hero on phones: "Up to 50% OFF" card - its gold slowly flows,
-     calm on purpose: no shine, growing or pulsing. */
+  /* Light hero on phones: "Up to 50% OFF" offer tile. A white glass card with
+     a thin gold / red / blue border that slowly travels around it; the text
+     rises in once when the page loads. No flashing or pulsing. */
   .ft-mobile-offer {
-    /* Moving background: soft diagonal stripes slide slowly across the gold
-       (no light band, no flashing; the text stays still) */
-    background-color: #dcae3f;
-    background-image: repeating-linear-gradient(
-      -45deg,
-      rgba(255, 255, 255, 0.18) 0 14px,
-      rgba(255, 255, 255, 0) 14px 28px
-    ) !important;
-    background-size: 39.6px 39.6px;
-    animation: ft-mobile-offer-stripes 2.5s linear infinite;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: 18px;
+    padding: 2px;
+    box-shadow:
+      0 10px 30px -12px rgba(179, 38, 30, 0.35),
+      0 4px 12px -6px rgba(214, 169, 52, 0.4);
   }
 
-  @keyframes ft-mobile-offer-stripes {
+  /* The moving border: a big colour wheel turning behind the card */
+  .ft-mobile-offer::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 50%;
+    width: 300%;
+    aspect-ratio: 1;
+    background: conic-gradient(
+      from 0deg,
+      #e9c66b,
+      #d6a934 20%,
+      #b3261e 35%,
+      #e9c66b 50%,
+      #2f5fc4 70%,
+      #e9c66b 85%,
+      #e9c66b
+    );
+    transform: translate(-50%, -50%) rotate(0deg);
+    animation: ft-offer-border-spin 6s linear infinite;
+  }
+
+  .ft-mobile-offer-inner {
+    border-radius: 16px;
+    background:
+      radial-gradient(120% 90% at 50% 0%, rgba(233, 198, 107, 0.28), transparent 70%),
+      rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+  }
+
+  /* "50% OFF": deep red gradient text whose tones slowly drift */
+  .ft-offer-amount {
+    background-image: linear-gradient(90deg, #8f1d17, #d93a2b, #b3261e, #8f1d17);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation:
+      ft-offer-rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.12s both,
+      ft-offer-amount-flow 8s ease-in-out infinite;
+  }
+
+  /* One-time entrance: each line rises in, one after the other */
+  .ft-offer-rise {
+    animation: ft-offer-rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .ft-offer-rise-3 {
+    animation-delay: 0.26s;
+  }
+
+  @keyframes ft-offer-border-spin {
+    to {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+  }
+
+  @keyframes ft-offer-amount-flow {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes ft-offer-rise {
     from {
-      background-position: 0 0;
+      opacity: 0;
+      transform: translateY(8px);
+      filter: blur(3px);
     }
     to {
-      background-position: 39.6px 0;
+      opacity: 1;
+      transform: none;
+      filter: none;
     }
   }
 
@@ -463,7 +533,9 @@
     .ft-homepage-shell .ft-sale-badge::after,
     .ft-offer-modal-overlay,
     .ft-offer-modal-dialog,
-    .ft-mobile-offer {
+    .ft-mobile-offer::before,
+    .ft-offer-amount,
+    .ft-offer-rise {
       animation: none;
     }
   }
