@@ -61,7 +61,7 @@ export function EstimateHeroSection() {
             </div>
             <h1
               id="estimate-hero-heading"
-              className="text-3xl font-extrabold leading-tight tracking-tight text-balance md:text-4xl xl:text-5xl"
+              className="font-serif text-3xl font-bold leading-tight tracking-tight text-balance md:text-4xl xl:text-5xl"
             >
               New floors, one honest price. <span className="text-primary">Installed by our own crew.</span>
             </h1>
