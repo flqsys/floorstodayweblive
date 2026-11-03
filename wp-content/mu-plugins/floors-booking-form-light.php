@@ -154,6 +154,21 @@ function ft_next_booking_form_light_shortcode($atts = []) {
             .ft-bfl__tile--floor[aria-pressed="true"] .ft-bfl__radio{border-color:var(--bfl-primary);background:var(--bfl-primary);}
             .ft-bfl__tile--floor[aria-pressed="true"] .ft-bfl__radio .ft-bfl__icon{visibility:visible;}
             @media(max-width:639px){.ft-bfl__tile--floor[aria-pressed="true"] .ft-bfl__thumbcheck{display:flex;}}
+            /* Theme and Elementor button styles (blue fill, white text, big font, pill
+               corners) must not reach these buttons: restate the look with !important. */
+            .ft-bfl button.ft-bfl__tile{display:flex!important;align-items:center!important;gap:12px!important;width:auto!important;min-width:0!important;min-height:0!important;margin:0!important;border:2px solid var(--bfl-border)!important;border-radius:12px!important;background:#fff!important;background-image:none!important;color:var(--bfl-text)!important;font-family:inherit!important;font-size:14px!important;font-weight:600!important;line-height:1.25!important;letter-spacing:0!important;text-transform:none!important;text-align:left!important;box-shadow:none!important;text-shadow:none!important;}
+            .ft-bfl button.ft-bfl__tile:hover{border-color:color-mix(in srgb,var(--bfl-primary) 40%,transparent)!important;background:#f9fafb!important;color:var(--bfl-text)!important;}
+            .ft-bfl button.ft-bfl__tile[aria-pressed="true"]{border-color:var(--bfl-primary)!important;background:color-mix(in srgb,var(--bfl-primary) 5%,#fff)!important;}
+            .ft-bfl button.ft-bfl__tile:focus-visible{box-shadow:0 0 0 4px color-mix(in srgb,var(--bfl-primary) 20%,transparent)!important;outline:none!important;}
+            .ft-bfl button.ft-bfl__tile--prop{height:56px!important;justify-content:center!important;padding:0 8px!important;text-align:center!important;}
+            .ft-bfl button.ft-bfl__tile--floor{height:auto!important;padding:6px 12px 6px 6px!important;}
+            .ft-bfl button.ft-bfl__tile::before,.ft-bfl button.ft-bfl__tile::after,.ft-bfl button.ft-bfl__submit::after,.ft-bfl button.ft-bfl__back::after{content:none!important;display:none!important;}
+            .ft-bfl button.ft-bfl__back{display:flex!important;width:56px!important;height:56px!important;min-height:0!important;margin:0!important;padding:0!important;border:2px solid var(--bfl-border)!important;border-radius:8px!important;background:#fff!important;color:var(--bfl-text)!important;box-shadow:none!important;}
+            .ft-bfl button.ft-bfl__back[hidden]{display:none!important;}
+            .ft-bfl button.ft-bfl__submit{display:flex!important;height:56px!important;min-height:0!important;margin:0!important;padding:0 16px!important;border:0!important;border-radius:8px!important;background:var(--bfl-btn)!important;background-image:none!important;color:var(--bfl-btn-text)!important;font-family:inherit!important;font-size:18px!important;font-weight:700!important;line-height:1.2!important;letter-spacing:0!important;text-transform:none!important;box-shadow:0 10px 15px -3px color-mix(in srgb,var(--bfl-btn) 25%,transparent)!important;}
+            .ft-bfl button .ft-bfl__icon{color:currentColor;}
+            .ft-bfl button.ft-bfl__tile--prop .ft-bfl__icon{color:var(--bfl-muted)!important;}
+            .ft-bfl button.ft-bfl__tile--prop[aria-pressed="true"] .ft-bfl__icon{color:var(--bfl-primary)!important;}
             /* Fields */
             .ft-bfl__grid{display:grid;gap:16px;}
             @media(min-width:640px){.ft-bfl__grid--2{grid-template-columns:repeat(2,minmax(0,1fr));}.ft-bfl__grid--addr{grid-template-columns:1fr 140px;}.ft-bfl__span{grid-column:1/-1;}}
