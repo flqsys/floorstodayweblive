@@ -380,16 +380,16 @@
   /* Light hero on phones: "Up to 50% OFF" card - a shine sweeps across it
      and it glows and grows slightly, every few seconds */
   .ft-mobile-offer {
-    animation: ft-mobile-offer-pulse 2.6s ease-in-out infinite;
+    animation: ft-mobile-offer-pulse 1.8s ease-in-out infinite;
   }
 
   .ft-mobile-offer::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.65) 50%, transparent 65%);
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.95) 50%, transparent 65%);
     transform: translateX(-120%);
-    animation: ft-mobile-offer-shine 3.2s ease-in-out infinite;
+    animation: ft-mobile-offer-shine 2.4s ease-in-out infinite;
     pointer-events: none;
   }
 
@@ -400,8 +400,8 @@
       box-shadow: 0 4px 10px -2px rgba(214, 169, 52, 0.35);
     }
     50% {
-      transform: scale(1.03);
-      box-shadow: 0 8px 26px -2px rgba(214, 169, 52, 0.7);
+      transform: scale(1.07);
+      box-shadow: 0 10px 34px 2px rgba(214, 169, 52, 0.9);
     }
   }
 
