@@ -391,15 +391,45 @@
       rgba(255, 255, 255, 0) 14px 28px
     ) !important;
     background-size: 39.6px 39.6px;
-    animation: ft-mobile-offer-stripes 2.5s linear infinite;
   }
 
-  @keyframes ft-mobile-offer-stripes {
-    from {
-      background-position: 0 0;
-    }
+  /* Animation: a thin gold / red / blue border slowly travels around the card */
+  @property --ft-offer-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  .ft-mobile-offer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: conic-gradient(
+      from var(--ft-offer-angle),
+      #e9c66b,
+      #d6a934 20%,
+      #b3261e 35%,
+      #e9c66b 50%,
+      #2f5fc4 70%,
+      #e9c66b 85%,
+      #e9c66b
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+    pointer-events: none;
+    animation: ft-offer-border-spin 6s linear infinite;
+  }
+
+  @keyframes ft-offer-border-spin {
     to {
-      background-position: 39.6px 0;
+      --ft-offer-angle: 360deg;
     }
   }
 
@@ -463,7 +493,7 @@
     .ft-homepage-shell .ft-sale-badge::after,
     .ft-offer-modal-overlay,
     .ft-offer-modal-dialog,
-    .ft-mobile-offer {
+    .ft-mobile-offer::before {
       animation: none;
     }
   }
