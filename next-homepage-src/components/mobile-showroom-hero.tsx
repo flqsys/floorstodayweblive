@@ -585,44 +585,27 @@ export function MobileShowroomHero() {
           </p>
         )}
 
-        {(settings.hero_badge || settings.mobile_hero_offer_note || settings.deals_details_label) && (
-          <div className="ft-mobile-offer mt-3 [text-shadow:none]">
-            <div className="ft-mobile-offer-inner px-4 py-3 text-center">
-              {settings.hero_badge && (() => {
-                // "Up to 50% OFF" → small "UP TO" line above a big "50% OFF"
-                const match = settings.hero_badge.match(/^(up to)\s+(.+)$/i)
-                return (
-                  <p className="leading-none">
-                    {match && (
-                      <span className="ft-offer-rise block text-[11px] font-bold uppercase tracking-[0.25em] text-[#9a6b12]">
-                        {match[1]}
-                      </span>
-                    )}
-                    <span className="ft-offer-rise ft-offer-rise-2 ft-offer-amount mt-1 block text-[34px] font-black tracking-tight">
-                      {match ? match[2] : settings.hero_badge}
-                    </span>
-                  </p>
-                )
-              })()}
-
-              {(settings.mobile_hero_offer_note || settings.deals_details_label) && (
-                <p className="ft-offer-rise ft-offer-rise-3 mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs font-medium text-muted-foreground">
-                  {settings.mobile_hero_offer_note && <span>{settings.mobile_hero_offer_note}</span>}
-                  {settings.deals_details_label && (
-                    <button
-                      type="button"
-                      onClick={() => window.dispatchEvent(new CustomEvent("ft:open-offer-details"))}
-                      className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 font-semibold text-primary"
-                    >
-                      Offer details
-                      <ArrowRight className="size-3" aria-hidden="true" />
-                    </button>
-                  )}
-                </p>
-              )}
-            </div>
-          </div>
+        {settings.hero_badge && (
+          <p className="ft-mobile-offer relative mt-3 overflow-hidden rounded-lg bg-gradient-to-r from-[#e9c66b] via-[#d6a934] to-[#e9c66b] py-2.5 text-center text-[28px] font-extrabold leading-none text-[#b3261e] shadow-md shadow-[#d6a934]/30">
+            {settings.hero_badge}
+          </p>
         )}
+
+        <p className="mt-2 text-center text-xs font-medium text-muted-foreground">
+          {settings.mobile_hero_offer_note}
+          {settings.deals_details_label && (
+            <>
+              {settings.mobile_hero_offer_note ? " · " : ""}
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent("ft:open-offer-details"))}
+                className="inline border-0 bg-transparent p-0 align-baseline font-semibold text-primary underline underline-offset-2"
+              >
+                Offer details →
+              </button>
+            </>
+          )}
+        </p>
 
         <h1 id="ft-mobile-hero-heading" className="mt-4 font-serif text-[32px] font-bold leading-[1.1] tracking-tight">
           {settings.mobile_hero_title}{" "}
