@@ -392,7 +392,7 @@
     ) !important;
     background-size: 200% 100%;
     background-repeat: repeat-x;
-    animation: ft-mobile-offer-flow 6s linear infinite;
+    animation: ft-mobile-offer-flow 16s linear infinite;
   }
 
   @keyframes ft-mobile-offer-flow {
