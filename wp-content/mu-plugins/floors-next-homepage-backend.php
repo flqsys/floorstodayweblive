@@ -4293,7 +4293,18 @@ function ft_next_header_shortcode() {
                 from { opacity: 0; transform: translateY(-4px); }
                 to { opacity: 1; transform: none; }
             }
+            /* Menu button shows an X while the menu is open */
+            .ft-sh-menu-toggle .ft-sh-icon-close { display: none; }
+            .ft-sh-menu-toggle[aria-expanded="true"] .ft-sh-icon-menu { display: none; }
+            .ft-sh-menu-toggle[aria-expanded="true"] .ft-sh-icon-close { display: block; }
+            .ft-sh-menu-toggle .ft-sh-icon { animation: ft-sh-icon-in .2s ease-out both; }
+            .ft-sh-phone-mobile-label { display: none; }
+            @keyframes ft-sh-icon-in {
+                from { opacity: 0; transform: scale(.75); }
+                to { opacity: 1; transform: none; }
+            }
             @media (prefers-reduced-motion: reduce) {
+                .ft-sh-menu-toggle .ft-sh-icon,
                 .ft-sh-mobile-menu a.ft-sh-mobile-row,
                 .ft-sh-mobile-pills,
                 .ft-sh-mobile-menu a.ft-sh-mobile-phone { animation: none; }
@@ -4339,19 +4350,47 @@ function ft_next_header_shortcode() {
                     max-width: 180px;
                     max-height: 56px;
                 }
+                /* Same as the homepage header on phones: blue "Call" pill and a
+                   round menu button that turns blue-tinted with an X when open */
+                .ft-sh-actions { gap: 12px; }
+                .ft-sh-actions > .ft-sh-phone-mobile {
+                    width: auto;
+                    height: 36px;
+                    gap: 6px;
+                    padding: 0 16px;
+                    background: var(--ft-sh-primary);
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    text-decoration: none;
+                    box-shadow: none;
+                    animation: none;
+                }
+                .ft-sh-phone-mobile .ft-sh-icon { width: 14px; height: 14px; }
+                .ft-sh-phone-mobile-label { display: inline; color: #fff; }
                 .ft-sh-menu-toggle {
                     display: inline-flex;
-                    width: 44px;
-                    height: 44px;
-                    border-radius: 6px;
-                    background: transparent !important;
+                    width: 36px;
+                    height: 36px;
+                    min-height: 0;
+                    padding: 0;
+                    border: 1px solid #d1d5db !important;
+                    border-radius: 9999px;
+                    background: #fff !important;
                     box-shadow: none !important;
                     outline: none !important;
-                    color: #111827;
+                    color: #374151 !important;
+                    transition: border-color .2s, background-color .2s, color .2s;
                 }
                 .ft-sh-menu-toggle .ft-sh-icon {
-                    width: 24px;
-                    height: 24px;
+                    width: 18px;
+                    height: 18px;
+                    color: inherit !important;
+                }
+                .ft-sh-menu-toggle[aria-expanded="true"] {
+                    border-color: var(--ft-sh-primary) !important;
+                    background: color-mix(in srgb, var(--ft-sh-primary) 10%, #fff) !important;
+                    color: var(--ft-sh-primary) !important;
                 }
                 .ft-sh-mobile-menu {
                     padding: 8px 16px 16px;
@@ -4435,11 +4474,13 @@ function ft_next_header_shortcode() {
                 <?php if ($phone !== '' && $phone_href !== '') : ?>
                     <a class="ft-sh-phone-mobile" href="<?php echo esc_url('tel:' . $phone_href); ?>" aria-label="<?php echo esc_attr('Call ' . $phone); ?>">
                         <svg class="ft-sh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13.8 16.6a1 1 0 0 0 1.2-.3l.4-.5A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.5.4a1 1 0 0 0-.3 1.2 14 14 0 0 0 6.4 6.4Z"/></svg>
+                        <span class="ft-sh-phone-mobile-label" aria-hidden="true">Call</span>
                     </a>
                 <?php endif; ?>
                 <button class="ft-sh-menu-toggle" type="button" aria-expanded="false" aria-controls="<?php echo esc_attr($instance_id); ?>">
                     <span class="screen-reader-text"><?php esc_html_e('Open menu', 'floors-today'); ?></span>
-                    <svg class="ft-sh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+                    <svg class="ft-sh-icon ft-sh-icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    <svg class="ft-sh-icon ft-sh-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
                 </button>
             </div>
         </div>

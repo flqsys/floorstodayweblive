@@ -12,6 +12,14 @@ export function Header() {
   const phoneHref = `tel:${settings.phone.replace(/[^\d+]/g, "")}`
   // Estimate form layout on phones: logo, Call and menu (no info bar or promo bar)
   const slim = settings.hero_variant === "estimate"
+  // Same extra links as the inner-page menu (Home Settings > utility links)
+  const utilityLinks = settings.utility_links?.length
+    ? settings.utility_links
+    : [
+        { name: "Financing", href: "/financing/" },
+        { name: "Contact", href: "/contact/" },
+        { name: "FAQs", href: "/faqs/" },
+      ]
   const headerRef = useRef<HTMLElement>(null)
 
   // On phones the WordPress bridge fixes the header and offsets the page by a
@@ -220,9 +228,16 @@ export function Header() {
                 ))}
               </ul>
               <div className="mt-4 grid grid-cols-3 gap-2 border-t border-border pt-4 text-[15px] font-bold animate-in fade-in fill-mode-both duration-300 [animation-delay:200ms]">
-                <a href="/financing/" className="flex h-[46px] items-center justify-center rounded-full border border-border bg-background px-2 text-foreground shadow-sm hover:border-primary hover:text-primary active:border-primary active:text-primary">Financing</a>
-                <a href="/contact/" className="flex h-[46px] items-center justify-center rounded-full border border-border bg-background px-2 text-foreground shadow-sm hover:border-primary hover:text-primary active:border-primary active:text-primary">Contact</a>
-                <a href="/faqs/" className="flex h-[46px] items-center justify-center rounded-full border border-border bg-background px-2 text-foreground shadow-sm hover:border-primary hover:text-primary active:border-primary active:text-primary">FAQs</a>
+                {utilityLinks.map((item) => (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex h-[46px] items-center justify-center whitespace-nowrap rounded-full border border-border bg-background px-2 text-foreground shadow-sm hover:border-primary hover:text-primary active:border-primary active:text-primary"
+                  >
+                    {item.name}
+                  </a>
+                ))}
               </div>
               <a
                 href={phoneHref}

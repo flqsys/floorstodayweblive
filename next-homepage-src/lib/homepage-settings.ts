@@ -202,6 +202,7 @@ export type HomepageSettings = {
   footer_bg_color_2: string
   footer_bg_location: string
   nav_items: NavItem[]
+  utility_links?: NavItem[]
   seo_title: string
   seo_description: string
   seo_canonical_url: string
