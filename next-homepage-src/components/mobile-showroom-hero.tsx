@@ -633,7 +633,7 @@ export function MobileShowroomHero() {
 
         <a
           href={phoneHref}
-          className="flex h-12 items-center justify-center gap-2 rounded-full border-2 border-primary bg-card font-bold text-primary"
+          className="flex h-13 items-center justify-center gap-2 rounded-lg border border-primary bg-card text-base font-bold text-primary"
         >
           <Phone className="size-4" aria-hidden="true" />
           Call {settings.phone}
