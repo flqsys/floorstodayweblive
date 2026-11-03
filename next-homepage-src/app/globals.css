@@ -287,20 +287,21 @@
     }
   }
 
+  /* Every phone icon on the site: green circle with a soft green pulse */
   @keyframes ft-phone-flash {
-    0%,
-    100% {
-      background-color: #16a34a;
-      box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.45);
+    0% {
+      box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.55);
     }
-    50% {
-      background-color: #235bb8;
-      box-shadow: 0 0 0 5px rgba(35, 91, 184, 0);
+    70%,
+    100% {
+      box-shadow: 0 0 0 10px rgba(22, 163, 74, 0);
     }
   }
 
   .ft-phone-icon {
-    animation: ft-phone-flash 1.6s ease-in-out infinite;
+    background-color: #16a34a;
+    color: #fff;
+    animation: ft-phone-flash 1.8s ease-out infinite;
   }
 
   @keyframes ft-sale-badge-glow {
@@ -486,7 +487,23 @@
     }
   }
 
+  /* Phone header call button (light hero): soft green pulse, same as the site header */
+  .ft-phone-pulse {
+    animation: ft-phone-pulse 1.8s ease-out infinite;
+  }
+
+  @keyframes ft-phone-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.55);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 10px rgba(22, 163, 74, 0);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
+    .ft-phone-pulse,
     .ft-floor-drift,
     .ft-floor-light::before,
     .ft-homepage-shell .ft-sale-badge,

@@ -4187,7 +4187,7 @@ function ft_next_header_shortcode() {
                 padding: 7px;
                 border-radius: 999px;
                 color: #fff !important;
-                animation: ft-sh-phone-flash 1.6s ease-in-out infinite;
+                animation: ft-sh-phone-flash 1.8s ease-out infinite;
             }
             .ft-sh-phone-mobile {
                 display: none;
@@ -4198,12 +4198,13 @@ function ft_next_header_shortcode() {
                 justify-content: center;
                 border-radius: 999px;
                 color: #fff !important;
-                animation: ft-sh-phone-flash 1.6s ease-in-out infinite;
+                animation: ft-sh-phone-flash 1.8s ease-out infinite;
             }
             .ft-sh-phone-mobile .ft-sh-icon { width: 18px; height: 18px; color: #fff !important; }
+            /* Every phone icon on the site: green circle with a soft green pulse */
             @keyframes ft-sh-phone-flash {
-                0%, 100% { background-color: #16a34a; box-shadow: 0 0 0 0 rgba(22, 163, 74, .45); }
-                50% { background-color: #235bb8; box-shadow: 0 0 0 5px rgba(35, 91, 184, 0); }
+                0% { background-color: #16a34a; box-shadow: 0 0 0 0 rgba(22, 163, 74, .55); }
+                70%, 100% { background-color: #16a34a; box-shadow: 0 0 0 10px rgba(22, 163, 74, 0); }
             }
             .ft-sh-menu-toggle {
                 display: none;
@@ -4316,7 +4317,17 @@ function ft_next_header_shortcode() {
                 text-decoration: none;
                 animation: ft-sh-row-in .3s ease-out .25s both;
             }
-            .ft-sh-mobile-phone svg { width: 24px; height: 24px; flex: none; }
+            .ft-sh-mobile-phone svg {
+                box-sizing: border-box;
+                width: 40px;
+                height: 40px;
+                padding: 11px;
+                flex: none;
+                border-radius: 999px;
+                background: #16a34a;
+                color: #fff;
+                animation: ft-sh-phone-flash 1.8s ease-out infinite;
+            }
             @keyframes ft-sh-row-in {
                 from { opacity: 0; transform: translateY(-4px); }
                 to { opacity: 1; transform: none; }
@@ -4335,7 +4346,9 @@ function ft_next_header_shortcode() {
                 .ft-sh-menu-toggle .ft-sh-icon,
                 .ft-sh-mobile-menu a.ft-sh-mobile-row,
                 .ft-sh-mobile-pills,
-                .ft-sh-mobile-menu a.ft-sh-mobile-phone { animation: none; }
+                .ft-sh-mobile-menu a.ft-sh-mobile-phone,
+                .ft-sh-actions > .ft-sh-phone-mobile,
+                .ft-sh-mobile-phone svg { animation: none; }
             }
             @media (max-width: 1100px) {
                 .ft-sh-nav { display: none; }
@@ -4378,24 +4391,24 @@ function ft_next_header_shortcode() {
                     max-width: 210px;
                     max-height: 60px;
                 }
-                /* Same as the homepage header on phones: blue "Call" pill and a
-                   round menu button that turns blue-tinted with an X when open */
-                .ft-sh-actions { gap: 12px; }
+                /* Phones: a round green phone icon with a soft pulse (no "Call" text,
+                   so it never covers the logo on small screens), and a round menu
+                   button that turns blue-tinted with an X when open */
+                .ft-sh-actions { gap: 10px; }
                 .ft-sh-actions > .ft-sh-phone-mobile {
-                    width: auto;
-                    height: 36px;
-                    gap: 6px;
-                    padding: 0 16px;
-                    background: var(--ft-sh-primary);
-                    font-size: 14px;
-                    font-weight: 700;
-                    line-height: 1;
+                    width: 40px;
+                    height: 40px;
+                    padding: 0;
+                    background: #16a34a;
                     text-decoration: none;
-                    box-shadow: none;
-                    animation: none;
+                    animation: ft-sh-phone-pulse 1.8s ease-out infinite;
                 }
-                .ft-sh-phone-mobile .ft-sh-icon { width: 14px; height: 14px; }
-                .ft-sh-phone-mobile-label { display: inline; color: #fff; }
+                .ft-sh-phone-mobile .ft-sh-icon { width: 18px; height: 18px; }
+                .ft-sh-phone-mobile-label { display: none; }
+                @keyframes ft-sh-phone-pulse {
+                    0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, .55); }
+                    70%, 100% { box-shadow: 0 0 0 10px rgba(22, 163, 74, 0); }
+                }
                 .ft-sh-menu-toggle {
                     display: inline-flex;
                     width: 36px;

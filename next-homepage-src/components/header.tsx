@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { ChevronRight, Menu, X, MapPin, Phone, PhoneCall } from "lucide-react"
+import { ChevronRight, Menu, X, MapPin, Phone } from "lucide-react"
 import { useHomepageSettingsStatus } from "@/components/homepage-settings-provider"
 import { PromoBar } from "@/components/promo-bar"
 
@@ -126,20 +126,21 @@ export function Header() {
               <a
                 href={phoneHref}
                 aria-label={`Call ${settings.phone}`}
-                className="flex h-9 flex-none items-center gap-1.5 rounded-full bg-primary px-4 text-sm font-bold text-primary-foreground sm:hidden"
+                // Same as the site header on other pages: round green phone icon
+                // with a soft pulse (no "Call" text, so small phones fit the logo)
+                className="ft-phone-icon flex h-10 w-10 flex-none items-center justify-center rounded-full text-white sm:hidden"
                 style={{ WebkitTapHighlightColor: "transparent" }}
               >
-                <Phone className="h-3.5 w-3.5" aria-hidden="true" />
-                Call
+                <Phone className="h-[18px] w-[18px]" aria-hidden="true" />
               </a>
             ) : (
             <a
               href={phoneHref}
               aria-label={`Call ${settings.phone}`}
-              className="ft-phone-icon flex h-[34px] w-[34px] flex-none items-center justify-center rounded-full text-white sm:hidden"
+              className="ft-phone-icon flex h-10 w-10 flex-none items-center justify-center rounded-full text-white sm:hidden"
               style={{ WebkitTapHighlightColor: "transparent" }}
             >
-              <Phone className="h-4 w-4" />
+              <Phone className="h-[18px] w-[18px]" />
             </a>
             )}
 
@@ -243,7 +244,9 @@ export function Header() {
                 href={phoneHref}
                 className="mt-3 flex h-14 items-center justify-center gap-3 text-[22px] font-extrabold tracking-tight text-foreground animate-in fade-in fill-mode-both duration-300 [animation-delay:250ms]"
               >
-                <PhoneCall className="h-6 w-6" strokeWidth={2.25} aria-hidden="true" />
+                <span className="ft-phone-icon flex h-10 w-10 flex-none items-center justify-center rounded-full text-white">
+                  <Phone className="h-[18px] w-[18px]" aria-hidden="true" />
+                </span>
                 {settings.phone}
               </a>
             </div>
