@@ -10,7 +10,7 @@ import { ArrowRight, BadgeDollarSign, CalendarCheck, Check, Gift, Hammer, Layers
 const offerIconRules: [RegExp, LucideIcon][] = [
   [/estimate|consult|visit|appointment/i, CalendarCheck],
   [/sample|swatch|colou?r|style/i, Layers],
-  [/pric|cost|quote|$|financ/i, BadgeDollarSign],
+  [/pric|cost|quote|financ/i, BadgeDollarSign],
   [/install|crew|workmanship/i, Hammer],
   [/warrant|guarantee/i, ShieldCheck],
   [/deliver|free ship/i, Truck],
