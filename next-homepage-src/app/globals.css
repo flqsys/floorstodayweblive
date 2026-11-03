@@ -404,10 +404,48 @@
     }
   }
 
-  /* Light hero on phones: the photo drifts very slowly (no light effects) */
+  /* Light hero on phones: the photo drifts very slowly and a soft warm light
+     glides across the floor every 14 seconds */
   .ft-floor-drift {
     animation: ft-floor-drift 30s ease-in-out infinite alternate;
     will-change: transform;
+  }
+
+  .ft-floor-light::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -60%;
+    width: 60%;
+    background: linear-gradient(
+      100deg,
+      transparent 0%,
+      rgba(255, 226, 160, 0.25) 45%,
+      rgba(255, 255, 255, 0.35) 50%,
+      rgba(255, 226, 160, 0.25) 55%,
+      transparent 100%
+    );
+    filter: blur(6px);
+    transform: skewX(-18deg);
+    animation: ft-floor-light 14s ease-in-out infinite;
+  }
+
+  @keyframes ft-floor-light {
+    0% {
+      left: -60%;
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    70% {
+      opacity: 1;
+    }
+    100% {
+      left: 110%;
+      opacity: 0;
+    }
   }
 
   @keyframes ft-floor-drift {
@@ -421,6 +459,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .ft-floor-drift,
+    .ft-floor-light::before,
     .ft-homepage-shell .ft-sale-badge,
     .ft-homepage-shell .ft-sale-badge::after,
     .ft-offer-modal-overlay,
