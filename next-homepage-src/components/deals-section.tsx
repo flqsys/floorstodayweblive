@@ -3,21 +3,61 @@
 import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import Link from "next/link"
-import { ArrowRight, BadgeDollarSign, CalendarCheck, Check, Gift, Hammer, Layers, ShieldCheck, Truck, type LucideIcon } from "lucide-react"
+import { ArrowRight, Check, Gift, ShieldCheck, Truck } from "lucide-react"
+import type { SVGProps } from "react"
 
-// Offer cards: an icon that fits each title (titles are edited in Home Settings),
-// falling back to a set order so the cards never all look the same.
-const offerIconRules: [RegExp, LucideIcon][] = [
-  [/estimate|consult|visit|appointment/i, CalendarCheck],
-  [/sample|swatch|colou?r|style/i, Layers],
-  [/pric|cost|quote|financ/i, BadgeDollarSign],
-  [/install|crew|workmanship/i, Hammer],
-  [/warrant|guarantee/i, ShieldCheck],
-  [/deliver|free ship/i, Truck],
+// Offer card icons - the Floors Today outline set (images/*.svg), drawn in
+// currentColor so they follow the brand colour.
+type OfferIconType = (props: SVGProps<SVGSVGElement>) => React.JSX.Element
+const iconBase = {
+  xmlns: "http://www.w3.org/2000/svg",
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+}
+const HomeCheckIcon: OfferIconType = (props) => (
+  <svg {...iconBase} {...props}>
+    <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2" />
+    <path d="M19 13.488v-1.488h2l-9 -9l-9 9h2v7a2 2 0 0 0 2 2h4.525" />
+    <path d="M15 19l2 2l4 -4" />
+  </svg>
+)
+const SamplesIcon: OfferIconType = (props) => (
+  <svg {...iconBase} {...props}>
+    <rect x="3" y="5" width="5" height="14" rx="1" />
+    <rect x="9.5" y="4" width="5" height="16" rx="1" />
+    <rect x="16" y="5" width="5" height="14" rx="1" />
+    <path d="M12 8v4" />
+  </svg>
+)
+const PriceTagIcon: OfferIconType = (props) => (
+  <svg {...iconBase} {...props}>
+    <path d="M6.5 7.5a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+    <path d="M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592 -5.592a2.41 2.41 0 0 0 0 -3.408l-7.71 -7.71a2 2 0 0 0 -1.414 -.586h-5.172a3 3 0 0 0 -3 3" />
+  </svg>
+)
+const ToolIcon: OfferIconType = (props) => (
+  <svg {...iconBase} {...props}>
+    <path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5" />
+  </svg>
+)
+
+// Each card gets the icon that fits its title (titles are edited in Home
+// Settings), falling back to a set order so the cards never all look the same.
+const offerIconRules: [RegExp, OfferIconType][] = [
+  [/estimate|consult|visit|appointment/i, HomeCheckIcon],
+  [/sample|swatch|colou?r|style/i, SamplesIcon],
+  [/pric|cost|quote|financ/i, PriceTagIcon],
+  [/install|crew|workmanship/i, ToolIcon],
+  [/warrant|guarantee/i, ShieldCheck as unknown as OfferIconType],
+  [/deliver|free ship/i, Truck as unknown as OfferIconType],
 ]
-const offerIconFallback: LucideIcon[] = [CalendarCheck, Layers, BadgeDollarSign, Hammer]
+const offerIconFallback: OfferIconType[] = [HomeCheckIcon, SamplesIcon, PriceTagIcon, ToolIcon]
 
-function offerIcon(title: string, index: number): LucideIcon {
+function offerIcon(title: string, index: number): OfferIconType {
   const match = offerIconRules.find(([pattern]) => pattern.test(title))
   return match ? match[1] : offerIconFallback[index % offerIconFallback.length]
 }
