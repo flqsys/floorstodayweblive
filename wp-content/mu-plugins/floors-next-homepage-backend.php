@@ -4292,19 +4292,19 @@ function ft_next_header_shortcode() {
             .ft-sh-mobile-menu a.ft-sh-mobile-pill {
                 display: flex;
                 align-items: center;
-                justify-content: center;
+                justify-content: flex-start;
                 gap: 8px;
                 min-height: 46px;
-                padding: 0 12px;
+                padding: 0 16px;
                 border: 1px solid #e5e7eb;
                 border-radius: 9999px;
                 background: #fff;
                 color: var(--ft-sh-foreground);
-                font-size: 14px;
+                font-size: 16px;
                 font-weight: 700;
                 line-height: 1.2;
                 white-space: nowrap;
-                text-align: center;
+                text-align: left;
                 text-decoration: none;
                 box-shadow: 0 1px 2px rgba(17, 24, 39, .05);
                 transition: border-color .15s, color .15s;

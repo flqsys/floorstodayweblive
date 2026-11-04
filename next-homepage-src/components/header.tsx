@@ -1,9 +1,44 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { ChevronRight, Menu, X, MapPin, Phone } from "lucide-react"
 import { useHomepageSettingsStatus } from "@/components/homepage-settings-provider"
 import { PromoBar } from "@/components/promo-bar"
+
+// Menu pill icons, matched by link name - same set as ft_next_header_pill_icon()
+// in floors-next-homepage-backend.php, so the homepage menu looks like the inner pages.
+const pillIcons: [string, React.ReactNode][] = [
+  ["how", <><path d="M3.5 5.5l1.5 1.5l2.5 -2.5" /><path d="M3.5 11.5l1.5 1.5l2.5 -2.5" /><path d="M3.5 17.5l1.5 1.5l2.5 -2.5" /><path d="M11 6h9" /><path d="M11 12h9" /><path d="M11 18h9" /></>],
+  ["financ", <><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M3 10h18" /><path d="M7 15h.01" /><path d="M11 15h2" /></>],
+  ["contact", <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></>],
+  ["faq", <><circle cx="12" cy="12" r="9" /><path d="M12 16v.01" /><path d="M12 13a2 2 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483" /></>],
+  ["about", <><circle cx="12" cy="12" r="9" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></>],
+  ["product", <><rect x="4" y="4" width="6" height="6" rx="1" /><rect x="14" y="4" width="6" height="6" rx="1" /><rect x="4" y="14" width="6" height="6" rx="1" /><rect x="14" y="14" width="6" height="6" rx="1" /></>],
+  ["shop", <><rect x="4" y="4" width="6" height="6" rx="1" /><rect x="14" y="4" width="6" height="6" rx="1" /><rect x="4" y="14" width="6" height="6" rx="1" /><rect x="14" y="14" width="6" height="6" rx="1" /></>],
+  ["locat", <><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" /><circle cx="12" cy="10" r="2.5" /></>],
+  ["store", <><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" /><circle cx="12" cy="10" r="2.5" /></>],
+  ["blog", <><path d="M5 4h11l3 3v13H5z" /><path d="M9 9h6" /><path d="M9 13h6" /><path d="M9 17h4" /></>],
+  ["review", <path d="m12 3 2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.1 6.1-.6z" />],
+]
+
+function PillIcon({ name }: { name: string }) {
+  const n = name.toLowerCase()
+  const match = pillIcons.find(([key]) => n.includes(key))
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="h-[18px] w-[18px] flex-none text-primary"
+    >
+      {match ? match[1] : <><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></>}
+    </svg>
+  )
+}
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -228,15 +263,17 @@ export function Header() {
                   </li>
                 ))}
               </ul>
-              <div className="mt-4 grid grid-cols-3 gap-2 border-t border-border pt-4 text-[15px] font-bold animate-in fade-in fill-mode-both duration-300 [animation-delay:200ms]">
+              {/* Same pills as the inner-page menu ([floors_header]): icon + name, 2 per row */}
+              <div className="mt-4 grid grid-cols-2 gap-2 border-t border-border pt-4 text-[16px] font-bold animate-in fade-in fill-mode-both duration-300 [animation-delay:200ms]">
                 {utilityLinks.map((item) => (
                   <a
                     key={item.name}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex h-[46px] items-center justify-center whitespace-nowrap rounded-full border border-border bg-background px-2 text-foreground shadow-sm hover:border-primary hover:text-primary active:border-primary active:text-primary"
+                    className="flex min-h-[46px] items-center justify-start gap-2 whitespace-nowrap rounded-full border border-border bg-background px-4 text-left text-foreground hover:border-primary hover:text-primary active:border-primary active:text-primary"
                   >
-                    {item.name}
+                    <PillIcon name={item.name} />
+                    <span className="overflow-hidden text-ellipsis">{item.name}</span>
                   </a>
                 ))}
               </div>
