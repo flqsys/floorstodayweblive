@@ -56,6 +56,29 @@ export function Header() {
         { name: "FAQs", href: "/faqs/" },
       ]
   const headerRef = useRef<HTMLElement>(null)
+  // Bottom of the logo bar: the open phone menu starts here and fills the rest
+  // of the screen, so the hero is hidden behind it
+  const barRef = useRef<HTMLDivElement>(null)
+  const [menuTop, setMenuTop] = useState(0)
+  const menuOpenRef = useRef(false)
+  menuOpenRef.current = mobileMenuOpen
+
+  useEffect(() => {
+    if (!mobileMenuOpen || !slim) return
+    const place = () => setMenuTop(barRef.current?.getBoundingClientRect().bottom ?? 0)
+    place()
+    window.addEventListener("resize", place)
+    // The page behind the open menu doesn't scroll
+    const html = document.documentElement
+    const saved = [html.style.overflow, document.body.style.overflow]
+    html.style.overflow = "hidden"
+    document.body.style.overflow = "hidden"
+    return () => {
+      window.removeEventListener("resize", place)
+      html.style.overflow = saved[0]
+      document.body.style.overflow = saved[1]
+    }
+  }, [mobileMenuOpen, slim])
 
   // On phones the WordPress bridge fixes the header and offsets the page by a
   // set height; the slim header is shorter, so publish its real height instead.
@@ -68,7 +91,10 @@ export function Header() {
       return
     }
 
-    const update = () => root.style.setProperty("--ft-mobile-header-h", `${header.offsetHeight}px`)
+    const update = () => {
+      if (menuOpenRef.current) return
+      root.style.setProperty("--ft-mobile-header-h", `${header.offsetHeight}px`)
+    }
     update()
     const observer = new ResizeObserver(update)
     observer.observe(header)
@@ -107,7 +133,7 @@ export function Header() {
       </div>
 
       <nav className="mx-auto max-w-[1340px] px-4">
-        <div className="flex min-h-16 items-center justify-between gap-3 py-1">
+        <div ref={barRef} className="flex min-h-16 items-center justify-between gap-3 py-1">
           <a href="/" className="flex min-w-0 items-center text-2xl font-bold text-primary">
             {logoSrc ? (
               <img
@@ -233,8 +259,12 @@ export function Header() {
 
         {mobileMenuOpen && slim && (
           // Light hero: menu drops down as tappable rows with arrows
-          <div id="ft-mobile-menu" className="animate-in fade-in slide-in-from-top-2 duration-200 lg:hidden">
-            <div className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-border pb-5 pt-3">
+          <div
+            id="ft-mobile-menu"
+            className="fixed inset-x-0 bottom-0 z-50 overflow-y-auto overscroll-contain bg-card px-4 animate-in fade-in slide-in-from-top-2 duration-200 lg:hidden"
+            style={{ top: menuTop }}
+          >
+            <div className="border-t border-border pb-5 pt-3">
               {/* Rows slide in one after the other */}
               <ul className="flex flex-col gap-1">
                 {settings.nav_items.map((item, index) => (

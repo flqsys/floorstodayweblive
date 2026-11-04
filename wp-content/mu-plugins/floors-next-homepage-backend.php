@@ -4237,6 +4237,7 @@ function ft_next_header_shortcode() {
             .ft-sh-menu-toggle:focus-visible { background: #f3f5f7; }
             .ft-sh-mobile-menu {
                 display: none;
+                box-sizing: border-box;
                 padding: 8px 16px 18px;
                 border-top: 1px solid #e5e7eb;
                 background: #fff;
@@ -4451,6 +4452,24 @@ function ft_next_header_shortcode() {
             }
         </style>
         <script id="ft-header-shortcode-script">
+            // The open phone menu fills the rest of the screen (like the
+            // homepage menu), so the page behind it is hidden.
+            function ftShFillMenu(menu) {
+                if (!menu || menu.hasAttribute('hidden')) return;
+                menu.style.height = '';
+                var top = menu.getBoundingClientRect().top;
+                menu.style.height = Math.max(0, window.innerHeight - top) + 'px';
+                menu.style.overflowY = 'auto';
+                menu.style.overscrollBehavior = 'contain';
+            }
+            // The page behind the open menu doesn't scroll
+            function ftShLockPage(lock) {
+                document.documentElement.style.overflow = lock ? 'hidden' : '';
+                document.body.style.overflow = lock ? 'hidden' : '';
+            }
+            window.addEventListener('resize', function () {
+                document.querySelectorAll('.ft-sh-mobile-menu:not([hidden])').forEach(ftShFillMenu);
+            });
             document.addEventListener('click', function (event) {
                 var button = event.target.closest('.ft-sh-menu-toggle');
                 var link = event.target.closest('.ft-sh-mobile-menu a');
@@ -4462,6 +4481,8 @@ function ft_next_header_shortcode() {
                     var opening = menu.hasAttribute('hidden');
                     menu.toggleAttribute('hidden', !opening);
                     button.setAttribute('aria-expanded', opening ? 'true' : 'false');
+                    if (opening) ftShFillMenu(menu);
+                    ftShLockPage(opening);
                 }
 
                 if (link) {
@@ -4470,6 +4491,7 @@ function ft_next_header_shortcode() {
                     var toggle = mobileHeader ? mobileHeader.querySelector('.ft-sh-menu-toggle') : null;
                     mobileMenu.setAttribute('hidden', '');
                     if (toggle) toggle.setAttribute('aria-expanded', 'false');
+                    ftShLockPage(false);
                 }
             });
         </script>
