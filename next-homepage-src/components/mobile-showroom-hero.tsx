@@ -586,14 +586,14 @@ export function MobileShowroomHero() {
         )}
 
         {settings.hero_badge && (
-          <p className="ft-mobile-offer relative mt-3 overflow-hidden rounded-lg bg-gradient-to-r from-[#e9c66b] via-[#d6a934] to-[#e9c66b] py-2.5 text-center text-[28px] font-extrabold leading-none text-[#b3261e] shadow-md shadow-[#d6a934]/30">
+          <p className="ft-offer-card font-serif relative mt-3 overflow-hidden rounded-lg text-center font-extrabold leading-none shadow-md shadow-[#d6a934]/30">
             {settings.hero_badge}
           </p>
         )}
 
         <p className="mt-2 text-center text-xs font-medium text-muted-foreground">
           {settings.mobile_hero_offer_note}
-          {settings.deals_details_label && (
+          {settings.deals_details_label && settings.hero_offer_link && (
             <>
               {settings.mobile_hero_offer_note ? " · " : ""}
               <button
@@ -601,13 +601,13 @@ export function MobileShowroomHero() {
                 onClick={() => window.dispatchEvent(new CustomEvent("ft:open-offer-details"))}
                 className="inline border-0 bg-transparent p-0 align-baseline font-semibold text-primary underline underline-offset-2"
               >
-                Offer details →
+                {settings.hero_offer_link}
               </button>
             </>
           )}
         </p>
 
-        <h2 id="ft-mobile-hero-heading" className="mt-4 font-serif text-[32px] font-bold leading-[1.1] tracking-tight">
+        <h2 id="ft-mobile-hero-heading" className="ft-hero-title mt-4 font-serif font-bold leading-[1.1] tracking-tight">
           {settings.mobile_hero_title}{" "}
           <span className="block text-primary">{settings.mobile_hero_highlight}</span>
         </h2>
@@ -636,7 +636,7 @@ export function MobileShowroomHero() {
           className="flex h-13 items-center justify-center gap-2 rounded-lg border border-primary bg-card text-base font-bold text-primary"
         >
           <Phone className="size-4" aria-hidden="true" />
-          Call {settings.phone}
+          {settings.mobile_hero_call_label ? `${settings.mobile_hero_call_label} ` : ""}{settings.phone}
         </a>
 
         {settings.mobile_hero_trust && (

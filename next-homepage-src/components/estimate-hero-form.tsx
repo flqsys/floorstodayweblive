@@ -742,7 +742,7 @@ export function EstimateHeroForm() {
             disabled={pending}
             className="group flex h-14 flex-1 items-center justify-center gap-2 ft-form-button rounded-lg text-lg font-bold shadow-lg transition-all hover:brightness-105 active:scale-[0.99] disabled:opacity-70"
           >
-            {step < 2 ? "Continue" : pending ? "Sending..." : "Book Your Appointment"}
+            {step === 0 && !propertyType && !flooringType ? "Book Now" : step < 2 ? "Continue" : pending ? "Sending..." : "Book Your Appointment"}
             {!pending && (
               <ArrowRight className="size-5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
             )}

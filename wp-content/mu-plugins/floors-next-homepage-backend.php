@@ -102,10 +102,16 @@ function ft_next_homepage_defaults() {
         'promo_bar_bg_color' => '#cc9c2e',
         'mobile_hero_tag' => 'Mobile flooring · GTA & Ottawa',
         'mobile_hero_offer_note' => 'Select styles · ends Dec 31, 2026',
+        // Estimate form layout, desktop/tablet hero
+        'hero_rating_score' => '4.9/5',
+        'hero_rating_text' => 'from 2,000+ GTA homeowners',
+        'hero_points' => "Samples brought to your home\nOne all-inclusive written price\nWe beat any comparable written quote",
+        'hero_offer_link' => 'Offer details →',
         'mobile_hero_title' => 'The Flooring Showroom',
         'mobile_hero_highlight' => 'Comes to You.',
         'mobile_hero_text' => 'We bring hundreds of samples to your home, measure every room, and give you one all-in price, installation included.',
         'mobile_hero_button' => 'Book In-Home Consultation',
+        'mobile_hero_call_label' => 'Call',
         'mobile_hero_trust' => 'From the team behind Flooring Liquidators, rated 4.9/5 by 2,000+ Ontario homeowners',
         'mobile_form_title' => 'Book In-Home Consultation',
         'mobile_form_subtitle' => 'Takes under a minute. No obligation.',
@@ -2419,7 +2425,8 @@ add_action('admin_post_ft_next_homepage_save', function () {
     $data = [];
     $text_fields = [
         'promo_bar_title', 'promo_bar_text', 'promo_bar_mobile_text', 'promo_bar_ends',
-        'mobile_hero_tag', 'mobile_hero_offer_note', 'mobile_hero_title', 'mobile_hero_highlight', 'mobile_hero_text', 'mobile_hero_button', 'mobile_hero_trust', 'mobile_form_title', 'mobile_form_subtitle', 'mobile_form_button', 'mobile_form_note', 'mobile_hero_image',
+        'hero_rating_score', 'hero_rating_text', 'hero_offer_link',
+        'mobile_hero_tag', 'mobile_hero_offer_note', 'mobile_hero_title', 'mobile_hero_highlight', 'mobile_hero_text', 'mobile_hero_button', 'mobile_hero_call_label', 'mobile_hero_trust', 'mobile_form_title', 'mobile_form_subtitle', 'mobile_form_button', 'mobile_form_note', 'mobile_hero_image',
         'phone', 'email', 'service_area', 'logo_text', 'logo_image', 'favicon_image', 'logo_size', 'cta_label',
         'facebook_url', 'instagram_url', 'linkedin_url', 'youtube_url', 'tiktok_url', 'footer_credit_url',
         'footer_badge_image_1', 'footer_badge_image_2', 'footer_badge_image_3',
@@ -2449,7 +2456,7 @@ add_action('admin_post_ft_next_homepage_save', function () {
         'fb_pixel_id', 'gtm_container_id', 'recaptcha_site_key',
     ];
     $textarea_fields = [
-        'hero_text', 'process_text', 'comparison_text', 'comparison_disclaimer', 'cta_text', 'footer_about',
+        'hero_text', 'hero_points', 'process_text', 'comparison_text', 'comparison_disclaimer', 'cta_text', 'footer_about',
         'seo_description', 'seo_og_description',
         'category_text', 'guarantee_text', 'deals_text', 'deals_body',
         'deals_includes', 'deals_popup_title', 'deals_popup_intro', 'deals_popup_steps',
@@ -2618,8 +2625,10 @@ add_action('admin_post_ft_next_homepage_save', function () {
     exit;
 });
 
-function ft_next_homepage_card_open($title) {
-    echo '<section class="ft-next-card"><div class="ft-next-card__head"><h2>' . esc_html($title) . '</h2></div><div class="ft-next-card__body">';
+function ft_next_homepage_card_open($title, $description = '') {
+    echo '<section class="ft-next-card"><div class="ft-next-card__head"><h2>' . esc_html($title) . '</h2>'
+        . ($description !== '' ? '<p class="description" style="margin:4px 0 0;">' . esc_html($description) . '</p>' : '')
+        . '</div><div class="ft-next-card__body">';
 }
 
 function ft_next_homepage_card_close() {
@@ -2812,7 +2821,7 @@ function ft_next_homepage_render_admin() {
 
             <div class="ft-next-grid">
                 <div>
-                    <?php ft_next_homepage_card_open('Style'); ?>
+                    <?php ft_next_homepage_card_open('Colours', 'Main colours used across the whole homepage.'); ?>
                         <div class="ft-next-style-grid">
                             <label>
                                 Primary blue color
@@ -2833,7 +2842,7 @@ function ft_next_homepage_render_admin() {
                         </div>
                     <?php ft_next_homepage_card_close(); ?>
 
-                    <?php ft_next_homepage_card_open('Button Style'); ?>
+                    <?php ft_next_homepage_card_open('Buttons', 'Shape and look of every button on the homepage.'); ?>
                         <div class="ft-next-button-style-grid">
                             <label>
                                 Border radius
@@ -2894,7 +2903,7 @@ function ft_next_homepage_render_admin() {
                         </div>
                     <?php ft_next_homepage_card_close(); ?>
 
-                    <?php ft_next_homepage_card_open('Header'); ?>
+                    <?php ft_next_homepage_card_open('Header & menus', 'Top of every page: service area, top links and the main menu.'); ?>
                         <div class="ft-next-inline-grid ft-next-inline-grid--header">
                             <label>
                                 Phone
@@ -2947,7 +2956,7 @@ function ft_next_homepage_render_admin() {
                         </table>
                     <?php ft_next_homepage_card_close(); ?>
 
-                    <?php ft_next_homepage_card_open('Promotion bar'); ?>
+                    <?php ft_next_homepage_card_open('Promotion bar', 'Thin strip above the header. Turn it on or off with the switch.'); ?>
                         <?php
                             ft_next_homepage_field($settings, 'promo_bar_show', 'Show promotion bar above the header', 'checkbox');
                             ft_next_homepage_field($settings, 'promo_bar_title', 'Bold lead-in (e.g. Limited-Time Flooring Sale)');
@@ -2968,13 +2977,14 @@ function ft_next_homepage_render_admin() {
                         <p class="description">The bar's link uses the Deals &rarr; &quot;details&quot; label and opens the same offer details popup.</p>
                     <?php ft_next_homepage_card_close(); ?>
 
-                    <?php ft_next_homepage_card_open('Hero'); ?>
+                    <?php ft_next_homepage_card_open('Hero (top of the homepage)', 'The first part of the homepage: title, promo badge and estimate form.'); ?>
                         <div class="ft-next-repeater">
                             <div class="ft-next-repeater-item ft-next-repeater-item--hero">
                                 <h3>Hero settings</h3>
                                 <div class="ft-next-field-stack">
                                     <div class="ft-next-subgroup">
                                         <h4>Hero layout</h4>
+                                        <p class="description"><strong>Both layouts</strong> use parts 1&ndash;3. The <strong>light hero</strong> (Estimate form) also uses parts 4 and 5. <strong>Classic</strong> also uses the background image on the right.</p>
                                         <label>
                                             Layout
                                             <select name="hero_variant">
@@ -2982,14 +2992,122 @@ function ft_next_homepage_render_admin() {
                                                 <option value="estimate" <?php selected($settings['hero_variant'] ?? 'classic', 'estimate'); ?>>Estimate form &mdash; light hero with the built-in 3-step form</option>
                                             </select>
                                         </label>
-                                        <p class="description">The estimate form layout sends leads straight to the Floors Today Inbox (and on to the CRM). The settings below apply to the Classic layout.</p>
+                                    </div>
+                                    <div class="ft-next-subgroup">
+                                        <h4>1. Title &amp; text</h4>
+                                        <p class="description">Desktop and tablet. Phones have their own title and text in part 5.</p>
+                                        <div class="ft-next-inline-grid ft-next-inline-grid--2" style="margin-bottom:0;">
+                                            <label>
+                                                Hero title
+                                                <input name="hero_title" type="text" value="<?php echo esc_attr($settings['hero_title']); ?>">
+                                            </label>
+                                            <label>
+                                                Hero highlighted text
+                                                <input name="hero_highlight" type="text" value="<?php echo esc_attr($settings['hero_highlight']); ?>">
+                                            </label>
+                                        </div>
+                                        <div class="ft-next-inline-grid ft-next-inline-grid--2" style="margin-bottom:0;">
+                                            <label>
+                                                Title size (desktop)
+                                                <input name="hero_title_font_size" type="text" value="<?php echo esc_attr($settings['hero_title_font_size']); ?>">
+                                                <span class="description">e.g. <code>60px</code> or <code>3.75rem</code></span>
+                                            </label>
+                                            <label>
+                                                Title size (mobile)
+                                                <input name="hero_title_mobile_font_size" type="text" value="<?php echo esc_attr($settings['hero_title_mobile_font_size']); ?>">
+                                                <span class="description">e.g. <code>30px</code> or <code>1.875rem</code></span>
+                                            </label>
+                                        </div>
+                                        <label>
+                                            Hero paragraph
+                                            <textarea name="hero_text" rows="4"><?php echo esc_textarea($settings['hero_text']); ?></textarea>
+                                        </label>
+                                        <?php ft_next_homepage_field($settings, 'hero_rating_score', 'Rating line, e.g. 4.9/5 (light hero) - leave empty to hide'); ?>
+                                        <?php ft_next_homepage_field($settings, 'hero_rating_text', 'Text after the rating'); ?>
+                                        <?php ft_next_homepage_field($settings, 'hero_points', 'Check-mark lines (light hero) - one per line, leave empty to hide', 'textarea'); ?>
+                                    </div>
+                                    <div class="ft-next-subgroup">
+                                        <h4>2. Promo badge</h4>
+                                        <p class="description">The gold card above the title (light hero, desktop and phones) and the badge in the Classic hero.</p>
+                                        <label>
+                                            Promo badge text
+                                            <input name="hero_badge" type="text" value="<?php echo esc_attr($settings['hero_badge']); ?>">
+                                        </label>
+                                        <?php ft_next_homepage_field($settings, 'mobile_hero_offer_note', 'Line under the badge, e.g. Select styles · ends Dec 31 (light hero)'); ?>
+                                        <?php ft_next_homepage_field($settings, 'hero_offer_link', 'Offer details link text (light hero, opens the Deals popup)'); ?>
+                                        <h4 style="margin-top:14px;">Style</h4>
+                                        <div class="ft-next-inline-grid ft-next-inline-grid--badge-style" style="margin-bottom:0;">
+                                            <label>
+                                                Background color
+                                                <?php ft_next_homepage_color_control($settings, 'hero_badge_bg_color'); ?>
+                                            </label>
+                                            <label>
+                                                Text color
+                                                <?php ft_next_homepage_color_control($settings, 'hero_badge_text_color'); ?>
+                                            </label>
+                                        </div>
+                                        <div class="ft-next-inline-grid ft-next-inline-grid--badge-numbers" style="margin-bottom:0;">
+                                            <label>
+                                                Font size
+                                                <input name="hero_badge_font_size" type="text" value="<?php echo esc_attr($settings['hero_badge_font_size']); ?>">
+                                            </label>
+                                            <label>
+                                                Mobile font size
+                                                <input name="hero_badge_mobile_font_size" type="text" value="<?php echo esc_attr($settings['hero_badge_mobile_font_size']); ?>">
+                                            </label>
+                                            <div class="ft-next-inline-grid ft-next-inline-grid--compact-values" style="margin-bottom:0;">
+                                                <label>
+                                                    Horizontal padding
+                                                    <input name="hero_badge_padding_x" type="text" value="<?php echo esc_attr($settings['hero_badge_padding_x']); ?>">
+                                                </label>
+                                                <label>
+                                                    Vertical padding
+                                                    <input name="hero_badge_padding_y" type="text" value="<?php echo esc_attr($settings['hero_badge_padding_y']); ?>">
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <h4 style="margin-top:14px;">Animation (Classic layout only)</h4>
+                                        <div class="ft-next-inline-grid ft-next-inline-grid--2" style="margin-bottom:0;">
+                                            <label>
+                                                Animation color 1
+                                                <?php ft_next_homepage_color_control($settings, 'hero_badge_animation_color_1'); ?>
+                                            </label>
+                                            <label>
+                                                Animation color 2
+                                                <?php ft_next_homepage_color_control($settings, 'hero_badge_animation_color_2'); ?>
+                                            </label>
+                                        </div>
+                                        <div class="ft-next-inline-grid ft-next-inline-grid--2" style="margin-bottom:0;">
+                                            <label>
+                                                Gradient location
+                                                <?php ft_next_homepage_gradient_select('hero_badge_animation_location', $settings['hero_badge_animation_location']); ?>
+                                            </label>
+                                            <label>
+                                                Animation speed
+                                                <input name="hero_badge_animation_speed" type="text" value="<?php echo esc_attr($settings['hero_badge_animation_speed']); ?>">
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="ft-next-subgroup">
+                                        <h4>3. Form header</h4>
+                                        <p class="description">Title and subtitle on top of the desktop estimate form.</p>
+                                        <div class="ft-next-inline-grid ft-next-inline-grid--2" style="margin-bottom:0;">
+                                            <label>
+                                                Form title
+                                                <input name="form_title" type="text" value="<?php echo esc_attr($settings['form_title']); ?>">
+                                            </label>
+                                            <label>
+                                                Form subtitle
+                                                <input name="form_subtitle" type="text" value="<?php echo esc_attr($settings['form_subtitle']); ?>">
+                                            </label>
+                                        </div>
                                     </div>
                                     <?php
                                         $ft_hero_images = array_values(array_filter((array) ($settings['estimate_hero_images'] ?? []), 'is_string'));
                                         $ft_hero_selected = (string) ($settings['estimate_hero_image'] ?? '');
                                     ?>
                                     <div class="ft-next-subgroup ft-hero-gallery">
-                                        <h4>Estimate form layout &mdash; hero images (desktop &amp; tablet)</h4>
+                                        <h4>4. Light hero &mdash; background images (desktop &amp; tablet)</h4>
                                         <p class="description">Add as many images as you like, then click the one to show behind the hero. Choose &quot;Built-in photo&quot; to use the default image.</p>
                                         <input type="hidden" name="estimate_hero_images_present" value="1">
                                         <div class="ft-hero-gallery__grid">
@@ -3021,137 +3139,30 @@ function ft_next_homepage_render_admin() {
                                         </style>
                                     </div>
                                     <div class="ft-next-subgroup">
-                                        <h4>Estimate form layout &mdash; phones</h4>
-                                        <p class="description">On phones the Estimate form layout shows a slim header (logo + Call), this hero, and a button that slides the consultation form up. The offer badge uses &quot;Promo badge&quot; text below; &quot;Offer details&quot; opens the Deals popup.</p>
-                                        <?php
-                                            ft_next_homepage_field($settings, 'mobile_hero_tag', 'Tag above the offer');
-                                            ft_next_homepage_field($settings, 'mobile_hero_offer_note', 'Line under the offer badge');
-                                            ft_next_homepage_field($settings, 'mobile_hero_title', 'Title');
-                                            ft_next_homepage_field($settings, 'mobile_hero_highlight', 'Title highlight (second line)');
-                                            ft_next_homepage_field($settings, 'mobile_hero_text', 'Intro text');
-                                            ft_next_homepage_field($settings, 'mobile_hero_button', 'Button that opens the form');
-                                            ft_next_homepage_field($settings, 'mobile_hero_trust', 'Trust line under the Call button');
-                                            ft_next_homepage_field($settings, 'mobile_form_title', 'Form title');
-                                            ft_next_homepage_field($settings, 'mobile_form_subtitle', 'Form subtitle');
-                                            ft_next_homepage_field($settings, 'mobile_form_button', 'Form submit button');
-                                            ft_next_homepage_field($settings, 'mobile_form_note', 'Note under the submit button');
-                                            ft_next_homepage_field($settings, 'mobile_hero_image', 'Phone hero image (leave empty for the built-in photo)', 'image');
-                                            ft_next_homepage_field($settings, 'mobile_hero_map_url', '"Check if we serve your area" link (leave empty to hide)');
-                                        ?>
-                                    </div>
-                                    <div class="ft-next-subgroup">
-                                        <h4>Main content</h4>
-                                        <div class="ft-next-inline-grid ft-next-inline-grid--2" style="margin-bottom:0;">
-                                            <label>
-                                                Hero title
-                                                <input name="hero_title" type="text" value="<?php echo esc_attr($settings['hero_title']); ?>">
-                                            </label>
-                                            <label>
-                                                Hero highlighted text
-                                                <input name="hero_highlight" type="text" value="<?php echo esc_attr($settings['hero_highlight']); ?>">
-                                            </label>
-                                        </div>
-                                        <div class="ft-next-inline-grid ft-next-inline-grid--2" style="margin-bottom:0;">
-                                            <label>
-                                                Title size (desktop)
-                                                <input name="hero_title_font_size" type="text" value="<?php echo esc_attr($settings['hero_title_font_size']); ?>">
-                                                <span class="description">e.g. <code>60px</code> or <code>3.75rem</code></span>
-                                            </label>
-                                            <label>
-                                                Title size (mobile)
-                                                <input name="hero_title_mobile_font_size" type="text" value="<?php echo esc_attr($settings['hero_title_mobile_font_size']); ?>">
-                                                <span class="description">e.g. <code>30px</code> or <code>1.875rem</code></span>
-                                            </label>
-                                        </div>
-                                        <label>
-                                            Hero paragraph
-                                            <textarea name="hero_text" rows="4"><?php echo esc_textarea($settings['hero_text']); ?></textarea>
-                                        </label>
-                                    </div>
-
-                                    <div class="ft-next-subgroup">
-                                        <h4>Promo badge text</h4>
-                                        <label>
-                                            Promo badge
-                                            <input name="hero_badge" type="text" value="<?php echo esc_attr($settings['hero_badge']); ?>">
-                                        </label>
-                                    </div>
-
-                                    <div class="ft-next-subgroup">
-                                        <h4>Promo badge style</h4>
-                                        <div class="ft-next-inline-grid ft-next-inline-grid--badge-style" style="margin-bottom:0;">
-                                            <label>
-                                                Background color
-                                                <?php ft_next_homepage_color_control($settings, 'hero_badge_bg_color'); ?>
-                                            </label>
-                                            <label>
-                                                Text color
-                                                <?php ft_next_homepage_color_control($settings, 'hero_badge_text_color'); ?>
-                                            </label>
-                                        </div>
-                                        <div class="ft-next-inline-grid ft-next-inline-grid--badge-numbers" style="margin-bottom:0;">
-                                            <label>
-                                                Font size
-                                                <input name="hero_badge_font_size" type="text" value="<?php echo esc_attr($settings['hero_badge_font_size']); ?>">
-                                            </label>
-                                            <label>
-                                                Mobile font size
-                                                <input name="hero_badge_mobile_font_size" type="text" value="<?php echo esc_attr($settings['hero_badge_mobile_font_size']); ?>">
-                                            </label>
-                                            <div class="ft-next-inline-grid ft-next-inline-grid--compact-values" style="margin-bottom:0;">
-                                                <label>
-                                                    Horizontal padding
-                                                    <input name="hero_badge_padding_x" type="text" value="<?php echo esc_attr($settings['hero_badge_padding_x']); ?>">
-                                                </label>
-                                                <label>
-                                                    Vertical padding
-                                                    <input name="hero_badge_padding_y" type="text" value="<?php echo esc_attr($settings['hero_badge_padding_y']); ?>">
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="ft-next-subgroup">
-                                        <h4>Promo badge animation</h4>
-                                        <div class="ft-next-inline-grid ft-next-inline-grid--2" style="margin-bottom:0;">
-                                            <label>
-                                                Animation color 1
-                                                <?php ft_next_homepage_color_control($settings, 'hero_badge_animation_color_1'); ?>
-                                            </label>
-                                            <label>
-                                                Animation color 2
-                                                <?php ft_next_homepage_color_control($settings, 'hero_badge_animation_color_2'); ?>
-                                            </label>
-                                        </div>
-                                        <div class="ft-next-inline-grid ft-next-inline-grid--2" style="margin-bottom:0;">
-                                            <label>
-                                                Gradient location
-                                                <?php ft_next_homepage_gradient_select('hero_badge_animation_location', $settings['hero_badge_animation_location']); ?>
-                                            </label>
-                                            <label>
-                                                Animation speed
-                                                <input name="hero_badge_animation_speed" type="text" value="<?php echo esc_attr($settings['hero_badge_animation_speed']); ?>">
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <div class="ft-next-subgroup">
-                                        <h4>Form text</h4>
-                                        <div class="ft-next-inline-grid ft-next-inline-grid--2" style="margin-bottom:0;">
-                                            <label>
-                                                Form title
-                                                <input name="form_title" type="text" value="<?php echo esc_attr($settings['form_title']); ?>">
-                                            </label>
-                                            <label>
-                                                Form subtitle
-                                                <input name="form_subtitle" type="text" value="<?php echo esc_attr($settings['form_subtitle']); ?>">
-                                            </label>
-                                        </div>
+                                        <h4>5. Light hero &mdash; phones</h4>
+                                        <p class="description">On phones the light hero shows a slim header (logo + phone icon), this text, and a button that slides the form up. The badge comes from part 2.</p>
+                                        <h4 style="margin-top:14px;">Top</h4>
+                                        <?php ft_next_homepage_field($settings, 'mobile_hero_tag', 'Tag above the badge'); ?>
+                                        <?php ft_next_homepage_field($settings, 'mobile_hero_title', 'Title'); ?>
+                                        <?php ft_next_homepage_field($settings, 'mobile_hero_highlight', 'Title highlight (second line)'); ?>
+                                        <?php ft_next_homepage_field($settings, 'mobile_hero_text', 'Intro text'); ?>
+                                        <h4 style="margin-top:14px;">Buttons</h4>
+                                        <?php ft_next_homepage_field($settings, 'mobile_hero_button', 'Button that opens the form'); ?>
+                                        <?php ft_next_homepage_field($settings, 'mobile_hero_call_label', 'Word before the phone number on the call button (e.g. Call)'); ?>
+                                        <?php ft_next_homepage_field($settings, 'mobile_hero_trust', 'Trust line under the Call button'); ?>
+                                        <?php ft_next_homepage_field($settings, 'mobile_hero_map_url', '"Check if we serve your area" link (leave empty to hide)'); ?>
+                                        <h4 style="margin-top:14px;">Slide-up form</h4>
+                                        <?php ft_next_homepage_field($settings, 'mobile_form_title', 'Form title'); ?>
+                                        <?php ft_next_homepage_field($settings, 'mobile_form_subtitle', 'Form subtitle'); ?>
+                                        <?php ft_next_homepage_field($settings, 'mobile_form_button', 'Form submit button'); ?>
+                                        <?php ft_next_homepage_field($settings, 'mobile_form_note', 'Note under the submit button'); ?>
+                                        <h4 style="margin-top:14px;">Image</h4>
+                                        <?php ft_next_homepage_field($settings, 'mobile_hero_image', 'Phone hero image (leave empty for the built-in photo)', 'image'); ?>
                                     </div>
                                 </div>
                                 <div class="ft-next-media-panel">
                                     <div class="ft-next-subgroup">
-                                        <h4>Background image</h4>
+                                        <h4>Classic layout &mdash; background image</h4>
                                         <div class="ft-next-inline-grid ft-next-hero-background-controls" style="margin-bottom:0;">
                                             <?php ft_next_homepage_field($settings, 'hero_show_background', 'Show background', 'checkbox'); ?>
                                             <?php ft_next_homepage_field($settings, 'hero_show_overlay', 'Show overlay', 'checkbox'); ?>
@@ -3189,7 +3200,7 @@ function ft_next_homepage_render_admin() {
                         </div>
                     <?php ft_next_homepage_card_close(); ?>
 
-                    <?php ft_next_homepage_card_open('Section One'); ?>
+                    <?php ft_next_homepage_card_open('How it works (steps)', 'The section under the hero with the installation steps.'); ?>
                         <?php ft_next_homepage_gradient_controls($settings, 'process'); ?>
                         <div class="ft-next-field-stack" style="margin-bottom:16px;">
                             <label>
@@ -3234,7 +3245,7 @@ function ft_next_homepage_render_admin() {
                         </div>
                     <?php ft_next_homepage_card_close(); ?>
 
-                    <?php ft_next_homepage_card_open('Section Two'); ?>
+                    <?php ft_next_homepage_card_open('Comparison table', 'The "All-inclusive pricing" section comparing us with others.'); ?>
                         <?php ft_next_homepage_gradient_controls($settings, 'comparison'); ?>
                         <div class="ft-next-field-stack" style="margin-bottom:16px;">
                             <div class="ft-next-inline-grid ft-next-inline-grid--3" style="margin-bottom:0;">
@@ -3270,7 +3281,7 @@ function ft_next_homepage_render_admin() {
                         </div>
                     <?php ft_next_homepage_card_close(); ?>
 
-                    <?php ft_next_homepage_card_open('Categories'); ?>
+                    <?php ft_next_homepage_card_open('Flooring categories', 'The flooring collection cards.'); ?>
                         <?php ft_next_homepage_gradient_controls($settings, 'category'); ?>
                         <div class="ft-next-field-stack" style="margin-bottom:16px;">
                             <label>
@@ -3315,7 +3326,7 @@ function ft_next_homepage_render_admin() {
                         </div>
                     <?php ft_next_homepage_card_close(); ?>
 
-                    <?php ft_next_homepage_card_open('Guarantee'); ?>
+                    <?php ft_next_homepage_card_open('Guarantee', 'The guarantee section.'); ?>
                         <?php ft_next_homepage_gradient_controls($settings, 'guarantee'); ?>
                         <div class="ft-next-repeater">
                             <div class="ft-next-repeater-item">
@@ -3354,7 +3365,7 @@ function ft_next_homepage_render_admin() {
                         </div>
                     <?php ft_next_homepage_card_close(); ?>
 
-                    <?php ft_next_homepage_card_open('Deals'); ?>
+                    <?php ft_next_homepage_card_open('Deals & offer popup', 'The deals cards and the "offer details" popup (also used by the promo badge and promotion bar).'); ?>
                         <?php ft_next_homepage_gradient_controls($settings, 'deals'); ?>
                         <div class="ft-next-inline-grid ft-next-inline-grid--2">
                             <label>
@@ -3468,7 +3479,7 @@ function ft_next_homepage_render_admin() {
                         </div>
                     <?php ft_next_homepage_card_close(); ?>
 
-                    <?php ft_next_homepage_card_open('Testimonials'); ?>
+                    <?php ft_next_homepage_card_open('Customer reviews', 'The testimonials section.'); ?>
                         <?php ft_next_homepage_gradient_controls($settings, 'testimonials'); ?>
                         <div class="ft-next-field-stack" style="margin-bottom:16px;">
                             <div class="ft-next-inline-grid ft-next-inline-grid--2" style="margin-bottom:0;">
@@ -3512,7 +3523,7 @@ function ft_next_homepage_render_admin() {
                         </div>
                     <?php ft_next_homepage_card_close(); ?>
 
-                    <?php ft_next_homepage_card_open('CTA and Footer'); ?>
+                    <?php ft_next_homepage_card_open('Bottom call-to-action & footer', 'The last call-to-action, newsletter, warranty popup and the footer.'); ?>
                         <?php ft_next_homepage_gradient_controls($settings, 'cta'); ?>
                         <?php ft_next_homepage_gradient_controls($settings, 'footer'); ?>
                         <div class="ft-next-field-stack">

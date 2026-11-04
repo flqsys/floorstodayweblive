@@ -64,6 +64,9 @@ export type HomepageSettings = {
   hero_badge_bg_color: string
   hero_badge_text_color: string
   hero_badge_font_size: string
+  hero_badge_mobile_font_size: string
+  hero_title_font_size: string
+  hero_title_mobile_font_size: string
   hero_badge_padding_x: string
   hero_badge_padding_y: string
   hero_title: string
@@ -87,12 +90,17 @@ export type HomepageSettings = {
   promo_bar_ends: string
   promo_bar_bg_color: string
   promo_bar_text_color: string
+  hero_rating_score: string
+  hero_rating_text: string
+  hero_points: string
+  hero_offer_link: string
   mobile_hero_tag: string
   mobile_hero_offer_note: string
   mobile_hero_title: string
   mobile_hero_highlight: string
   mobile_hero_text: string
   mobile_hero_button: string
+  mobile_hero_call_label: string
   mobile_hero_trust: string
   mobile_form_title: string
   mobile_form_subtitle: string
@@ -253,6 +261,9 @@ export const homepageDefaults: HomepageSettings = {
   hero_badge_bg_color: "#cc9c2e",
   hero_badge_text_color: "#ffffff",
   hero_badge_font_size: "16px",
+  hero_badge_mobile_font_size: "14px",
+  hero_title_font_size: "60px",
+  hero_title_mobile_font_size: "30px",
   hero_badge_padding_x: "16px",
   hero_badge_padding_y: "8px",
   hero_title: "",
@@ -277,9 +288,14 @@ export const homepageDefaults: HomepageSettings = {
   mobile_hero_tag: "Mobile flooring · GTA & Ottawa",
   mobile_hero_offer_note: "Select styles · ends Dec 31, 2026",
   mobile_hero_title: "The Flooring Showroom",
+  hero_rating_score: "4.9/5",
+  hero_rating_text: "from 2,000+ GTA homeowners",
+  hero_points: "Samples brought to your home\nOne all-inclusive written price\nWe beat any comparable written quote",
+  hero_offer_link: "Offer details →",
   mobile_hero_highlight: "Comes to You.",
   mobile_hero_text: "We bring hundreds of samples to your home, measure every room, and give you one all-in price, installation included.",
   mobile_hero_button: "Book In-Home Consultation",
+  mobile_hero_call_label: "Call",
   mobile_hero_trust: "From the team behind Flooring Liquidators, rated 4.9/5 by 2,000+ Ontario homeowners",
   mobile_form_title: "Book In-Home Consultation",
   mobile_form_subtitle: "Takes under a minute. No obligation.",

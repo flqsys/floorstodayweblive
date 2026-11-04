@@ -380,28 +380,35 @@
       transform: translateY(0) scale(1);
     }
   }
-  /* Light hero on phones: "Up to 50% OFF" card - its gold slowly flows,
-     calm on purpose: no shine, growing or pulsing. */
-  .ft-mobile-offer {
-    /* Moving background: soft diagonal stripes slide slowly across the gold
-       (no light band, no flashing; the text stays still) */
-    background-color: #dcae3f;
+  /* Light hero promo card (desktop and phones): gold with soft diagonal
+     stripes and a thin gold / red / blue border slowly travelling around it.
+     Text, colours, sizes and padding come from Home Settings > Hero > Promo badge. */
+  .ft-offer-card {
+    background-color: var(--ft-hero-badge-bg, #dcae3f);
     background-image: repeating-linear-gradient(
       -45deg,
       rgba(255, 255, 255, 0.18) 0 14px,
       rgba(255, 255, 255, 0) 14px 28px
-    ) !important;
+    );
     background-size: 39.6px 39.6px;
+    color: var(--ft-hero-badge-text, #b3261e);
+    /* Shrinks on narrow tablets, never above the size set in Home Settings */
+    font-size: min(var(--ft-hero-badge-font-size, 30px), 6vw);
+    padding: var(--ft-hero-badge-padding-y, 8px) var(--ft-hero-badge-padding-x, 16px);
+    /* Card keeps the same size when the font is made smaller (text stays centred) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 84px;
   }
 
-  /* Animation: a thin gold / red / blue border slowly travels around the card */
   @property --ft-offer-angle {
     syntax: "<angle>";
     initial-value: 0deg;
     inherits: false;
   }
 
-  .ft-mobile-offer::before {
+  .ft-offer-card::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -431,6 +438,21 @@
   @keyframes ft-offer-border-spin {
     to {
       --ft-offer-angle: 360deg;
+    }
+  }
+
+  .ft-hero-title {
+    font-size: min(var(--ft-hero-title-size, 48px), 5.5vw);
+  }
+
+  @media (max-width: 639.98px) {
+    .ft-offer-card {
+      font-size: var(--ft-hero-badge-mobile-font-size, 28px);
+      min-height: 52px;
+    }
+
+    .ft-hero-title {
+      font-size: var(--ft-hero-title-mobile-size, 32px);
     }
   }
 
@@ -510,7 +532,7 @@
     .ft-homepage-shell .ft-sale-badge::after,
     .ft-offer-modal-overlay,
     .ft-offer-modal-dialog,
-    .ft-mobile-offer::before {
+    .ft-offer-card::before {
       animation: none;
     }
   }
