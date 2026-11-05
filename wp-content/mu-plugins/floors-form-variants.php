@@ -629,6 +629,14 @@ function ft_next_booking_form_contact_shortcode($atts) {
             .ft-cf__consent { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; color: #475569; font-size: 12px; line-height: 1.5; }
             .ft-cf__consent input { width: 16px !important; height: 16px !important; min-width: 16px !important; margin: 2px 0 0 !important; padding: 0 !important; border: 1px solid #cbd5e1 !important; border-radius: 3px !important; background: #fff !important; box-shadow: none !important; appearance: auto !important; -webkit-appearance: checkbox !important; }
             .ft-cf__consent a { color: var(--ft-cf-primary); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+            /* One "I agree" box; ticking it ticks the three consents and opens them below */
+            .ft-cf__consent--all { color: #1f2937; font-size: 13px; font-weight: 600; }
+            .ft-cf__consent-toggle { all: unset; display: inline-flex; align-items: center; gap: 4px; margin-left: 4px; color: var(--ft-cf-primary); font-size: 12px; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; white-space: nowrap; }
+            .ft-cf__consent-toggle svg { width: 12px; height: 12px; transition: transform .2s ease; }
+            .ft-cf__consent-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+            .ft-cf__consent-list { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .25s ease; }
+            .ft-cf__consent-list.is-open { grid-template-rows: 1fr; }
+            .ft-cf__consent-list > div { display: grid; gap: 10px; min-height: 0; overflow: hidden; }
             .ft-cf button.ft-cf__submit { display: inline-flex; width: 100%; justify-content: center; align-items: center; gap: 8px; min-height: 48px; padding: 10px 24px; margin-top: 8px; border: 0 !important; border-radius: 999px !important; background: var(--ft-cf-primary) !important; color: #fff !important; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; transition: background-color .18s ease, box-shadow .18s ease, transform .12s ease, opacity .18s ease; }
             .ft-cf button.ft-cf__submit:hover { background: color-mix(in srgb, var(--ft-cf-primary) 90%, white) !important; box-shadow: 0 10px 20px rgba(35,91,184,.18) !important; }
             .ft-cf button.ft-cf__submit:focus-visible { outline: 0; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ft-cf-primary) 24%, transparent); }
@@ -688,9 +696,12 @@ function ft_next_booking_form_contact_shortcode($atts) {
                 <small class="ft-cf__hint" data-message-counter>0 / 50 characters minimum</small>
             </label>
             <div class="ft-cf__consents">
-                <label class="ft-cf__consent"><input name="privacyConsent" type="checkbox" required><span>I agree to receive promotional emails from Floors Today and have read the <a href="/privacy-policy/">Privacy Policy</a> and <a href="/terms-of-use/">Terms &amp; Conditions</a>.</span></label>
-                <label class="ft-cf__consent"><input name="smsConsent" type="checkbox" required><span>I agree to receive SMS marketing and informational messages from Floors Today at the contact information provided above. Message frequency may vary. Message &amp; data rates may apply. Reply STOP to unsubscribe or HELP for assistance.</span></label>
-                <label class="ft-cf__consent"><input name="emailConsent" type="checkbox" required><span>I agree to receive email marketing communications from Floors Today at the email address provided above. I understand Floors Today may respond to any messages or emails I send.</span></label>
+                <label class="ft-cf__consent ft-cf__consent--all"><input type="checkbox" data-consent-all required><span>I agree to the Privacy Policy, the Terms &amp; Conditions and to receive messages from Floors Today. <button type="button" class="ft-cf__consent-toggle" data-consent-toggle aria-expanded="false" aria-controls="<?php echo esc_attr($instance_id); ?>-consents">Details <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></span></label>
+                <div class="ft-cf__consent-list" id="<?php echo esc_attr($instance_id); ?>-consents"><div>
+                <label class="ft-cf__consent"><input name="privacyConsent" type="checkbox"><span>I agree to receive promotional emails from Floors Today and have read the <a href="/privacy-policy/">Privacy Policy</a> and <a href="/terms-of-use/">Terms &amp; Conditions</a>.</span></label>
+                <label class="ft-cf__consent"><input name="smsConsent" type="checkbox"><span>I agree to receive SMS marketing and informational messages from Floors Today at the contact information provided above. Message frequency may vary. Message &amp; data rates may apply. Reply STOP to unsubscribe or HELP for assistance.</span></label>
+                <label class="ft-cf__consent"><input name="emailConsent" type="checkbox"><span>I agree to receive email marketing communications from Floors Today at the email address provided above. I understand Floors Today may respond to any messages or emails I send.</span></label>
+                </div></div>
             </div>
             <button class="ft-cf__submit" type="submit">Send Message <span aria-hidden="true">&rarr;</span></button>
             <p class="ft-cf__error" role="alert" hidden></p>
@@ -744,6 +755,31 @@ function ft_next_booking_form_contact_shortcode($atts) {
         message.addEventListener('input', updateMessageCount);
         updateMessageCount();
 
+        // Consents: the "I agree" box ticks/unticks all three and opens the list;
+        // unticking any one of the three unticks "I agree".
+        var consentAll    = root.querySelector('[data-consent-all]');
+        var consentToggle = root.querySelector('[data-consent-toggle]');
+        var consentList   = root.querySelector('.ft-cf__consent-list');
+        var consentBoxes  = root.querySelectorAll('.ft-cf__consent-list input[type="checkbox"]');
+        function openConsents(open) {
+            consentList.classList.toggle('is-open', open);
+            consentToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+        consentAll.addEventListener('change', function () {
+            consentBoxes.forEach(function (box) { box.checked = consentAll.checked; });
+            if (consentAll.checked) openConsents(true);
+        });
+        consentBoxes.forEach(function (box) {
+            box.addEventListener('change', function () {
+                consentAll.checked = Array.prototype.every.call(consentBoxes, function (b) { return b.checked; });
+            });
+        });
+        consentToggle.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            openConsents(!consentList.classList.contains('is-open'));
+        });
+
         form.addEventListener('submit', async function (event) {
             event.preventDefault();
             showError('');
@@ -762,7 +798,7 @@ function ft_next_booking_form_contact_shortcode($atts) {
             if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError('Please enter a valid email address.');
             if (!isValidCanadianPhone(phoneLocal)) return showError('Please enter a valid Canadian phone number.');
             if (messageText.length < MESSAGE_MIN_LENGTH) return showError('Please enter a message of at least ' + MESSAGE_MIN_LENGTH + ' characters (' + messageText.length + ' so far).');
-            if (!privacyConsent || !smsConsent || !emailConsent) return showError('Please check all three boxes to continue.');
+            if (!privacyConsent || !smsConsent || !emailConsent) { openConsents(true); return showError('Please agree to the terms and messages to continue.'); }
 
             var phone  = '+1 ' + phoneLocal;
             var submit = root.querySelector('.ft-cf__submit');
