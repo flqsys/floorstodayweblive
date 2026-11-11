@@ -388,7 +388,8 @@ function ft_inbox_handle_rest_submission(WP_REST_Request $request) {
         return new WP_Error('ft_inbox_spam', 'Unable to send this request.', ['status' => 400]);
     }
 
-    $ip = sanitize_text_field($_SERVER['REMOTE_ADDR'] ?? '');
+    // Real visitor IP behind Cloudflare (floors-security.php), not Cloudflare's own address.
+    $ip = sanitize_text_field(function_exists('ft_security_client_ip') ? ft_security_client_ip() : ($_SERVER['REMOTE_ADDR'] ?? ''));
     $rate_key = 'ft_inbox_rate_' . md5($ip);
 
     if (get_transient($rate_key)) {
@@ -423,6 +424,14 @@ function ft_inbox_handle_rest_submission(WP_REST_Request $request) {
 
         if ($data['phone'] === '' || $data['phone'] === '+1' || $data['email'] === '' || !is_email($data['email'])) {
             return new WP_Error('ft_inbox_invalid', 'Please enter your name, phone, and a valid email.', ['status' => 400]);
+        }
+    }
+
+    // Each request emails the address typed in, so cap it: 3 per email per hour, 20 per IP per day.
+    if (function_exists('ft_security_rate_ok')) {
+        $email_ok = $data['email'] === '' || ft_security_rate_ok('lead-email:' . strtolower($data['email']), 3, HOUR_IN_SECONDS);
+        if (!$email_ok || !ft_security_rate_ok('lead-ip-day:' . $ip, 20, DAY_IN_SECONDS)) {
+            return new WP_Error('ft_inbox_rate_limited', 'We already have your request. Our team will contact you shortly.', ['status' => 429]);
         }
     }
 

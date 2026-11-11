@@ -153,6 +153,16 @@ class FT_XD_Newsletter_Integration {
             return new WP_Error('xd_newsletter_invalid_email', 'Please enter a valid email address.', ['status' => 400]);
         }
 
+        // Spam limits (helper from mu-plugins/floors-security.php): 5 signups per IP per 10 minutes,
+        // 3 per email per hour, so nobody can flood the list or keep rewriting someone's details.
+        if (function_exists('ft_security_rate_ok')) {
+            $ip = function_exists('ft_security_client_ip') ? ft_security_client_ip() : (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+            if (!ft_security_rate_ok('newsletter-ip:' . $ip, 5, 10 * MINUTE_IN_SECONDS)
+                || !ft_security_rate_ok('newsletter-email:' . strtolower($data['email']), 3, HOUR_IN_SECONDS)) {
+                return new WP_Error('xd_newsletter_rate_limited', 'Too many sign-ups from here. Please try again a little later.', ['status' => 429]);
+            }
+        }
+
         $email_check = self::check_email($data['email']);
         if ($email_check['status'] === 'typo') {
             return new WP_Error('xd_newsletter_email_typo', 'That email looks misspelled - did you mean ' . $email_check['suggestion'] . '?', ['status' => 400]);
