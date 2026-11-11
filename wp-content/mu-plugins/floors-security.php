@@ -121,7 +121,7 @@ add_filter('rest_pre_dispatch', function ($result, $server, $request) {
         return $result;
     }
     return new WP_Error('rest_forbidden', 'Sorry, you are not allowed to do that.', ['status' => rest_authorization_required_code()]);
-}, 10, 3);
+}, 999, 3); // After ACF, whose filter at 10 returns nothing.
 
 // ?author=N and author archives never reveal user names to visitors.
 add_action('template_redirect', function () {
