@@ -245,13 +245,13 @@ function ft_sec_csp(): string {
     $s3 = 'https://floors-today-media.s3.amazonaws.com';
     $policy = [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://*.google-analytics.com https://connect.facebook.net https://cdn.callrail.com https://*.callrail.com https://maps.googleapis.com https://maps.gstatic.com https://challenges.cloudflare.com https://static.cloudflareinsights.com https://cdnjs.cloudflare.com https://tag.connectxmedia.com https://bzrcdn.openai.com https://apis.google.com https://accounts.google.com https://www.youtube.com https://analytics.tiktok.com https://snap.licdn.com",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
-        "img-src 'self' data: blob: $s3 https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.google.ca https://*.google-analytics.com https://*.googletagmanager.com https://www.facebook.com https://*.callrail.com https://i.ytimg.com",
-        "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.floorstoday.ca https://www.googletagmanager.com https://*.google-analytics.com https://connect.facebook.net https://cdn.callrail.com https://*.callrail.com https://maps.googleapis.com https://maps.gstatic.com https://challenges.cloudflare.com https://static.cloudflareinsights.com https://cdnjs.cloudflare.com https://tag.connectxmedia.com https://bzrcdn.openai.com https://apis.google.com https://accounts.google.com https://www.youtube.com https://analytics.tiktok.com https://snap.licdn.com",
+        "style-src 'self' 'unsafe-inline' https://app.floorstoday.ca https://fonts.googleapis.com https://cdnjs.cloudflare.com",
+        "img-src 'self' data: blob: $s3 https://app.floorstoday.ca https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.google.ca https://*.google-analytics.com https://*.googletagmanager.com https://www.facebook.com https://*.callrail.com https://i.ytimg.com",
+        "font-src 'self' data: https://app.floorstoday.ca https://fonts.gstatic.com https://cdnjs.cloudflare.com",
         "connect-src 'self' $s3 https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://maps.googleapis.com https://www.facebook.com https://*.callrail.com https://app.floorstoday.ca https://cloudflareinsights.com https://tag.connectxmedia.com https://*.openai.com",
         "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://www.google.com https://www.facebook.com https://challenges.cloudflare.com https://app.floorstoday.ca https://www.googletagmanager.com",
-        "media-src 'self' $s3",
+        "media-src 'self' $s3 https://app.floorstoday.ca",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self' https://app.floorstoday.ca",
