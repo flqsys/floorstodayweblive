@@ -380,11 +380,20 @@
       transform: translateY(0) scale(1);
     }
   }
-  /* Light hero promo card (desktop and phones): plain colour, no stripes or
-     moving lights. Text, colours, sizes and padding come from
-     Home Settings > Hero > Promo badge. */
+  /* Light hero promo card (desktop and phones): shiny gold that slowly flows
+     (Promo badge > Animation: colour 1, colour 2, direction, speed) and a thin
+     gold / red / blue border slowly travelling around it. Text, colours, sizes
+     and padding come from Home Settings > Hero > Promo badge. */
   .ft-offer-card {
     background-color: var(--ft-hero-badge-bg, #dcae3f);
+    background-image: linear-gradient(
+      var(--ft-hero-badge-animation-location, 90deg),
+      var(--ft-hero-badge-animation-color-1, #dcae3f),
+      var(--ft-hero-badge-animation-color-2, #f5dc8a),
+      var(--ft-hero-badge-animation-color-1, #dcae3f)
+    );
+    background-size: 220% 100%;
+    animation: ft-hero-highlight-flow var(--ft-hero-badge-animation-speed, 4s) linear infinite;
     color: var(--ft-hero-badge-text, #b3261e);
     /* Shrinks on narrow tablets, never above the size set in Home Settings */
     font-size: min(var(--ft-hero-badge-font-size, 30px), 6vw);
@@ -394,6 +403,45 @@
     align-items: center;
     justify-content: center;
     min-height: 84px;
+  }
+
+  @property --ft-offer-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  .ft-offer-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: conic-gradient(
+      from var(--ft-offer-angle),
+      #e9c66b,
+      #d6a934 20%,
+      #b3261e 35%,
+      #e9c66b 50%,
+      #2f5fc4 70%,
+      #e9c66b 85%,
+      #e9c66b
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+    pointer-events: none;
+    animation: ft-offer-border-spin 6s linear infinite;
+  }
+
+  @keyframes ft-offer-border-spin {
+    to {
+      --ft-offer-angle: 360deg;
+    }
   }
 
   .ft-hero-title {
@@ -486,7 +534,9 @@
     .ft-homepage-shell .ft-sale-badge,
     .ft-homepage-shell .ft-sale-badge::after,
     .ft-offer-modal-overlay,
-    .ft-offer-modal-dialog {
+    .ft-offer-modal-dialog,
+    .ft-offer-card,
+    .ft-offer-card::before {
       animation: none;
     }
   }
