@@ -1176,7 +1176,9 @@ add_action('template_redirect', function () {
         JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES
     );
 
-    $html = preg_replace('/<title>.*?<\/title>/is', '<title>' . esc_html($seo_title) . '</title>', $html, 1);
+    // The static export often has no <title> (its build can't reach the WP
+    // settings), so drop any it has and always add ours with the tags below.
+    $html = preg_replace('/<title\b[^>]*>.*?<\/title>/is', '', $html);
     $html = preg_replace('/<meta\s+name="description"[^>]*>/i', '', $html);
     $html = preg_replace('/<meta\s+name="keywords"[^>]*>/i', '', $html);
     $html = preg_replace('/<meta\s+name="robots"[^>]*>/i', '', $html);
@@ -1189,6 +1191,7 @@ add_action('template_redirect', function () {
     $ncta_json = wp_json_encode($ncta_html, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
     $seo_tags = "\n"
+        . '<title>' . esc_html($seo_title) . '</title>' . "\n"
         . '<script>window.__FT_HOMEPAGE_SETTINGS__=' . $initial_settings . ';window.__FT_NCTA_HTML__=' . $ncta_json . ';</script>' . "\n"
         . ($settings['logo_image']
             ? '<link rel="preload" as="image" href="' . esc_url($settings['logo_image']) . '" fetchpriority="high">' . "\n"
