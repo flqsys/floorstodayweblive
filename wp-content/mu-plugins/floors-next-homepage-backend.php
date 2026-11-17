@@ -44,8 +44,8 @@ function ft_next_homepage_https_url($url) {
 
 /**
  * LocalBusiness JSON-LD for the homepage. Only flooring menu items are listed
- * as services (menu links such as Blog are left out), and hours, address, geo,
- * areas served and sameAs come from Home Settings.
+ * as services (menu links such as Blog are left out), and hours, head office
+ * address, areas served and sameAs come from Home Settings.
  */
 function ft_next_homepage_local_business_schema($settings, $url, $description, $image) {
     $schema = [
@@ -71,7 +71,10 @@ function ft_next_homepage_local_business_schema($settings, $url, $description, $
         $schema['openingHours'] = count($hours) === 1 ? $hours[0] : $hours;
     }
 
+    // Mobile business: the only address is the head office (not a showroom).
+    // Customers are served at home, which areaServed below describes.
     $address = array_filter([
+        'name' => 'Head office',
         'streetAddress' => trim((string) ($settings['business_street'] ?? '')),
         'addressLocality' => trim((string) ($settings['business_city'] ?? '')),
         'addressRegion' => trim((string) ($settings['business_region'] ?? '')),
@@ -80,12 +83,6 @@ function ft_next_homepage_local_business_schema($settings, $url, $description, $
     ]);
     if (!empty($address['streetAddress']) || !empty($address['addressLocality'])) {
         $schema['address'] = ['@type' => 'PostalAddress'] + $address;
-    }
-
-    $lat = trim((string) ($settings['business_latitude'] ?? ''));
-    $lng = trim((string) ($settings['business_longitude'] ?? ''));
-    if (is_numeric($lat) && is_numeric($lng)) {
-        $schema['geo'] = ['@type' => 'GeoCoordinates', 'latitude' => (float) $lat, 'longitude' => (float) $lng];
     }
 
     $area = trim((string) ($settings['business_area_served'] ?? ''));
@@ -167,8 +164,6 @@ function ft_next_homepage_defaults() {
         'business_region' => 'ON',
         'business_postal_code' => '',
         'business_country' => 'CA',
-        'business_latitude' => '',
-        'business_longitude' => '',
         'business_area_served' => '',
         'button_radius' => '8px',
         'button_font_weight' => '700',
@@ -2525,7 +2520,7 @@ add_action('admin_post_ft_next_homepage_save', function () {
         'footer_badge_height',
         'seo_title', 'seo_canonical_url', 'seo_robots', 'seo_og_title', 'seo_og_image', 'hero_badge',
         'business_hours', 'business_street', 'business_city', 'business_region', 'business_postal_code',
-        'business_country', 'business_latitude', 'business_longitude', 'business_area_served',
+        'business_country', 'business_area_served',
         'hero_badge_font_size', 'hero_badge_mobile_font_size', 'hero_badge_padding_x', 'hero_badge_padding_y',
         'hero_title', 'hero_highlight', 'hero_title_font_size', 'hero_title_mobile_font_size',
         'hero_badge_animation_location', 'hero_badge_animation_speed', 'form_title', 'form_subtitle',
@@ -3851,17 +3846,15 @@ function ft_next_homepage_render_admin() {
 
                     <?php ft_next_homepage_card_open('Business details (schema)'); ?>
                         <div class="ft-next-field-stack">
-                            <small>Used in the homepage LocalBusiness schema. Keep it the same as the Contact page and Google Business Profile. The address is only added when street or city is filled.</small>
+                            <small>Used in the homepage LocalBusiness schema. Keep it the same as the Contact page and Google Business Profile. The address is the head office (not a showroom) and is only added when street or city is filled.</small>
                             <?php
                             $ft_business_fields = [
                                 'business_hours' => ['Opening hours', 'Comma separated. Example: Mo-Fr 09:00-18:00, Sa 10:00-16:00'],
-                                'business_street' => ['Street address', ''],
-                                'business_city' => ['City', ''],
-                                'business_region' => ['Province', 'Example: ON'],
-                                'business_postal_code' => ['Postal code', ''],
-                                'business_country' => ['Country code', 'Example: CA'],
-                                'business_latitude' => ['Latitude', 'Example: 43.7615'],
-                                'business_longitude' => ['Longitude', 'Example: -79.4111'],
+                                'business_street' => ['Head office street', ''],
+                                'business_city' => ['Head office city', ''],
+                                'business_region' => ['Head office province', 'Example: ON'],
+                                'business_postal_code' => ['Head office postal code', ''],
+                                'business_country' => ['Head office country code', 'Example: CA'],
                                 'business_area_served' => ['Areas served', 'Comma separated. Example: Greater Toronto Area, Ottawa'],
                             ];
                             foreach ($ft_business_fields as $ft_key => $ft_field) : ?>
