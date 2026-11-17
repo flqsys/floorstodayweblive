@@ -66,7 +66,12 @@ function ft_next_homepage_local_business_schema($settings, $url, $description, $
         $schema['logo'] = ft_next_homepage_https_url($settings['logo_image']);
     }
 
-    $hours = array_values(array_filter(array_map('trim', explode(',', (string) ($settings['business_hours'] ?? '')))));
+    $hours_raw = trim((string) ($settings['business_hours'] ?? ''));
+    // The first default was wrong; the business is open 24/7.
+    if ($hours_raw === 'Mo-Fr 09:00-18:00, Sa 10:00-16:00') {
+        $hours_raw = 'Mo-Su 00:00-23:59';
+    }
+    $hours = array_values(array_filter(array_map('trim', explode(',', $hours_raw))));
     if ($hours) {
         $schema['openingHours'] = count($hours) === 1 ? $hours[0] : $hours;
     }
@@ -158,7 +163,7 @@ function ft_next_homepage_defaults() {
         'seo_og_description' => 'Free in-home flooring estimates, transparent pricing and professional installation across Ontario.',
         'seo_og_image' => '',
         // Business details for the homepage LocalBusiness schema.
-        'business_hours' => 'Mo-Fr 09:00-18:00, Sa 10:00-16:00',
+        'business_hours' => 'Mo-Su 00:00-23:59',
         'business_street' => '',
         'business_city' => '',
         'business_region' => 'ON',
@@ -3849,7 +3854,7 @@ function ft_next_homepage_render_admin() {
                             <small>Used in the homepage LocalBusiness schema. Keep it the same as the Contact page and Google Business Profile. The address is the head office (not a showroom) and is only added when street or city is filled.</small>
                             <?php
                             $ft_business_fields = [
-                                'business_hours' => ['Opening hours', 'Comma separated. Example: Mo-Fr 09:00-18:00, Sa 10:00-16:00'],
+                                'business_hours' => ['Opening hours', 'Schema format. 24/7 is Mo-Su 00:00-23:59. Several ranges: Mo-Fr 09:00-18:00, Sa 10:00-16:00'],
                                 'business_street' => ['Head office street', ''],
                                 'business_city' => ['Head office city', ''],
                                 'business_region' => ['Head office province', 'Example: ON'],
