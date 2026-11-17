@@ -25,6 +25,103 @@ function ft_next_ensure_script_wrapped($code) {
     return '<script>' . $code . '</script>';
 }
 
+/**
+ * Turns a URL into https and gives a bare domain a trailing slash
+ * ("http://floorstoday.ca" -> "https://floorstoday.ca/"). Cloudflare only
+ * rewrites http in href/src attributes, so og:url and the JSON-LD kept http.
+ */
+function ft_next_homepage_https_url($url) {
+    $url = trim((string) $url);
+    if ($url === '') {
+        return $url;
+    }
+    $url = preg_replace('#^http://#i', 'https://', $url);
+    if (!wp_parse_url($url, PHP_URL_PATH)) {
+        $url .= '/';
+    }
+    return $url;
+}
+
+/**
+ * LocalBusiness JSON-LD for the homepage. Only flooring menu items are listed
+ * as services (menu links such as Blog are left out), and hours, address, geo,
+ * areas served and sameAs come from Home Settings.
+ */
+function ft_next_homepage_local_business_schema($settings, $url, $description, $image) {
+    $schema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'HomeAndConstructionBusiness',
+        '@id' => $url . '#business',
+        'name' => $settings['logo_text'],
+        'description' => $description,
+        'url' => $url,
+        'telephone' => $settings['phone'],
+        'email' => $settings['email'],
+        'priceRange' => '$$',
+    ];
+    if ($image) {
+        $schema['image'] = $image;
+    }
+    if (!empty($settings['logo_image'])) {
+        $schema['logo'] = ft_next_homepage_https_url($settings['logo_image']);
+    }
+
+    $hours = array_values(array_filter(array_map('trim', explode(',', (string) ($settings['business_hours'] ?? '')))));
+    if ($hours) {
+        $schema['openingHours'] = count($hours) === 1 ? $hours[0] : $hours;
+    }
+
+    $address = array_filter([
+        'streetAddress' => trim((string) ($settings['business_street'] ?? '')),
+        'addressLocality' => trim((string) ($settings['business_city'] ?? '')),
+        'addressRegion' => trim((string) ($settings['business_region'] ?? '')),
+        'postalCode' => trim((string) ($settings['business_postal_code'] ?? '')),
+        'addressCountry' => trim((string) ($settings['business_country'] ?? '')),
+    ]);
+    if (!empty($address['streetAddress']) || !empty($address['addressLocality'])) {
+        $schema['address'] = ['@type' => 'PostalAddress'] + $address;
+    }
+
+    $lat = trim((string) ($settings['business_latitude'] ?? ''));
+    $lng = trim((string) ($settings['business_longitude'] ?? ''));
+    if (is_numeric($lat) && is_numeric($lng)) {
+        $schema['geo'] = ['@type' => 'GeoCoordinates', 'latitude' => (float) $lat, 'longitude' => (float) $lng];
+    }
+
+    $area = trim((string) ($settings['business_area_served'] ?? ''));
+    if ($area !== '') {
+        $schema['areaServed'] = array_map(function ($name) {
+            return ['@type' => 'Place', 'name' => $name];
+        }, array_values(array_filter(array_map('trim', explode(',', $area)))));
+    }
+
+    $same_as = [];
+    foreach (['facebook_url', 'instagram_url', 'linkedin_url', 'youtube_url', 'tiktok_url'] as $key) {
+        $profile = trim((string) ($settings[$key] ?? ''));
+        if ($profile !== '' && preg_match('#^https?://#i', $profile)) {
+            $same_as[] = ft_next_homepage_https_url($profile);
+        }
+    }
+    if ($same_as) {
+        $schema['sameAs'] = $same_as;
+    }
+
+    $offers = [];
+    foreach ((array) ($settings['nav_items'] ?? []) as $nav_item) {
+        $nav_name = is_array($nav_item) ? trim((string) ($nav_item['name'] ?? '')) : '';
+        if ($nav_name === '' || !preg_match('/hardwood|laminate|vinyl|carpet|tile|floor|stair|engineered|spc|lvp/i', $nav_name)) {
+            continue;
+        }
+        $service = stripos($nav_name, 'install') !== false ? $nav_name : $nav_name . ' Installation';
+        $offers[] = ['@type' => 'Offer', 'itemOffered' => ['@type' => 'Service', 'name' => $service]];
+    }
+    if ($offers) {
+        $schema['hasOfferCatalog'] = ['@type' => 'OfferCatalog', 'name' => 'Flooring Services', 'itemListElement' => $offers];
+    }
+
+    return $schema;
+}
+
 function ft_next_homepage_defaults() {
     $public_url = untrailingslashit(ft_next_homepage_asset_url());
 
@@ -63,6 +160,16 @@ function ft_next_homepage_defaults() {
         'seo_og_title' => 'Floors Today | Premium Flooring in Ontario',
         'seo_og_description' => 'Free in-home flooring estimates, transparent pricing and professional installation across Ontario.',
         'seo_og_image' => '',
+        // Business details for the homepage LocalBusiness schema.
+        'business_hours' => 'Mo-Fr 09:00-18:00, Sa 10:00-16:00',
+        'business_street' => '',
+        'business_city' => '',
+        'business_region' => 'ON',
+        'business_postal_code' => '',
+        'business_country' => 'CA',
+        'business_latitude' => '',
+        'business_longitude' => '',
+        'business_area_served' => '',
         'button_radius' => '8px',
         'button_font_weight' => '700',
         'button_text_transform' => 'none',
@@ -1147,11 +1254,14 @@ add_action('template_redirect', function () {
 
     $seo_title = $settings['seo_title'];
     $seo_description = $settings['seo_description'];
-    $seo_canonical = $settings['seo_canonical_url'] ?: home_url('/');
+    $seo_canonical = ft_next_homepage_https_url($settings['seo_canonical_url'] ?: home_url('/'));
     $seo_robots = $settings['seo_robots'];
     $seo_og_title = $settings['seo_og_title'] ?: $seo_title;
     $seo_og_description = $settings['seo_og_description'] ?: $seo_description;
     $seo_og_image = $settings['seo_og_image'] ?: $settings['hero_image'];
+    if (str_starts_with((string) $seo_og_image, 'http://')) {
+        $seo_og_image = ft_next_homepage_https_url($seo_og_image);
+    }
     // Parse src and id from the embed code and pass them to React as clean values.
     $settings_for_react = $settings;
     $embed_raw = trim($settings['testimonials_embed_code'] ?? '');
@@ -1219,29 +1329,7 @@ add_action('template_redirect', function () {
 
     $html = str_replace('</head>', $seo_tags . ft_next_homepage_runtime_bridge($settings) . '</head>', $html);
 
-    $schema = [
-        '@context' => 'https://schema.org',
-        '@type' => 'LocalBusiness',
-        'name' => $settings['logo_text'],
-        'description' => $seo_description,
-        'url' => $seo_canonical,
-        'telephone' => $settings['phone'],
-        'email' => $settings['email'],
-        'image' => $seo_og_image,
-        'areaServed' => $settings['service_area'],
-        'priceRange' => '$$',
-        'openingHours' => 'Mo-Fr 09:00-18:00, Sa 10:00-16:00',
-    ];
-    $schema_offers = [];
-    foreach ((array) ($settings['nav_items'] ?? []) as $nav_item) {
-        $nav_name = is_array($nav_item) ? trim((string) ($nav_item['name'] ?? '')) : '';
-        if ($nav_name !== '') {
-            $schema_offers[] = ['@type' => 'Offer', 'itemOffered' => ['@type' => 'Service', 'name' => $nav_name . ' Installation']];
-        }
-    }
-    if ($schema_offers) {
-        $schema['hasOfferCatalog'] = ['@type' => 'OfferCatalog', 'name' => 'Flooring Services', 'itemListElement' => $schema_offers];
-    }
+    $schema = ft_next_homepage_local_business_schema($settings, $seo_canonical, $seo_description, $seo_og_image);
     $schema_script = '<script type="application/ld+json" id="ft-home-schema">'
         . wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
         . '</script>';
@@ -2436,6 +2524,8 @@ add_action('admin_post_ft_next_homepage_save', function () {
         'footer_badge_image_4', 'footer_badge_image_5', 'footer_badge_image_6',
         'footer_badge_height',
         'seo_title', 'seo_canonical_url', 'seo_robots', 'seo_og_title', 'seo_og_image', 'hero_badge',
+        'business_hours', 'business_street', 'business_city', 'business_region', 'business_postal_code',
+        'business_country', 'business_latitude', 'business_longitude', 'business_area_served',
         'hero_badge_font_size', 'hero_badge_mobile_font_size', 'hero_badge_padding_x', 'hero_badge_padding_y',
         'hero_title', 'hero_highlight', 'hero_title_font_size', 'hero_title_mobile_font_size',
         'hero_badge_animation_location', 'hero_badge_animation_speed', 'form_title', 'form_subtitle',
@@ -3756,6 +3846,31 @@ function ft_next_homepage_render_admin() {
                                     <img class="ft-next-image-preview" src="<?php echo esc_url($settings['seo_og_image']); ?>" alt="">
                                 </div>
                             </div>
+                        </div>
+                    <?php ft_next_homepage_card_close(); ?>
+
+                    <?php ft_next_homepage_card_open('Business details (schema)'); ?>
+                        <div class="ft-next-field-stack">
+                            <small>Used in the homepage LocalBusiness schema. Keep it the same as the Contact page and Google Business Profile. The address is only added when street or city is filled.</small>
+                            <?php
+                            $ft_business_fields = [
+                                'business_hours' => ['Opening hours', 'Comma separated. Example: Mo-Fr 09:00-18:00, Sa 10:00-16:00'],
+                                'business_street' => ['Street address', ''],
+                                'business_city' => ['City', ''],
+                                'business_region' => ['Province', 'Example: ON'],
+                                'business_postal_code' => ['Postal code', ''],
+                                'business_country' => ['Country code', 'Example: CA'],
+                                'business_latitude' => ['Latitude', 'Example: 43.7615'],
+                                'business_longitude' => ['Longitude', 'Example: -79.4111'],
+                                'business_area_served' => ['Areas served', 'Comma separated. Example: Greater Toronto Area, Ottawa'],
+                            ];
+                            foreach ($ft_business_fields as $ft_key => $ft_field) : ?>
+                                <label>
+                                    <?php echo esc_html($ft_field[0]); ?>
+                                    <input name="<?php echo esc_attr($ft_key); ?>" type="text" value="<?php echo esc_attr($settings[$ft_key] ?? ''); ?>">
+                                    <?php if ($ft_field[1] !== '') : ?><small><?php echo esc_html($ft_field[1]); ?></small><?php endif; ?>
+                                </label>
+                            <?php endforeach; ?>
                         </div>
                     <?php ft_next_homepage_card_close(); ?>
 
